@@ -11,10 +11,14 @@ const MIME = {
     '.json': 'application/json',
     '.png':  'image/png',
     '.ico':  'image/x-icon',
+    '.wav':  'audio/wav',
+    '.mp3':  'audio/mpeg',
+    '.ogg':  'audio/ogg',
+    '.m4a':  'audio/mp4',
 };
 
 http.createServer((req, res) => {
-    const url      = req.url === '/' ? '/index.html' : req.url;
+    const url      = decodeURIComponent(req.url === '/' ? '/index.html' : req.url);
     const filePath = path.join(__dirname, url);
     const ext      = path.extname(filePath);
 
