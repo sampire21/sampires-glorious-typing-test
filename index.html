@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sampire's Glorious Typing Test</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -18,7 +19,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 3.5rem 2rem 4rem;
+            padding: 4.3rem 2rem 4rem;
         }
 
         h1 {
@@ -232,6 +233,15 @@
             box-shadow: none;
         }
 
+        .btn-hint {
+            display: block;
+            margin-top: 0.15rem;
+            font-size: 0.66rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+        }
+
         /* ── Hidden input ── */
         #hidden-input {
             position: absolute;
@@ -291,6 +301,62 @@
             border-color: #7c6ff7;
             box-shadow: 0 0 0 2px rgba(124, 111, 247, 0.15);
             transform: none;
+        }
+
+        .pb-celebration {
+            position: fixed;
+            inset: 0;
+            z-index: 400;
+            pointer-events: none;
+            display: none;
+        }
+
+        .pb-celebration.show { display: block; }
+
+        .pb-banner {
+            position: absolute;
+            top: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ffe082, #ffca28);
+            color: #2a1f00;
+            border: 1px solid rgba(255,255,255,0.65);
+            border-radius: 999px;
+            padding: 0.55rem 1.05rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            box-shadow: 0 10px 24px rgba(255, 193, 7, 0.35), inset 0 1px 0 rgba(255,255,255,0.8);
+            opacity: 0;
+        }
+
+        .pb-celebration.show .pb-banner {
+            animation: pbBannerPop 1.35s ease forwards;
+        }
+
+        .pb-confetti {
+            position: absolute;
+            top: -8vh;
+            width: 8px;
+            height: 12px;
+            border-radius: 2px;
+            opacity: 0;
+        }
+
+        .pb-celebration.show .pb-confetti {
+            animation: confettiFall 1.6s linear forwards;
+        }
+
+        @keyframes pbBannerPop {
+            0%   { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(0.92); }
+            16%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            84%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(0.98); }
+        }
+
+        @keyframes confettiFall {
+            0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+            10%  { opacity: 1; }
+            100% { opacity: 0.95; transform: translateY(92vh) rotate(640deg); }
         }
 
         @keyframes pop {
@@ -379,6 +445,51 @@
 
         /* ── Ranking bar ── */
         .rank-block { margin-bottom: 1.75rem; }
+
+        .result-submit {
+            margin: -0.2rem 0 1rem;
+            padding: 0.7rem 0.75rem;
+            border-radius: 10px;
+            border: 1px solid #2a2a45;
+            background: rgba(12, 12, 26, 0.7);
+            text-align: left;
+        }
+
+        .result-submit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .result-submit-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: #dbe5ff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .result-submit-label input {
+            width: 16px;
+            height: 16px;
+            accent-color: #7c6ff7;
+        }
+
+        .result-submit-status {
+            margin-top: 0.45rem;
+            min-height: 1rem;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #8fd3ff;
+        }
+
+        .result-submit-status.error {
+            color: #ff8ab8;
+        }
 
         .rank-label {
             font-size: 1rem;
@@ -507,12 +618,170 @@
             transform: none;
         }
 
-        /* ── Music toggle button ── */
-        .music-toggle {
+        .account-section {
+            margin-top: 1.25rem;
+            border-top: 1px solid #2a2a45;
+            padding-top: 0.9rem;
+        }
+
+        .account-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.7rem;
+        }
+
+        .account-title {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #b9c8ef;
+            font-weight: 700;
+        }
+
+        .account-status {
+            font-size: 0.78rem;
+            color: #d9e7ff;
+            font-weight: 700;
+        }
+
+        .auth-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .auth-grid input {
+            background: #0d1226;
+            color: #eef4ff;
+            border: 1px solid #4b5c96;
+            border-radius: 8px;
+            padding: 0.5rem 0.6rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .auth-grid input::placeholder {
+            color: #b9c8ef;
+            opacity: 0.95;
+        }
+
+        .auth-grid input:focus {
+            outline: none;
+            border-color: #7c6ff7;
+            box-shadow: 0 0 0 2px rgba(124,111,247,0.18);
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.4rem;
+        }
+
+        .auth-note {
+            font-size: 0.8rem;
+            color: #c8d7ff;
+            min-height: 1.05rem;
+            font-weight: 600;
+        }
+
+        .cloud-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+            margin-top: 0.45rem;
+        }
+
+        .cloud-metric {
+            background: #1a1a2e;
+            border: 1px solid #2a2a45;
+            border-radius: 8px;
+            padding: 0.45rem 0.55rem;
+            text-align: center;
+        }
+
+        .cloud-metric-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #7c6ff7;
+            margin-bottom: 0.15rem;
+        }
+
+        .cloud-metric-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #dbe5ff;
+        }
+
+        .leaderboard-list {
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 42px 1.2fr 1fr 92px 74px;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.5rem 0.65rem;
+            border: 1px solid #2a2a45;
+            background: #1a1a2e;
+            border-radius: 8px;
+            font-size: 0.82rem;
+        }
+
+        .lb-rank { color: #7c6ff7; font-weight: 700; }
+        .lb-user { color: #dbe5ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lb-mode { color: #8ec5ff; text-transform: capitalize; }
+        .lb-wpm  { color: #e2e8f0; font-weight: 700; text-align: right; }
+        .lb-acc  { color: #93a7da; }
+        .lb-head {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #8ea8d8;
+            background: transparent;
+            border: none;
+            padding-top: 0;
+            padding-bottom: 0.2rem;
+        }
+        .lb-head .lb-wpm,
+        .lb-head .lb-acc {
+            font-weight: 600;
+        }
+        .lb-head .lb-mode {
+            text-transform: uppercase;
+        }
+
+        .top-controls {
             position: fixed;
             top: 1rem;
-            right: 6.8rem;
+            right: 1rem;
             z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            max-width: calc(100vw - 1.5rem);
+        }
+
+        .top-controls .music-toggle,
+        .top-controls .keysound-toggle,
+        .top-controls .leaderboard-toggle,
+        .top-controls .theme-toggle {
+            position: static;
+            top: auto;
+            right: auto;
+            margin: 0;
+        }
+
+        /* ── Music toggle button ── */
+        .music-toggle {
             display: flex;
             align-items: center;
             gap: 0.3rem;
@@ -529,10 +798,22 @@
         }
 
         .keysound-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 10.9rem;
-            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-family: inherit;
+            cursor: pointer;
+            background: #1a1a2e;
+            color: #6b7280;
+            border: 1px solid #2a2a45;
+            box-shadow: none;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        .leaderboard-toggle {
             display: flex;
             align-items: center;
             gap: 0.35rem;
@@ -570,6 +851,17 @@
             text-shadow: none;
         }
 
+        body[data-theme="aero"] .leaderboard-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.42);
+            color: #003a12;
+            border-color: rgba(255,255,255,0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 3px 10px rgba(30,130,60,0.18), inset 0 1px 0 rgba(255,255,255,0.88);
+            text-shadow: none;
+        }
+
         body[data-theme="aero"] .music-toggle:hover {
             background: rgba(255,255,255,0.62);
             transform: none;
@@ -582,12 +874,14 @@
             box-shadow: 0 4px 14px rgba(30,150,70,0.22), inset 0 1px 0 rgba(255,255,255,0.95);
         }
 
+        body[data-theme="aero"] .leaderboard-toggle:hover {
+            background: rgba(255,255,255,0.62);
+            transform: none;
+            box-shadow: 0 4px 14px rgba(30,150,70,0.22), inset 0 1px 0 rgba(255,255,255,0.95);
+        }
+
         /* ── Theme toggle button ── */
         .theme-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 200;
             display: flex;
             align-items: center;
             gap: 0.4rem;
@@ -603,6 +897,16 @@
             box-shadow: none;
             transition: background 0.2s, color 0.2s, border-color 0.2s;
         }
+
+        .toggle-indicator {
+            margin-left: 0.2rem;
+            font-weight: 800;
+            font-size: 0.8rem;
+            line-height: 1;
+        }
+
+        .toggle-indicator.on { color: #4ade80; }
+        .toggle-indicator.off { color: #ef4444; }
 
         .theme-toggle:hover {
             background: #242442;
@@ -729,7 +1033,8 @@
 
         body:not([data-theme="aero"]) .theme-toggle,
         body:not([data-theme="aero"]) .music-toggle,
-        body:not([data-theme="aero"]) .keysound-toggle {
+        body:not([data-theme="aero"]) .keysound-toggle,
+        body:not([data-theme="aero"]) .leaderboard-toggle {
             background: rgba(17, 14, 44, 0.78);
             color: #8ec5ff;
             border-color: rgba(109, 153, 255, 0.55);
@@ -738,7 +1043,8 @@
 
         body:not([data-theme="aero"]) .theme-toggle:hover,
         body:not([data-theme="aero"]) .music-toggle:hover,
-        body:not([data-theme="aero"]) .keysound-toggle:hover {
+        body:not([data-theme="aero"]) .keysound-toggle:hover,
+        body:not([data-theme="aero"]) .leaderboard-toggle:hover {
             background: rgba(36, 26, 82, 0.9);
             color: #d6eaff;
             border-color: rgba(143, 201, 255, 0.74);
@@ -1251,6 +1557,14 @@
         body[data-theme="aero"] .result-extra-label { color: #1a5f1a; }
         body[data-theme="aero"] .result-extra-value { color: #062806; }
         body[data-theme="aero"] .result-extra-value--small { color: #2e7d32; }
+        body[data-theme="aero"] .result-submit {
+            border-color: #7f9db9;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(236,243,253,0.86) 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.96), inset 0 -1px 0 rgba(170,190,220,0.48);
+        }
+        body[data-theme="aero"] .result-submit-label { color: #123b79; }
+        body[data-theme="aero"] .result-submit-status { color: #1a5f1a; }
+        body[data-theme="aero"] .result-submit-status.error { color: #a32222; }
 
         body[data-theme="aero"] .rank-bar-track { background: rgba(0,80,20,0.12); }
         body[data-theme="aero"] .rank-bar-fill  { background: linear-gradient(90deg, #52c85a, #29b6f6); }
@@ -1297,7 +1611,8 @@
 
         body[data-theme="aero"] .theme-toggle,
         body[data-theme="aero"] .music-toggle,
-        body[data-theme="aero"] .keysound-toggle {
+        body[data-theme="aero"] .keysound-toggle,
+        body[data-theme="aero"] .leaderboard-toggle {
             background: linear-gradient(180deg, #fdfefe 0%, #e9f2ff 42%, #c6dbff 48%, #9fc0f4 100%);
             color: #0b2f66;
             border-color: #316ac5;
@@ -1312,7 +1627,8 @@
 
         body[data-theme="aero"] .theme-toggle:hover,
         body[data-theme="aero"] .music-toggle:hover,
-        body[data-theme="aero"] .keysound-toggle:hover {
+        body[data-theme="aero"] .keysound-toggle:hover,
+        body[data-theme="aero"] .leaderboard-toggle:hover {
             background: linear-gradient(180deg, #ffffff 0%, #eef5ff 40%, #d2e4ff 52%, #b3cff8 100%);
             transform: none;
             box-shadow: 0 1px 0 rgba(255,255,255,0.85), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(95,145,215,0.4);
@@ -1472,7 +1788,8 @@
 
         body[data-theme="aero"] .theme-toggle,
         body[data-theme="aero"] .music-toggle,
-        body[data-theme="aero"] .keysound-toggle {
+        body[data-theme="aero"] .keysound-toggle,
+        body[data-theme="aero"] .leaderboard-toggle {
             min-width: 38px;
             min-height: 28px;
             border-radius: 3px;
@@ -1487,9 +1804,111 @@
 
         body[data-theme="aero"] .theme-toggle:hover,
         body[data-theme="aero"] .music-toggle:hover,
-        body[data-theme="aero"] .keysound-toggle:hover {
+        body[data-theme="aero"] .keysound-toggle:hover,
+        body[data-theme="aero"] .leaderboard-toggle:hover {
             background: linear-gradient(180deg, rgba(143, 210, 226, 0.95) 0%, rgba(98, 168, 191, 0.95) 100%);
             box-shadow: inset 0 1px 0 rgba(236, 254, 255, 0.68);
+        }
+
+        .leaderboard-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 260;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(5, 7, 22, 0.62);
+            padding: 1rem;
+        }
+
+        .leaderboard-modal.show {
+            display: flex;
+        }
+
+        .leaderboard-modal-card {
+            width: min(860px, 100%);
+            max-height: min(82vh, 760px);
+            overflow: auto;
+            border-radius: 14px;
+            border: 1px solid #2a2a45;
+            background: rgba(10, 11, 34, 0.9);
+            box-shadow: 0 16px 38px rgba(2, 2, 18, 0.58);
+            padding: 0.9rem 0.95rem 1rem;
+        }
+
+        .leaderboard-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.55rem;
+        }
+
+        .leaderboard-modal-title {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #dbe5ff;
+        }
+
+        .leaderboard-modal-close {
+            min-width: 30px;
+            min-height: 28px;
+            padding: 0;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        body[data-theme="aero"] .leaderboard-modal {
+            background: rgba(7, 42, 56, 0.3);
+        }
+
+        body[data-theme="aero"] .leaderboard-modal-card {
+            border-radius: 8px;
+            border: 1px solid #7dbacc;
+            background: linear-gradient(180deg, rgba(126, 190, 214, 0.9) 0%, rgba(111, 175, 202, 0.9) 100%);
+            box-shadow: 0 12px 26px rgba(20, 84, 117, 0.32), inset 0 1px 0 rgba(228, 252, 255, 0.55);
+        }
+
+        body[data-theme="aero"] .leaderboard-modal-title {
+            color: #f0fdff;
+            text-shadow: 0 1px 0 rgba(27, 85, 112, 0.45);
+        }
+
+        body[data-theme="aero"] .leaderboard-row {
+            border-color: #81bed0;
+            background: linear-gradient(180deg, rgba(136, 196, 218, 0.66) 0%, rgba(119, 180, 206, 0.64) 100%);
+            color: #05364d;
+        }
+
+        body[data-theme="aero"] .account-title,
+        body[data-theme="aero"] .account-status,
+        body[data-theme="aero"] .auth-note {
+            color: #083f58;
+        }
+
+        body[data-theme="aero"] .auth-grid input {
+            background: rgba(235, 250, 255, 0.88);
+            color: #08364c;
+            border-color: #6aaec2;
+        }
+
+        body[data-theme="aero"] .auth-grid input::placeholder {
+            color: rgba(8, 63, 88, 0.78);
+        }
+
+        body[data-theme="aero"] .lb-head {
+            color: rgba(7, 67, 88, 0.8);
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        body[data-theme="aero"] .lb-rank,
+        body[data-theme="aero"] .lb-user,
+        body[data-theme="aero"] .lb-mode,
+        body[data-theme="aero"] .lb-wpm,
+        body[data-theme="aero"] .lb-acc {
+            color: #083f58;
         }
 
         body[data-theme="aero"] .history-section {
@@ -1704,6 +2123,37 @@
             z-index: 1;
         }
 
+        /* Production-safe Aero color normalization */
+        body[data-theme="aero"] {
+            background:
+                radial-gradient(ellipse 520px 280px at 8% 10%, rgba(255,255,255,0.62) 0%, transparent 55%),
+                radial-gradient(ellipse 460px 240px at 68% 5%, rgba(255,255,255,0.56) 0%, transparent 52%),
+                linear-gradient(180deg, #1f8fda 0%, #5bbbe8 40%, #b9e9ff 58%, #7ecf66 70%, #5aac44 86%, #4a9439 100%) !important;
+            color: #10324e;
+        }
+
+        body[data-theme="aero"] .container {
+            background: linear-gradient(180deg, rgba(124, 188, 214, 0.70) 0%, rgba(112, 176, 205, 0.68) 100%) !important;
+            border-color: #79bbd1 !important;
+            box-shadow: 0 12px 26px rgba(22, 82, 120, 0.28), inset 0 1px 0 rgba(233, 252, 255, 0.58) !important;
+        }
+
+        body[data-theme="aero"] .stat,
+        body[data-theme="aero"] .result-stats .stat,
+        body[data-theme="aero"] .result-extra-item,
+        body[data-theme="aero"] .history-row,
+        body[data-theme="aero"] .quote-display {
+            background: linear-gradient(180deg, rgba(130, 195, 219, 0.58) 0%, rgba(117, 182, 208, 0.56) 100%) !important;
+            border-color: rgba(129, 193, 216, 0.92) !important;
+            box-shadow: inset 0 1px 0 rgba(229, 252, 255, 0.46), inset 0 -1px 0 rgba(80, 140, 166, 0.28) !important;
+        }
+
+        /* The skyline/ground layer can overpower colors on some deployed renderers. */
+        body[data-theme="aero"] .aero-city,
+        body[data-theme="aero"] .aero-horizon-blur {
+            display: none !important;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 500px) {
             h1 { font-size: 1.45rem; }
@@ -1712,6 +2162,12 @@
             .history-row { grid-template-columns: 58px 52px 66px 50px 1fr; font-size: 0.75rem; }
             .wpm-chart         { height: 90px; }
             .wpm-chart--result { height: 100px; }
+            .top-controls { left: 1rem; right: 1rem; gap: 0.35rem; }
+            .leaderboard-row {
+                grid-template-columns: 32px 1fr 0.9fr 70px 60px;
+                font-size: 0.72rem;
+                gap: 0.3rem;
+            }
         }
     </style>
 </head>
@@ -1910,19 +2366,29 @@
     </svg>
 </div>
 
-<button class="music-toggle" id="music-toggle" onclick="toggleMusic()">
-    <span id="music-icon">🎵</span>
-</button>
+<div class="top-controls">
+    <button class="leaderboard-toggle" id="leaderboard-toggle" onclick="openLeaderboard()">
+        <span>Leaderboards</span>
+    </button>
 
-<button class="keysound-toggle" id="keysound-toggle" onclick="toggleKeySounds()">
-    <span id="keysound-icon">⌨️</span>
-    <span id="keysound-label">Keys Off</span>
-</button>
+    <button class="keysound-toggle" id="keysound-toggle" onclick="toggleKeySounds()">
+        <span id="keysound-label">Key Sounds</span>
+        <span id="keysound-state" class="toggle-indicator off">✗</span>
+    </button>
 
-<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
-    <span id="theme-icon">🌊</span>
-    <span id="theme-label">Aero</span>
-</button>
+    <button class="music-toggle" id="music-toggle" onclick="toggleMusic()">
+        <span>Music</span>
+        <span id="music-state" class="toggle-indicator on">✓</span>
+    </button>
+
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+        <span id="theme-label">Frutiger Aero</span>
+    </button>
+</div>
+
+<div class="pb-celebration" id="pb-celebration" aria-hidden="true">
+    <div class="pb-banner">New Personal Best!</div>
+</div>
 
 <h1>Sampire's Glorious Typing Test</h1>
 
@@ -1979,6 +2445,47 @@
         <button class="history-clear" onclick="clearHistory()">Clear history</button>
     </div>
 
+    <div class="account-section" id="account-section">
+        <div class="account-header">
+            <span class="account-title">Account</span>
+            <span class="account-status" id="account-status">Not logged in</span>
+        </div>
+        <div class="auth-grid" id="auth-grid">
+            <input id="auth-username" type="text" maxlength="24" placeholder="username (a-z, 0-9, _)">
+            <input id="auth-password" type="password" maxlength="72" placeholder="password (min 6 chars)">
+            <button type="button" class="secondary" onclick="loginUser()">Login</button>
+        </div>
+        <div class="auth-actions">
+            <button type="button" class="secondary" onclick="signupUser()">Sign Up</button>
+            <button type="button" class="secondary" id="logout-btn" onclick="logoutUser()" style="display:none;">Logout</button>
+        </div>
+        <div class="auth-note" id="auth-note"></div>
+        <div class="cloud-metrics" id="cloud-metrics" style="display:none;">
+            <div class="cloud-metric">
+                <div class="cloud-metric-label">Cloud Best</div>
+                <div class="cloud-metric-value" id="cloud-best">0</div>
+            </div>
+            <div class="cloud-metric">
+                <div class="cloud-metric-label">Cloud Avg</div>
+                <div class="cloud-metric-value" id="cloud-avg">0</div>
+            </div>
+            <div class="cloud-metric">
+                <div class="cloud-metric-label">Cloud Tests</div>
+                <div class="cloud-metric-value" id="cloud-tests">0</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="leaderboard-modal" id="leaderboard-modal" aria-hidden="true" onclick="handleLeaderboardBackdrop(event)">
+    <div class="leaderboard-modal-card" role="dialog" aria-modal="true" aria-labelledby="leaderboard-modal-title">
+        <div class="leaderboard-modal-header">
+            <div class="leaderboard-modal-title" id="leaderboard-modal-title">Leaderboard</div>
+            <button type="button" class="leaderboard-modal-close secondary" onclick="closeLeaderboard()">X</button>
+        </div>
+        <div class="leaderboard-list" id="leaderboard-list"></div>
+    </div>
 </div>
 
 <!-- Result overlay -->
@@ -2050,9 +2557,19 @@
             </div>
             <div class="rank-caption" id="rank-caption">—</div>
         </div>
+        <div class="result-submit">
+            <div class="result-submit-row">
+                <label class="result-submit-label" for="result-submit-toggle">
+                    <input id="result-submit-toggle" type="checkbox" onchange="onResultSubmitToggleChange()">
+                    Submit this run to the leaderboard
+                </label>
+                <button type="button" class="secondary" id="result-submit-btn" onclick="submitCompletedRun()">Submit Run</button>
+            </div>
+            <div class="result-submit-status" id="result-submit-status"></div>
+        </div>
         <div class="buttons">
-            <button class="new-test-btn" onclick="newTest()">New Quote</button>
-            <button class="secondary" onclick="tryAgain()">Try Again</button>
+            <button class="new-test-btn" onclick="newTest()">New Quote<span class="btn-hint">(Spacebar)</span></button>
+            <button class="secondary" onclick="tryAgain()">Try Again<span class="btn-hint">(Tab)</span></button>
         </div>
     </div>
 </div>
@@ -2657,6 +3174,458 @@ function getPopulationRank(wpm) {
 // ── History ────────────────────────────────────────────────────────────────
 const HISTORY_KEY = 'sampire-typing-history';
 const MAX_HISTORY = 50;
+const AUTH_TOKEN_KEY = 'sampire-auth-token';
+const SUBMIT_RUN_PREF_KEY = 'sampire-submit-run-pref';
+const LOCAL_AUTH_USERS_KEY = 'sampire-local-auth-users';
+const LOCAL_AUTH_SCORES_KEY = 'sampire-local-auth-scores';
+let authToken = null;
+let currentUser = null;
+let localApiFallbackActive = false;
+let pendingLeaderboardScore = null;
+let pendingLeaderboardSubmitted = false;
+
+function loadLocalJson(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed == null ? fallback : parsed;
+    } catch (e) {
+        return fallback;
+    }
+}
+
+function saveLocalJson(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+function makeLocalToken(userId) {
+    return `local-token:${userId}`;
+}
+
+function getLocalUserFromAuth(headers = {}) {
+    const auth = headers.Authorization || headers.authorization || '';
+    if (!auth.startsWith('Bearer ')) return null;
+    const token = auth.slice(7);
+    if (!token.startsWith('local-token:')) return null;
+    const userId = token.slice('local-token:'.length);
+    const users = loadLocalJson(LOCAL_AUTH_USERS_KEY, []);
+    const user = users.find(u => u.id === userId);
+    if (!user) return null;
+    return { id: user.id, username: user.username };
+}
+
+function localApiError(status, error) {
+    const err = new Error(error || `Request failed (${status})`);
+    err.status = status;
+    err.payload = { error };
+    throw err;
+}
+
+async function localApiFetch(url, options = {}, headers = {}) {
+    const method = String(options.method || 'GET').toUpperCase();
+    const parsed = new URL(url, 'https://local.app');
+    const pathname = parsed.pathname;
+    const params = parsed.searchParams;
+    let body = {};
+    if (options.body) {
+        try { body = JSON.parse(options.body); } catch (e) {}
+    }
+
+    const users = loadLocalJson(LOCAL_AUTH_USERS_KEY, []);
+    const scores = loadLocalJson(LOCAL_AUTH_SCORES_KEY, []);
+    const isBetterScore = (candidate, baseline) => {
+        if (!baseline) return true;
+        if ((candidate.wpm || 0) > (baseline.wpm || 0)) return true;
+        if ((candidate.wpm || 0) < (baseline.wpm || 0)) return false;
+        if ((candidate.accuracy || 0) > (baseline.accuracy || 0)) return true;
+        if ((candidate.accuracy || 0) < (baseline.accuracy || 0)) return false;
+        return (candidate.date || 0) > (baseline.date || 0);
+    };
+
+    if (method === 'POST' && pathname === '/api/signup') {
+        const usernameRaw = String(body.username || '').trim();
+        const usernameNorm = usernameRaw.toLowerCase();
+        const password = String(body.password || '');
+        if (!usernameNorm || usernameNorm.length < 3 || usernameNorm.length > 24 || !/^[a-z0-9_]+$/.test(usernameNorm)) {
+            localApiError(400, 'Username must be 3-24 chars: a-z, 0-9, _');
+        }
+        if (password.length < 6) localApiError(400, 'Password must be at least 6 characters');
+        if (users.some(u => u.usernameNorm === usernameNorm)) localApiError(409, 'Username already exists');
+        const user = {
+            id: crypto.randomUUID(),
+            username: usernameRaw,
+            usernameNorm,
+            password,
+            createdAt: Date.now(),
+        };
+        users.push(user);
+        saveLocalJson(LOCAL_AUTH_USERS_KEY, users);
+        return { user: { id: user.id, username: user.username }, token: makeLocalToken(user.id) };
+    }
+
+    if (method === 'POST' && pathname === '/api/login') {
+        const usernameNorm = String(body.username || '').trim().toLowerCase();
+        const password = String(body.password || '');
+        const user = users.find(u => u.usernameNorm === usernameNorm && u.password === password);
+        if (!user) localApiError(401, 'Invalid username or password');
+        return { user: { id: user.id, username: user.username }, token: makeLocalToken(user.id) };
+    }
+
+    if (method === 'GET' && pathname === '/api/me') {
+        const user = getLocalUserFromAuth(headers);
+        if (!user) localApiError(401, 'Unauthorized');
+        return { user };
+    }
+
+    if (method === 'POST' && pathname === '/api/scores') {
+        const user = getLocalUserFromAuth(headers);
+        if (!user) localApiError(401, 'Unauthorized');
+        const score = {
+            id: crypto.randomUUID(),
+            userId: user.id,
+            username: user.username,
+            wpm: Number(body.wpm) || 0,
+            accuracy: Number(body.accuracy) || 0,
+            rawWpm: Number(body.rawWpm) || 0,
+            consistency: Number(body.consistency) || 0,
+            time: Number(body.time) || 0,
+            mode: String(body.mode || 'quotes'),
+            date: Number(body.date) || Date.now(),
+            createdAt: Date.now(),
+        };
+        if (score.wpm < 0 || score.wpm > 400) localApiError(400, 'Invalid score payload');
+        const existingIdx = scores.findIndex(s => s.userId === user.id && s.mode === score.mode);
+        const existing = existingIdx >= 0 ? scores[existingIdx] : null;
+        if (!isBetterScore(score, existing)) {
+            localApiError(409, 'Only your best run for this mode can be submitted.');
+        }
+        if (existingIdx >= 0) scores[existingIdx] = score;
+        else scores.push(score);
+        if (scores.length > 5000) scores.splice(0, scores.length - 5000);
+        saveLocalJson(LOCAL_AUTH_SCORES_KEY, scores);
+        return { ok: true, score };
+    }
+
+    if (method === 'GET' && pathname === '/api/scores/me') {
+        const user = getLocalUserFromAuth(headers);
+        if (!user) localApiError(401, 'Unauthorized');
+        const limit = Math.max(1, Math.min(200, Number(params.get('limit') || 50)));
+        const mode = (params.get('mode') || '').trim();
+        const list = scores
+            .filter(s => s.userId === user.id && (!mode || s.mode === mode))
+            .sort((a, b) => b.date - a.date)
+            .slice(0, limit);
+        return { scores: list };
+    }
+
+    if (method === 'GET' && pathname === '/api/leaderboard') {
+        const limit = Math.max(1, Math.min(100, Number(params.get('limit') || 20)));
+        const mode = (params.get('mode') || '').trim();
+        const bestByUserMode = new Map();
+        for (const score of scores) {
+            if (mode && score.mode !== mode) continue;
+            const key = `${score.userId}::${score.mode}`;
+            const prev = bestByUserMode.get(key);
+            if (isBetterScore(score, prev)) bestByUserMode.set(key, score);
+        }
+        const leaderboard = [...bestByUserMode.values()]
+            .sort((a, b) => b.wpm - a.wpm || b.accuracy - a.accuracy || b.date - a.date)
+            .slice(0, limit)
+            .map(s => ({
+                username: s.username,
+                mode: s.mode,
+                wpm: s.wpm,
+                accuracy: s.accuracy,
+                date: s.date,
+            }));
+        return { leaderboard };
+    }
+
+    localApiError(404, 'Not found');
+}
+
+async function apiFetch(url, options = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+    };
+    if (authToken) headers.Authorization = `Bearer ${authToken}`;
+    const isWebContext = location.protocol === 'http:' || location.protocol === 'https:';
+    if (!isWebContext) {
+        localApiFallbackActive = true;
+        return localApiFetch(url, options, headers);
+    }
+
+    try {
+        const res = await fetch(url, { ...options, headers });
+        let data = {};
+        try { data = await res.json(); } catch (e) {}
+        if (!res.ok) {
+            const msg = data && data.error ? data.error : `Request failed (${res.status})`;
+            throw new Error(msg);
+        }
+        return data;
+    } catch (e) {
+        if (!localApiFallbackActive && /failed to fetch/i.test(String(e && e.message || ''))) {
+            localApiFallbackActive = true;
+            setAuthNote('Cloud API unreachable. Using local browser storage mode.', false);
+            return localApiFetch(url, options, headers);
+        }
+        throw e;
+    }
+}
+
+function setAuthNote(message, isError = false) {
+    const note = document.getElementById('auth-note');
+    if (!note) return;
+    note.textContent = message || '';
+    note.style.color = isError ? '#ff8ab8' : '#8fd3ff';
+}
+
+function updateAuthUi() {
+    const status = document.getElementById('account-status');
+    const logoutBtn = document.getElementById('logout-btn');
+    const metrics = document.getElementById('cloud-metrics');
+    if (status) status.textContent = currentUser ? `Logged in as ${currentUser.username}` : 'Not logged in';
+    if (logoutBtn) logoutBtn.style.display = currentUser ? 'inline-block' : 'none';
+    if (metrics && !currentUser) metrics.style.display = 'none';
+    updateResultSubmitUi();
+}
+
+async function signupUser() {
+    const username = document.getElementById('auth-username').value.trim();
+    const password = document.getElementById('auth-password').value;
+    try {
+        const out = await apiFetch('/api/signup', {
+            method: 'POST',
+            body: JSON.stringify({ username, password }),
+        });
+        authToken = out.token;
+        currentUser = out.user;
+        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        updateAuthUi();
+        setAuthNote('Account created and logged in.');
+        await refreshCloudProgress();
+        await refreshLeaderboard();
+    } catch (e) {
+        setAuthNote(e.message, true);
+    }
+}
+
+async function loginUser() {
+    const username = document.getElementById('auth-username').value.trim();
+    const password = document.getElementById('auth-password').value;
+    try {
+        const out = await apiFetch('/api/login', {
+            method: 'POST',
+            body: JSON.stringify({ username, password }),
+        });
+        authToken = out.token;
+        currentUser = out.user;
+        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        updateAuthUi();
+        setAuthNote('Logged in successfully.');
+        await refreshCloudProgress();
+        await refreshLeaderboard();
+    } catch (e) {
+        setAuthNote(e.message, true);
+    }
+}
+
+function logoutUser() {
+    authToken = null;
+    currentUser = null;
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    updateAuthUi();
+    setAuthNote('Logged out.');
+}
+
+async function restoreSession() {
+    authToken = localStorage.getItem(AUTH_TOKEN_KEY) || null;
+    if (!authToken) {
+        updateAuthUi();
+        return;
+    }
+    try {
+        const out = await apiFetch('/api/me');
+        currentUser = out.user;
+        updateAuthUi();
+        setAuthNote('');
+    } catch (e) {
+        authToken = null;
+        currentUser = null;
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        updateAuthUi();
+    }
+}
+
+async function saveScoreToCloud(score) {
+    if (!authToken || !currentUser) return { ok: false, error: 'Not logged in' };
+    try {
+        await apiFetch('/api/scores', {
+            method: 'POST',
+            body: JSON.stringify(score),
+        });
+        await refreshCloudProgress();
+        await refreshLeaderboard();
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, error: e.message || 'Unknown error' };
+    }
+}
+
+function setResultSubmitStatus(message, isError = false) {
+    const statusEl = document.getElementById('result-submit-status');
+    if (!statusEl) return;
+    statusEl.textContent = message || '';
+    statusEl.classList.toggle('error', !!isError);
+}
+
+function updateResultSubmitUi() {
+    const toggle = document.getElementById('result-submit-toggle');
+    const btn = document.getElementById('result-submit-btn');
+    if (!toggle || !btn) return;
+
+    const hasScore = !!pendingLeaderboardScore;
+    const canSubmit = hasScore && !!currentUser && !pendingLeaderboardSubmitted;
+    btn.disabled = !canSubmit;
+
+    if (!hasScore) {
+        setResultSubmitStatus('');
+        return;
+    }
+
+    if (pendingLeaderboardSubmitted) {
+        setResultSubmitStatus('Submitted to leaderboard.');
+        return;
+    }
+
+    if (!currentUser) {
+        setResultSubmitStatus('Log in to submit this run to the leaderboard.', true);
+        return;
+    }
+
+    if (toggle.checked) {
+        setResultSubmitStatus('Auto-submit is enabled for this run.');
+    } else {
+        setResultSubmitStatus('This run will stay local unless you click Submit Run.');
+    }
+}
+
+function onResultSubmitToggleChange() {
+    const toggle = document.getElementById('result-submit-toggle');
+    if (!toggle) return;
+    try { localStorage.setItem(SUBMIT_RUN_PREF_KEY, toggle.checked ? '1' : '0'); } catch (e) {}
+    updateResultSubmitUi();
+}
+
+async function submitCompletedRun() {
+    if (!pendingLeaderboardScore || pendingLeaderboardSubmitted) return;
+    if (!authToken || !currentUser) {
+        updateResultSubmitUi();
+        return;
+    }
+    setResultSubmitStatus('Submitting run...');
+    const result = await saveScoreToCloud(pendingLeaderboardScore);
+    if (result.ok) {
+        pendingLeaderboardSubmitted = true;
+        updateResultSubmitUi();
+        return;
+    }
+    const message = String(result.error || '');
+    if (/best run/i.test(message)) {
+        setResultSubmitStatus('Not submitted: only your personal best for this mode can be on the leaderboard.', true);
+    } else {
+        setResultSubmitStatus(`Could not submit run: ${message || 'please try again.'}`, true);
+    }
+    setAuthNote(`Cloud save failed: ${message || 'please try again.'}`, true);
+}
+
+async function refreshCloudProgress() {
+    if (!authToken || !currentUser) return;
+    try {
+        const out = await apiFetch('/api/scores/me?limit=50');
+        const scores = Array.isArray(out.scores) ? out.scores : [];
+        const metrics = document.getElementById('cloud-metrics');
+        if (!metrics) return;
+        if (scores.length === 0) {
+            document.getElementById('cloud-best').textContent = '0';
+            document.getElementById('cloud-avg').textContent = '0';
+            document.getElementById('cloud-tests').textContent = '0';
+            metrics.style.display = 'grid';
+            return;
+        }
+        const best = Math.max(...scores.map(s => s.wpm || 0));
+        const avg = Math.round(scores.reduce((acc, s) => acc + (s.wpm || 0), 0) / scores.length);
+        document.getElementById('cloud-best').textContent = String(best);
+        document.getElementById('cloud-avg').textContent = String(avg);
+        document.getElementById('cloud-tests').textContent = String(scores.length);
+        metrics.style.display = 'grid';
+    } catch (e) {
+        setAuthNote(`Failed to load cloud stats: ${e.message}`, true);
+    }
+}
+
+async function refreshLeaderboard() {
+    const listEl = document.getElementById('leaderboard-list');
+    if (!listEl) return;
+    try {
+        const out = await apiFetch('/api/leaderboard?limit=15');
+        const rows = Array.isArray(out.leaderboard) ? out.leaderboard : [];
+        if (rows.length === 0) {
+            listEl.innerHTML = '<div class="history-empty">No records yet... be the first, and carve your name into the Hall of Champions!</div>';
+            return;
+        }
+        const header = `
+            <div class="leaderboard-row lb-head">
+                <span class="lb-rank">#</span>
+                <span class="lb-user">Username</span>
+                <span class="lb-mode">Test Type</span>
+                <span class="lb-wpm">WPM</span>
+                <span class="lb-acc">Accuracy</span>
+            </div>
+        `;
+        listEl.innerHTML = header;
+        rows.forEach((row, idx) => {
+            const el = document.createElement('div');
+            el.className = 'leaderboard-row';
+            const modeLabel = row.mode === 'words30'
+                ? 'words 30s'
+                : (row.mode === 'words' ? 'random words' : 'quotes');
+            el.innerHTML = `
+                <span class="lb-rank">#${idx + 1}</span>
+                <span class="lb-user">${row.username}</span>
+                <span class="lb-mode">${modeLabel}</span>
+                <span class="lb-wpm">${Math.round(row.wpm || 0)}</span>
+                <span class="lb-acc">${Math.round(row.accuracy || 0)}%</span>
+            `;
+            listEl.appendChild(el);
+        });
+    } catch (e) {
+        listEl.innerHTML = `<div class="history-empty">Leaderboard unavailable (${e.message}).</div>`;
+    }
+}
+
+function openLeaderboard() {
+    const modal = document.getElementById('leaderboard-modal');
+    if (!modal) return;
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+    refreshLeaderboard();
+}
+
+function closeLeaderboard() {
+    const modal = document.getElementById('leaderboard-modal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+}
+
+function handleLeaderboardBackdrop(event) {
+    const modal = document.getElementById('leaderboard-modal');
+    if (event && event.target === modal) closeLeaderboard();
+}
 
 function saveToHistory(entry) {
     const history = loadHistory();
@@ -2783,13 +3752,15 @@ function showResults() {
     const prevHistory = loadHistory();
     const prevBest    = prevHistory.length > 0 ? Math.max(...prevHistory.map(h => h.wpm)) : 0;
 
-    // Save to history and refresh the list
-    saveToHistory({ wpm, rawWpm, consistency, accuracy, time, mode: currentMode, text: currentQuote, date: Date.now() });
+    // Save to local history. Leaderboard submission is user-controlled per run.
+    const scoreEntry = { wpm, rawWpm, consistency, accuracy, time, mode: currentMode, text: currentQuote, date: Date.now() };
+    saveToHistory(scoreEntry);
     renderHistory();
 
     // Play the appropriate completion sound
     if (wpm > prevBest) {
         playSound(SFX.personalBest);
+        runPersonalBestCelebration();
     } else if (wpm < 50) {
         playSound(SFX.below50);
     } else {
@@ -2798,10 +3769,22 @@ function showResults() {
 
     drawResultChart();
     resultOverlay.classList.add('show');
+
+    pendingLeaderboardScore = scoreEntry;
+    pendingLeaderboardSubmitted = false;
+    const submitToggle = document.getElementById('result-submit-toggle');
+    if (submitToggle) {
+        const storedPref = localStorage.getItem(SUBMIT_RUN_PREF_KEY);
+        submitToggle.checked = storedPref === null ? true : storedPref === '1';
+    }
+    updateResultSubmitUi();
+    if (submitToggle && submitToggle.checked && currentUser) {
+        submitCompletedRun();
+    }
 }
 
 // ── Input handling ─────────────────────────────────────────────────────────
-hiddenInput.addEventListener('keydown', (e) => {
+function handleTypingKeydown(e) {
     if (isComplete) return;
 
     if (e.key === 'Tab') {
@@ -2848,18 +3831,63 @@ hiddenInput.addEventListener('keydown', (e) => {
         isComplete = true;
         setTimeout(showResults, 400);
     }
-});
+}
+
+function isTypingIntentKey(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return false;
+    return e.key.length === 1 || e.key === 'Backspace' || e.key === 'Tab';
+}
+
+function isUserTextEntryTarget(target) {
+    if (!target) return false;
+    if (target === hiddenInput) return false;
+    const tag = (target.tagName || '').toLowerCase();
+    if (target.isContentEditable) return true;
+    if (tag === 'textarea' || tag === 'select') return true;
+    if (tag !== 'input') return false;
+    const type = (target.type || 'text').toLowerCase();
+    return type !== 'button' && type !== 'submit' && type !== 'reset' && type !== 'checkbox' && type !== 'radio' && type !== 'range' && type !== 'file' && type !== 'color';
+}
+
+hiddenInput.addEventListener('keydown', handleTypingKeydown);
 
 hiddenInput.addEventListener('blur',  () => quoteDisplay.classList.remove('focused'));
 hiddenInput.addEventListener('focus', () => quoteDisplay.classList.add('focused'));
 
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab') {
-        playKeypressSound('Tab');
-        e.preventDefault();
-        restart();
+    const resultsOpen = resultOverlay.classList.contains('show');
+    const activeEl = document.activeElement;
+
+    // Do not hijack keyboard input while user is typing in UI form fields.
+    if (isUserTextEntryTarget(activeEl)) return;
+
+    if (isComplete || resultsOpen) {
+        if (e.key === ' ') {
+            e.preventDefault();
+            newTest();
+            return;
+        }
+        if (e.key === 'Tab') {
+            playKeypressSound('Tab');
+            e.preventDefault();
+            tryAgain();
+            return;
+        }
     }
+
+    if (e.key === 'Tab') { e.preventDefault(); restart(); return; }
+
+    // If focus was lost (e.g., after clicking UI controls), first typing key should
+    // immediately re-focus the hidden input and continue the test.
+    if (!resultsOpen && activeEl !== hiddenInput && isTypingIntentKey(e)) {
+        e.preventDefault();
+        focusInput();
+        handleTypingKeydown(e);
+        return;
+    }
+
     if (e.key === 'Escape' && resultOverlay.classList.contains('show')) closeResults();
+    if (e.key === 'Escape') closeLeaderboard();
 });
 
 // ── Theme Soundtracks ────────────────────────────────────────────────────────
@@ -2878,6 +3906,7 @@ let musicNeedsUserGesture = false;
 let keySoundsEnabled = false;
 const KEY_SOUND_BASE = 'Sound Effects/nk-cream';
 const keySoundCache = new Map();
+let pbFxTimeout = null;
 
 function getActiveTheme() {
     return document.body.getAttribute('data-theme') === 'aero' ? 'aero' : 'dark';
@@ -2900,13 +3929,21 @@ function stopThemeSoundtracks() {
 
 function toggleMusic() {
     musicMuted = !musicMuted;
-    const icon = document.getElementById('music-icon');
+    const state = document.getElementById('music-state');
     if (musicMuted) {
         musicNeedsUserGesture = false;
-        icon.textContent = '🔇';
+        if (state) {
+            state.textContent = '✗';
+            state.classList.add('off');
+            state.classList.remove('on');
+        }
         stopThemeSoundtracks();
     } else {
-        icon.textContent = '🎵';
+        if (state) {
+            state.textContent = '✓';
+            state.classList.add('on');
+            state.classList.remove('off');
+        }
         playThemeSoundtrack(getActiveTheme());
     }
     try { localStorage.setItem('sampire-music-muted', musicMuted ? '1' : '0'); } catch(e) {}
@@ -2914,10 +3951,12 @@ function toggleMusic() {
 
 function setKeySoundToggleUI() {
     const label = document.getElementById('keysound-label');
-    const icon = document.getElementById('keysound-icon');
-    if (!label || !icon) return;
-    label.textContent = keySoundsEnabled ? 'Keys On' : 'Keys Off';
-    icon.textContent = keySoundsEnabled ? '⌨️' : '🔈';
+    const state = document.getElementById('keysound-state');
+    if (label) label.textContent = 'Key Sounds';
+    if (!state) return;
+    state.textContent = keySoundsEnabled ? '✓' : '✗';
+    state.classList.toggle('on', keySoundsEnabled);
+    state.classList.toggle('off', !keySoundsEnabled);
 }
 
 function toggleKeySounds() {
@@ -2958,15 +3997,14 @@ function toggleTheme() {
 }
 
 function applyTheme(theme) {
+    const themeLabel = document.getElementById('theme-label');
     if (theme === 'aero') {
         document.body.setAttribute('data-theme', 'aero');
-        document.getElementById('theme-icon').textContent  = '🌙';
-        document.getElementById('theme-label').textContent = 'Dark';
+        if (themeLabel) themeLabel.textContent = 'Dark Mode';
         if (!musicMuted) playThemeSoundtrack('aero');
     } else {
         document.body.removeAttribute('data-theme');
-        document.getElementById('theme-icon').textContent  = '🌊';
-        document.getElementById('theme-label').textContent = 'Aero';
+        if (themeLabel) themeLabel.textContent = 'Frutiger Aero';
         if (!musicMuted) playThemeSoundtrack('dark');
         else stopThemeSoundtracks();
     }
@@ -3007,10 +4045,44 @@ function playSound(audio) {
     audio.play().catch(() => {}); // silently ignore autoplay policy blocks
 }
 
+function runPersonalBestCelebration() {
+    const overlay = document.getElementById('pb-celebration');
+    if (!overlay) return;
+    overlay.innerHTML = '<div class="pb-banner">New Personal Best!</div>';
+
+    const colors = ['#ff5252', '#ffca28', '#66bb6a', '#42a5f5', '#ab47bc', '#26c6da'];
+    const pieces = 42;
+    for (let i = 0; i < pieces; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'pb-confetti';
+        piece.style.left = (Math.random() * 100).toFixed(2) + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = (Math.random() * 0.35).toFixed(2) + 's';
+        piece.style.animationDuration = (1.2 + Math.random() * 0.9).toFixed(2) + 's';
+        piece.style.width = (6 + Math.random() * 5).toFixed(0) + 'px';
+        piece.style.height = (8 + Math.random() * 8).toFixed(0) + 'px';
+        overlay.appendChild(piece);
+    }
+
+    overlay.classList.add('show');
+    if (pbFxTimeout) clearTimeout(pbFxTimeout);
+    pbFxTimeout = setTimeout(() => {
+        overlay.classList.remove('show');
+        overlay.innerHTML = '<div class="pb-banner">New Personal Best!</div>';
+    }, 2100);
+}
+
 // ── Boot ───────────────────────────────────────────────────────────────────
-musicMuted = localStorage.getItem('sampire-music-muted') === '1';
-if (musicMuted) document.getElementById('music-icon').textContent = '🔇';
-keySoundsEnabled = localStorage.getItem('sampire-key-sounds-enabled') === '1';
+const storedMusicMuted = localStorage.getItem('sampire-music-muted');
+musicMuted = storedMusicMuted === null ? false : storedMusicMuted === '1';
+const musicState = document.getElementById('music-state');
+if (musicState) {
+    musicState.textContent = musicMuted ? '✗' : '✓';
+    musicState.classList.toggle('on', !musicMuted);
+    musicState.classList.toggle('off', musicMuted);
+}
+const storedKeySoundsEnabled = localStorage.getItem('sampire-key-sounds-enabled');
+keySoundsEnabled = storedKeySoundsEnabled === null ? true : storedKeySoundsEnabled === '1';
 setKeySoundToggleUI();
 applyTheme(localStorage.getItem('sampire-theme') || 'dark');
 
@@ -3024,6 +4096,11 @@ document.addEventListener('visibilitychange', () => {
 renderHistory();
 newTest();
 sfxReady = true; // enable sounds after initial load
+updateAuthUi();
+restoreSession().then(() => {
+    refreshLeaderboard();
+    if (currentUser) refreshCloudProgress();
+});
 </script>
 </body>
 </html>
