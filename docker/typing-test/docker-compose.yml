@@ -1,0 +1,7 @@
+services:
+  typing-test:
+    image: typing-test:latest
+    container_name: typing-test
+    restart: unless-stopped
+    ports:
+      - "8080:80"
