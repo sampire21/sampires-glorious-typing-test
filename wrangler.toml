@@ -1,4 +1,7 @@
 name = "sampires-glorious-typing-test"
-pages_build_output_dir = "."
+main = "worker.js"
 compatibility_date = "2025-09-27"
 compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "."
