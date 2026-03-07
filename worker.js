@@ -18,7 +18,16 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const match = routes.find(r => r.method === request.method && r.path === url.pathname);
-    if (match) return match.handler({ request, env });
+    if (match) {
+      try {
+        return await match.handler({ request, env });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message || 'Internal server error' }), {
+          status: 500,
+          headers: { 'content-type': 'application/json' },
+        });
+      }
+    }
 
     if (url.pathname.startsWith('/api/')) {
       return new Response(JSON.stringify({ error: 'Not found' }), {
