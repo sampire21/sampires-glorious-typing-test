@@ -9,6 +9,7 @@ Thumbs.db
 # Env
 .env
 .env.*
+data/
 
 # Claude internal
 .claude/

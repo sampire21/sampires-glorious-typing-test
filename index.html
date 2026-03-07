@@ -446,52 +446,6 @@
         /* ── Ranking bar ── */
         .rank-block { margin-bottom: 1.75rem; }
 
-        .result-submit {
-            margin: -0.2rem 0 1rem;
-            padding: 0.7rem 0.75rem;
-            border-radius: 10px;
-            border: 1px solid #2a2a45;
-            background: rgba(12, 12, 26, 0.7);
-            text-align: center;
-        }
-
-        .result-submit-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.7rem;
-            flex-wrap: wrap;
-        }
-
-        .result-submit-label {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.45rem;
-            color: #dbe5ff;
-            font-size: 0.82rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .result-submit-label input {
-            width: 16px;
-            height: 16px;
-            accent-color: #7c6ff7;
-        }
-
-        .result-submit-status {
-            margin-top: 0.45rem;
-            min-height: 1rem;
-            font-size: 0.74rem;
-            font-weight: 600;
-            color: #8fd3ff;
-            text-align: center;
-        }
-
-        .result-submit-status.error {
-            color: #ff8ab8;
-        }
 
         .rank-label {
             font-size: 1rem;
@@ -1559,14 +1513,6 @@
         body[data-theme="aero"] .result-extra-label { color: #1a5f1a; }
         body[data-theme="aero"] .result-extra-value { color: #062806; }
         body[data-theme="aero"] .result-extra-value--small { color: #2e7d32; }
-        body[data-theme="aero"] .result-submit {
-            border-color: #7f9db9;
-            background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(236,243,253,0.86) 100%);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.96), inset 0 -1px 0 rgba(170,190,220,0.48);
-        }
-        body[data-theme="aero"] .result-submit-label { color: #123b79; }
-        body[data-theme="aero"] .result-submit-status { color: #1a5f1a; }
-        body[data-theme="aero"] .result-submit-status.error { color: #a32222; }
 
         body[data-theme="aero"] .rank-bar-track { background: rgba(0,80,20,0.12); }
         body[data-theme="aero"] .rank-bar-fill  { background: linear-gradient(90deg, #52c85a, #29b6f6); }
@@ -2202,7 +2148,6 @@
         body[data-theme="aero"] .new-test-btn,
         body[data-theme="aero"] button.secondary,
         body[data-theme="aero"] .history-clear,
-        body[data-theme="aero"] #result-submit-btn,
         body[data-theme="aero"] .theme-toggle,
         body[data-theme="aero"] .music-toggle,
         body[data-theme="aero"] .keysound-toggle,
@@ -2216,7 +2161,6 @@
         body[data-theme="aero"] .new-test-btn:hover,
         body[data-theme="aero"] button.secondary:hover,
         body[data-theme="aero"] .history-clear:hover,
-        body[data-theme="aero"] #result-submit-btn:hover,
         body[data-theme="aero"] .theme-toggle:hover,
         body[data-theme="aero"] .music-toggle:hover,
         body[data-theme="aero"] .keysound-toggle:hover,
@@ -2553,9 +2497,11 @@
 
     <canvas id="wpm-chart" class="wpm-chart" aria-hidden="true"></canvas>
 
-    <input type="text" id="hidden-input"
+    <input type="text" id="hidden-input" name="typing_capture_input"
            autocomplete="off" autocorrect="off"
-           autocapitalize="off" spellcheck="false">
+           autocapitalize="off" spellcheck="false"
+           data-bwignore="true" data-1p-ignore="true"
+           data-lpignore="true" data-form-type="other">
 
     <div class="hint" id="hint">Click the text above to begin &nbsp;·&nbsp; Tab to restart &nbsp;·&nbsp; Backspace to correct</div>
 
@@ -2580,8 +2526,8 @@
             <span class="account-status" id="account-status">Not logged in</span>
         </div>
         <div class="auth-grid" id="auth-grid">
-            <input id="auth-username" type="text" maxlength="24" placeholder="username (a-z, 0-9, _)">
-            <input id="auth-password" type="password" maxlength="72" placeholder="password (min 6 chars)">
+            <input id="auth-username" name="username" type="text" maxlength="24" autocomplete="username" placeholder="username (a-z, 0-9, _)">
+            <input id="auth-password" name="password" type="password" maxlength="72" autocomplete="current-password" placeholder="password (min 6 chars)">
             <button type="button" class="secondary" onclick="loginUser()">Login</button>
         </div>
         <div class="auth-actions" id="auth-actions">
@@ -2685,16 +2631,6 @@
                 <div class="rank-marker" id="rank-marker"></div>
             </div>
             <div class="rank-caption" id="rank-caption">—</div>
-        </div>
-        <div class="result-submit">
-            <div class="result-submit-row">
-                <label class="result-submit-label" for="result-submit-toggle">
-                    <input id="result-submit-toggle" type="checkbox" onchange="onResultSubmitToggleChange()">
-                    Submit this run to the leaderboard
-                </label>
-                <button type="button" class="secondary" id="result-submit-btn" onclick="submitCompletedRun()">Submit Run</button>
-            </div>
-            <div class="result-submit-status" id="result-submit-status"></div>
         </div>
         <div class="buttons">
             <button class="new-test-btn" onclick="newTest()">New Quote<span class="btn-hint">(Spacebar)</span></button>
@@ -3350,14 +3286,11 @@ function escapeHtml(str) {
 const HISTORY_KEY = 'sampire-typing-history';
 const MAX_HISTORY = 50;
 const AUTH_TOKEN_KEY = 'sampire-auth-token';
-const SUBMIT_RUN_PREF_KEY = 'sampire-submit-run-pref';
 const LOCAL_AUTH_USERS_KEY = 'sampire-local-auth-users';
 const LOCAL_AUTH_SCORES_KEY = 'sampire-local-auth-scores';
 let authToken = null;
 let currentUser = null;
 let localApiFallbackActive = false;
-let pendingLeaderboardScore = null;
-let pendingLeaderboardSubmitted = false;
 
 function loadLocalJson(key, fallback) {
     try {
@@ -3593,7 +3526,6 @@ function updateAuthUi() {
     if (authGrid) authGrid.style.display = currentUser ? 'none' : 'grid';
     if (signupBtn) signupBtn.style.display = currentUser ? 'none' : '';
     if (metrics && !currentUser) metrics.style.display = 'none';
-    updateResultSubmitUi();
 }
 
 async function signupUser() {
@@ -3676,76 +3608,6 @@ async function saveScoreToCloud(score) {
     } catch (e) {
         return { ok: false, error: e.message || 'Unknown error' };
     }
-}
-
-function setResultSubmitStatus(message, isError = false) {
-    const statusEl = document.getElementById('result-submit-status');
-    if (!statusEl) return;
-    statusEl.textContent = message || '';
-    statusEl.classList.toggle('error', !!isError);
-}
-
-function updateResultSubmitUi() {
-    const toggle = document.getElementById('result-submit-toggle');
-    const btn = document.getElementById('result-submit-btn');
-    if (!toggle || !btn) return;
-
-    const hasScore = !!pendingLeaderboardScore;
-    const canSubmit = hasScore && !!currentUser && !pendingLeaderboardSubmitted;
-    btn.disabled = !canSubmit;
-
-    const submitSection = document.querySelector('.result-submit');
-    if (submitSection) submitSection.style.display = hasScore ? '' : 'none';
-
-    if (!hasScore) {
-        setResultSubmitStatus('');
-        return;
-    }
-
-    if (pendingLeaderboardSubmitted) {
-        setResultSubmitStatus('Submitted to leaderboard.');
-        return;
-    }
-
-    if (!currentUser) {
-        setResultSubmitStatus('Log in to submit this run to the leaderboard.', true);
-        return;
-    }
-
-    if (toggle.checked) {
-        setResultSubmitStatus('Auto-submit is enabled for this run.');
-    } else {
-        setResultSubmitStatus('This run will stay local unless you click Submit Run.');
-    }
-}
-
-function onResultSubmitToggleChange() {
-    const toggle = document.getElementById('result-submit-toggle');
-    if (!toggle) return;
-    try { localStorage.setItem(SUBMIT_RUN_PREF_KEY, toggle.checked ? '1' : '0'); } catch (e) {}
-    updateResultSubmitUi();
-}
-
-async function submitCompletedRun() {
-    if (!pendingLeaderboardScore || pendingLeaderboardSubmitted) return;
-    if (!authToken || !currentUser) {
-        updateResultSubmitUi();
-        return;
-    }
-    setResultSubmitStatus('Submitting run...');
-    const result = await saveScoreToCloud(pendingLeaderboardScore);
-    if (result.ok) {
-        pendingLeaderboardSubmitted = true;
-        updateResultSubmitUi();
-        return;
-    }
-    const message = String(result.error || '');
-    if (/best run/i.test(message)) {
-        setResultSubmitStatus('Not submitted: only your personal best for this mode can be on the leaderboard.', true);
-    } else {
-        setResultSubmitStatus(`Could not submit run: ${message || 'please try again.'}`, true);
-    }
-    setAuthNote(`Cloud save failed: ${message || 'please try again.'}`, true);
 }
 
 async function refreshCloudProgress() {
@@ -3960,7 +3822,7 @@ function showResults() {
     const prevBestForMode = prevHistory.filter(h => h.mode === currentMode).reduce((best, h) => Math.max(best, h.wpm), 0);
     const isModePB = wpm > prevBestForMode;
 
-    // Save to local history. Leaderboard submission is user-controlled per run.
+    // Save to local history. Best-per-mode runs auto-submit when logged in.
     const scoreEntry = { wpm, rawWpm, consistency, accuracy, time, mode: currentMode, text: currentQuote, date: Date.now() };
     saveToHistory(scoreEntry);
     renderHistory();
@@ -3977,17 +3839,12 @@ function showResults() {
 
     drawResultChart();
     resultOverlay.classList.add('show');
-
-    pendingLeaderboardScore = isModePB ? scoreEntry : null;
-    pendingLeaderboardSubmitted = false;
-    const submitToggle = document.getElementById('result-submit-toggle');
-    if (submitToggle) {
-        const storedPref = localStorage.getItem(SUBMIT_RUN_PREF_KEY);
-        submitToggle.checked = storedPref === null ? true : storedPref === '1';
-    }
-    updateResultSubmitUi();
-    if (isModePB && submitToggle && submitToggle.checked && currentUser) {
-        submitCompletedRun();
+    if (isModePB && currentUser) {
+        saveScoreToCloud(scoreEntry).then(result => {
+            if (!result.ok && !/best run/i.test(String(result.error || ''))) {
+                setAuthNote(`Cloud save failed: ${result.error || 'please try again.'}`, true);
+            }
+        });
     }
 }
 
