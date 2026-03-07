@@ -29,6 +29,8 @@ export async function onRequestGet(context) {
       mode: row.mode,
       wpm: row.wpm,
       accuracy: row.accuracy,
+      rawWpm: row.rawWpm,
+      time: row.time,
       date: row.date,
     }));
 

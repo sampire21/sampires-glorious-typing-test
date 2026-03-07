@@ -65,6 +65,8 @@ export async function onRequestPost(context) {
     mode: score.mode,
     wpm: score.wpm,
     accuracy: score.accuracy,
+    rawWpm: score.rawWpm,
+    time: score.time,
     date: score.date,
   };
   const lbIdx = leaderboard.findIndex((row) => row.userId === user.id && row.mode === score.mode);
