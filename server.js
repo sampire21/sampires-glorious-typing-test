@@ -223,7 +223,12 @@ async function handleApi(req, res) {
             date: Number(body.date) || Date.now(),
             createdAt: Date.now(),
         };
-        if (score.wpm < 0 || score.wpm > 400) return sendJson(res, 400, { error: 'Invalid score payload' });
+        if (score.wpm < 0 || score.wpm > 400 ||
+            score.accuracy < 0 || score.accuracy > 100 ||
+            score.rawWpm < 0 || score.rawWpm > 600 ||
+            score.time < 0 || score.time > 3600) {
+            return sendJson(res, 400, { error: 'Invalid score payload' });
+        }
 
         const sameModeIdx = data.scores.findIndex(s => s.userId === user.id && s.mode === score.mode);
         const existing = sameModeIdx >= 0 ? data.scores[sameModeIdx] : null;

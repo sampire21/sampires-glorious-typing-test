@@ -2551,7 +2551,7 @@
     <div class="quote-display" id="quote-display" onclick="focusInput()"></div>
     <div class="quote-source" id="quote-source"></div>
 
-    <canvas id="wpm-chart" class="wpm-chart"></canvas>
+    <canvas id="wpm-chart" class="wpm-chart" aria-hidden="true"></canvas>
 
     <input type="text" id="hidden-input"
            autocomplete="off" autocorrect="off"
@@ -2584,8 +2584,8 @@
             <input id="auth-password" type="password" maxlength="72" placeholder="password (min 6 chars)">
             <button type="button" class="secondary" onclick="loginUser()">Login</button>
         </div>
-        <div class="auth-actions">
-            <button type="button" class="secondary" onclick="signupUser()">Sign Up</button>
+        <div class="auth-actions" id="auth-actions">
+            <button type="button" class="secondary" id="signup-btn" onclick="signupUser()">Sign Up</button>
             <button type="button" class="secondary" id="logout-btn" onclick="logoutUser()" style="display:none;">Logout</button>
         </div>
         <div class="auth-note" id="auth-note"></div>
@@ -2611,7 +2611,7 @@
     <div class="leaderboard-modal-card" role="dialog" aria-modal="true" aria-labelledby="leaderboard-modal-title">
         <div class="leaderboard-modal-header">
             <div class="leaderboard-modal-title" id="leaderboard-modal-title">Leaderboard</div>
-            <button type="button" class="leaderboard-modal-close secondary" onclick="closeLeaderboard()">X</button>
+            <button type="button" class="leaderboard-modal-close secondary" onclick="closeLeaderboard()" aria-label="Close leaderboard">X</button>
         </div>
         <div class="leaderboard-list" id="leaderboard-list"></div>
     </div>
@@ -2676,7 +2676,7 @@
                 <div class="result-extra-value" id="final-error-rate">0%</div>
             </div>
         </div>
-        <canvas id="wpm-chart-result" class="wpm-chart wpm-chart--result"></canvas>
+        <canvas id="wpm-chart-result" class="wpm-chart wpm-chart--result" aria-hidden="true"></canvas>
 
         <div class="rank-block">
             <div class="rank-label" id="rank-label">—</div>
@@ -2885,6 +2885,7 @@ let pendingGhostTimeline = null;
 const lastTimelineByTest = new Map();
 let lastCompletedTimeline = [];
 let ghostReplayIndex = -1;
+let charSpans = []; // flat array of char <span> elements, indexed by quote position
 
 function getTestKey(mode = currentMode, text = currentQuote) {
     return `${mode}::${text}`;
@@ -3046,17 +3047,45 @@ function makeCharSpan(i) {
 }
 
 function renderQuote() {
+    charSpans = [];
     quoteDisplay.innerHTML = '';
     let i = 0;
     while (i < currentQuote.length) {
         if (currentQuote[i] === ' ') {
-            quoteDisplay.appendChild(makeCharSpan(i++));
+            const sp = makeCharSpan(i);
+            charSpans.push(sp);
+            quoteDisplay.appendChild(sp);
+            i++;
         } else {
             const wordSpan = document.createElement('span');
             wordSpan.style.whiteSpace = 'nowrap';
-            while (i < currentQuote.length && currentQuote[i] !== ' ')
-                wordSpan.appendChild(makeCharSpan(i++));
+            while (i < currentQuote.length && currentQuote[i] !== ' ') {
+                const sp = makeCharSpan(i);
+                charSpans.push(sp);
+                wordSpan.appendChild(sp);
+                i++;
+            }
             quoteDisplay.appendChild(wordSpan);
+        }
+    }
+}
+
+// Update a single character span in-place — avoids full DOM rebuild per keystroke.
+function updateCharSpan(i) {
+    if (i < 0 || i >= charSpans.length) return;
+    const span = charSpans[i];
+    const ch = currentQuote[i];
+    if (i < currentIndex) {
+        span.className = (typedChars[i] === ch) ? 'char-correct' : 'char-incorrect';
+    } else if (i === currentIndex) {
+        span.className = 'char-cursor';
+    } else {
+        span.className = 'char-untyped';
+        if (ghostChars[i] !== undefined) {
+            span.classList.add(ghostChars[i] === ch ? 'char-ghost-correct' : 'char-ghost-incorrect');
+        }
+        if (i === ghostReplayIndex && i !== currentIndex) {
+            span.classList.add('char-ghost-cursor');
         }
     }
 }
@@ -3076,7 +3105,8 @@ function getWPM(elapsed) {
 
 function getRawWPM(elapsed) {
     if (!elapsed) return 0;
-    return Math.round((keyStrokes / 5) / (elapsed / 60));
+    // Raw WPM counts every keystroke (forward + backspaces), matching industry standard.
+    return Math.round(((keyStrokes + backspaces) / 5) / (elapsed / 60));
 }
 
 function getAccuracy() {
@@ -3100,8 +3130,9 @@ function getConsistency() {
 
 function updateStats() {
     const elapsed  = getElapsed();
+    const acc = getAccuracy();
     wpmEl.textContent      = getWPM(elapsed);
-    accuracyEl.textContent = getAccuracy() !== null ? getAccuracy() + '%' : '—';
+    accuracyEl.textContent = acc !== null ? acc + '%' : '—';
     const progress = isTimedMode()
         ? Math.min(100, (elapsed / RANDOM_WORDS_DURATION) * 100)
         : (currentIndex / currentQuote.length * 100);
@@ -3257,8 +3288,14 @@ function startTimer() {
         if (ghostTimeline.length > 0) {
             const nextGhost = Math.max(0, Math.min(currentQuote.length - 1, getGhostIndexAtElapsed(elapsed)));
             if (nextGhost !== ghostReplayIndex) {
+                const oldGhost = ghostReplayIndex;
                 ghostReplayIndex = nextGhost;
-                renderQuote();
+                if (charSpans.length === currentQuote.length) {
+                    updateCharSpan(oldGhost);   // remove ghost cursor class
+                    updateCharSpan(nextGhost);  // add ghost cursor class
+                } else {
+                    renderQuote();
+                }
             }
         }
 
@@ -3286,18 +3323,27 @@ const RANK_TIERS = [
 ];
 
 function getPopulationRank(wpm) {
-    for (const t of RANK_TIERS) {
+    for (let idx = 0; idx < RANK_TIERS.length; idx++) {
+        const t = RANK_TIERS[idx];
         if (wpm < t.maxWpm) {
-            const range  = t.maxWpm === Infinity ? 20 : t.maxWpm - t.minWpm;
-            const prev   = t.percentile - (RANK_TIERS.indexOf(t) > 0
-                ? (t.percentile - RANK_TIERS[RANK_TIERS.indexOf(t) - 1].percentile)
-                : t.percentile);
-            const frac   = Math.min((wpm - t.minWpm) / range, 1);
-            const interp = Math.round(prev + frac * (t.percentile - prev));
+            const range        = t.maxWpm === Infinity ? 20 : t.maxWpm - t.minWpm;
+            const prevPct      = idx > 0 ? RANK_TIERS[idx - 1].percentile : 0;
+            const frac         = Math.min((wpm - t.minWpm) / range, 1);
+            const interp       = Math.round(prevPct + frac * (t.percentile - prevPct));
             return { percentile: Math.max(1, Math.min(99, interp)), tier: t.tier };
         }
     }
     return { percentile: 99, tier: 'World-class' };
+}
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 // ── History ────────────────────────────────────────────────────────────────
@@ -3351,6 +3397,13 @@ function localApiError(status, error) {
     throw err;
 }
 
+// SHA-256 hash with salt for local-storage credential storage.
+async function localHashPassword(password, salt) {
+    const data = new TextEncoder().encode(salt + password);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function localApiFetch(url, options = {}, headers = {}) {
     const method = String(options.method || 'GET').toUpperCase();
     const parsed = new URL(url, 'https://local.app');
@@ -3381,11 +3434,17 @@ async function localApiFetch(url, options = {}, headers = {}) {
         }
         if (password.length < 6) localApiError(400, 'Password must be at least 6 characters');
         if (users.some(u => u.usernameNorm === usernameNorm)) localApiError(409, 'Username already exists');
+        // Hash password with SHA-256 + a random salt for local storage.
+        // Not as strong as scrypt/bcrypt but far better than plaintext.
+        const salt = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+            .map(b => b.toString(16).padStart(2, '0')).join('');
+        const pwHash = await localHashPassword(password, salt);
         const user = {
             id: crypto.randomUUID(),
             username: usernameRaw,
             usernameNorm,
-            password,
+            passwordHash: pwHash,
+            passwordSalt: salt,
             createdAt: Date.now(),
         };
         users.push(user);
@@ -3396,8 +3455,13 @@ async function localApiFetch(url, options = {}, headers = {}) {
     if (method === 'POST' && pathname === '/api/login') {
         const usernameNorm = String(body.username || '').trim().toLowerCase();
         const password = String(body.password || '');
-        const user = users.find(u => u.usernameNorm === usernameNorm && u.password === password);
+        const user = users.find(u => u.usernameNorm === usernameNorm);
         if (!user) localApiError(401, 'Invalid username or password');
+        // Support legacy plaintext entries created before this fix.
+        const isValid = user.passwordHash
+            ? (await localHashPassword(password, user.passwordSalt)) === user.passwordHash
+            : user.password === password;
+        if (!isValid) localApiError(401, 'Invalid username or password');
         return { user: { id: user.id, username: user.username }, token: makeLocalToken(user.id) };
     }
 
@@ -3481,7 +3545,7 @@ async function apiFetch(url, options = {}) {
     };
     if (authToken) headers.Authorization = `Bearer ${authToken}`;
     const isWebContext = location.protocol === 'http:' || location.protocol === 'https:';
-    if (!isWebContext) {
+    if (!isWebContext || localApiFallbackActive) {
         localApiFallbackActive = true;
         return localApiFetch(url, options, headers);
     }
@@ -3522,8 +3586,12 @@ function updateAuthUi() {
     const status = document.getElementById('account-status');
     const logoutBtn = document.getElementById('logout-btn');
     const metrics = document.getElementById('cloud-metrics');
+    const authGrid = document.getElementById('auth-grid');
+    const signupBtn = document.getElementById('signup-btn');
     if (status) status.textContent = currentUser ? `Logged in as ${currentUser.username}` : 'Not logged in';
     if (logoutBtn) logoutBtn.style.display = currentUser ? 'inline-block' : 'none';
+    if (authGrid) authGrid.style.display = currentUser ? 'none' : 'grid';
+    if (signupBtn) signupBtn.style.display = currentUser ? 'none' : '';
     if (metrics && !currentUser) metrics.style.display = 'none';
     updateResultSubmitUi();
 }
@@ -3625,6 +3693,9 @@ function updateResultSubmitUi() {
     const hasScore = !!pendingLeaderboardScore;
     const canSubmit = hasScore && !!currentUser && !pendingLeaderboardSubmitted;
     btn.disabled = !canSubmit;
+
+    const submitSection = document.querySelector('.result-submit');
+    if (submitSection) submitSection.style.display = hasScore ? '' : 'none';
 
     if (!hasScore) {
         setResultSubmitStatus('');
@@ -3730,8 +3801,8 @@ async function refreshLeaderboard() {
                 : (row.mode === 'words' ? 'random words' : 'quotes');
             el.innerHTML = `
                 <span class="lb-rank">#${idx + 1}</span>
-                <span class="lb-user">${row.username}</span>
-                <span class="lb-mode">${modeLabel}</span>
+                <span class="lb-user">${escapeHtml(row.username)}</span>
+                <span class="lb-mode">${escapeHtml(modeLabel)}</span>
                 <span class="lb-wpm">${Math.round(row.wpm || 0)}</span>
                 <span class="lb-acc">${Math.round(row.accuracy || 0)}%</span>
             `;
@@ -3810,11 +3881,11 @@ function renderHistory() {
         const row = document.createElement('div');
         row.className = 'history-row' + (isBest ? ' is-best' : '');
         row.innerHTML = `
-            <span class="h-date">${dateStr}</span>
-            <span class="h-mode">${entry.mode}</span>
-            <span class="h-wpm">${entry.wpm} WPM</span>
-            <span class="h-acc">${entry.accuracy}%</span>
-            <span class="h-text" title="${entry.text.replace(/"/g, '&quot;')}">${snip}</span>
+            <span class="h-date">${escapeHtml(dateStr)}</span>
+            <span class="h-mode">${escapeHtml(entry.mode)}</span>
+            <span class="h-wpm">${Number(entry.wpm)} WPM</span>
+            <span class="h-acc">${Number(entry.accuracy)}%</span>
+            <span class="h-text" title="${escapeHtml(entry.text)}">${escapeHtml(snip)}</span>
         `;
         listEl.appendChild(row);
     });
@@ -3886,6 +3957,8 @@ function showResults() {
     // Check for personal best BEFORE saving (so comparison is against previous bests)
     const prevHistory = loadHistory();
     const prevBest    = prevHistory.length > 0 ? Math.max(...prevHistory.map(h => h.wpm)) : 0;
+    const prevBestForMode = prevHistory.filter(h => h.mode === currentMode).reduce((best, h) => Math.max(best, h.wpm), 0);
+    const isModePB = wpm > prevBestForMode;
 
     // Save to local history. Leaderboard submission is user-controlled per run.
     const scoreEntry = { wpm, rawWpm, consistency, accuracy, time, mode: currentMode, text: currentQuote, date: Date.now() };
@@ -3905,7 +3978,7 @@ function showResults() {
     drawResultChart();
     resultOverlay.classList.add('show');
 
-    pendingLeaderboardScore = scoreEntry;
+    pendingLeaderboardScore = isModePB ? scoreEntry : null;
     pendingLeaderboardSubmitted = false;
     const submitToggle = document.getElementById('result-submit-toggle');
     if (submitToggle) {
@@ -3913,7 +3986,7 @@ function showResults() {
         submitToggle.checked = storedPref === null ? true : storedPref === '1';
     }
     updateResultSubmitUi();
-    if (submitToggle && submitToggle.checked && currentUser) {
+    if (isModePB && submitToggle && submitToggle.checked && currentUser) {
         submitCompletedRun();
     }
 }
@@ -3935,10 +4008,16 @@ function handleTypingKeydown(e) {
         e.preventDefault();
         if (currentIndex > 0) {
             backspaces++;
+            const prevIdx = currentIndex;
             currentIndex--;
             typedChars.pop();
             recordAttemptTimelinePoint();
-            renderQuote();
+            if (charSpans.length === currentQuote.length) {
+                updateCharSpan(prevIdx);    // was cursor → now untyped
+                updateCharSpan(currentIndex); // now cursor
+            } else {
+                renderQuote();
+            }
             updateStats();
         }
         return;
@@ -3954,11 +4033,17 @@ function handleTypingKeydown(e) {
 
     keyStrokes++;
     if (e.key !== currentQuote[currentIndex]) mistakeCount++;
+    const prevIdx = currentIndex;
     typedChars[currentIndex] = e.key;
     currentIndex++;
     recordAttemptTimelinePoint();
 
-    renderQuote();
+    if (charSpans.length === currentQuote.length) {
+        updateCharSpan(prevIdx);    // just typed → correct/incorrect
+        updateCharSpan(currentIndex); // new cursor position
+    } else {
+        renderQuote(); // fallback for post-extension rebuilds
+    }
     updateStats();
     setTimeout(() => { hiddenInput.value = ''; }, 0);
 
@@ -4166,8 +4251,8 @@ function loadAudioWithFallback(primarySrc, fallbackSrc) {
 // ── Sound Effects ───────────────────────────────────────────────────────────
 const SFX = {
     newTest:      new Audio('Sound Effects/New Test.wav'),
-    restartTest:  loadAudioWithFallback('Sound Effects/Restart Test.mp3', 'Sound Effects/Restart Test.wav'),
-    tryAgain:     loadAudioWithFallback('Sound Effects/Try Again.mp3', 'Sound Effects/Try Again.wav'),
+    restartTest:  new Audio('Sound Effects/Restart Test.wav'),
+    tryAgain:     new Audio('Sound Effects/Try Again.wav'),
     completed:    new Audio('Sound Effects/Test Completed.wav'),
     personalBest: new Audio('Sound Effects/New Personal Best.wav'),
     clearHistory: new Audio('Sound Effects/Clear History.wav'),
