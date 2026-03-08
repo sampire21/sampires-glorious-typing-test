@@ -3901,12 +3901,12 @@
             <input id="auth-username" name="username" type="text" maxlength="24" autocomplete="username" placeholder="username">
             <label class="sr-only" for="auth-password">Password</label>
             <input id="auth-password" name="password" type="password" maxlength="72" autocomplete="current-password" placeholder="password">
-            <button type="button" class="secondary" onclick="loginUser()">Login</button>
+            <button type="button" class="secondary" id="login-btn">Login</button>
         </div>
         <div class="auth-actions" id="auth-actions">
             <div class="signup-cta" id="signup-cta">
                 <div class="signup-cta-text">Don't have an account? Create one for free to keep track of your scores, level up and earn rewards!</div>
-                <button type="button" class="create-account-btn" onclick="openSignupModal()">Create Account</button>
+                <button type="button" class="create-account-btn" id="open-signup-btn">Create Account</button>
             </div>
             <button type="button" class="secondary" id="logout-btn" onclick="logoutUser()" style="display:none;">Logout</button>
         </div>
@@ -9564,6 +9564,10 @@ function bindAuthInputEvents() {
     const onEnterDeleteAccount = (e) => { if (e.key === 'Enter') deleteAccountConfirmed(); };
     if (loginUserInput) loginUserInput.addEventListener('keydown', onEnterLogin);
     if (loginPassInput) loginPassInput.addEventListener('keydown', onEnterLogin);
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) loginBtn.addEventListener('click', loginUser);
+    const openSignupBtn = document.getElementById('open-signup-btn');
+    if (openSignupBtn) openSignupBtn.addEventListener('click', openSignupModal);
     if (signupUserInput) signupUserInput.addEventListener('keydown', onEnterSignup);
     if (signupPassInput) signupPassInput.addEventListener('keydown', onEnterSignup);
     if (signupConfirmInput) signupConfirmInput.addEventListener('keydown', onEnterSignup);
