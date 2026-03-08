@@ -6121,7 +6121,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
         : document.getElementById('auth-password').value;
     const usingModal = usernameOverride !== null || passwordOverride !== null;
     try {
-        const out = await apiFetch('/api/signup', {
+        const out = await apiFetchCloudFirst('/api/signup', {
             method: 'POST',
             body: JSON.stringify({ username, password }),
         });
@@ -6167,7 +6167,7 @@ async function loginUser() {
     const username = document.getElementById('auth-username').value.trim();
     const password = document.getElementById('auth-password').value;
     try {
-        const out = await apiFetch('/api/login', {
+        const out = await apiFetchCloudFirst('/api/login', {
             method: 'POST',
             body: JSON.stringify({ username, password }),
         });
