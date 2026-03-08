@@ -27,6 +27,35 @@ function weeklyCompletionsCount(weeklyObj) {
   return completions.length;
 }
 
+async function getCommunityContributionTotal(env, userId, usernameNorm) {
+  let total = 0;
+  let cursor = undefined;
+  const targetId = `user:${userId}`;
+  do {
+    const page = await env.TYPING_APP.list({ prefix: 'community-contrib:v1:', cursor, limit: 1000 });
+    const keys = Array.isArray(page && page.keys) ? page.keys : [];
+    for (const entry of keys) {
+      const keyName = String(entry && entry.name || '');
+      if (!keyName) continue;
+      const payload = await getJson(env, keyName, null);
+      const rows = payload && payload.entries && typeof payload.entries === 'object' ? payload.entries : {};
+      const direct = rows[targetId];
+      if (direct && Number.isFinite(Number(direct.damage))) {
+        total += Math.max(0, Math.floor(Number(direct.damage) || 0));
+        continue;
+      }
+      if (!usernameNorm) continue;
+      for (const row of Object.values(rows)) {
+        const rowName = normalizeUsername(row && row.username || '');
+        if (!rowName || rowName !== usernameNorm) continue;
+        total += Math.max(0, Math.floor(Number(row && row.damage) || 0));
+      }
+    }
+    cursor = page && page.list_complete ? undefined : (page && page.cursor ? page.cursor : undefined);
+  } while (cursor);
+  return total;
+}
+
 export async function onRequestGet(context) {
   const { request, env } = context;
   if (!hasStorage(env)) return json({ error: 'Server storage not configured (TYPING_APP KV binding missing).' }, 500);
@@ -55,10 +84,21 @@ export async function onRequestGet(context) {
   const dailyTotal = dailyCompletionsTotal(parseJsonSafe(progress['sampire-daily-v2'] || '{}', {}));
   const weeklyCount = weeklyCompletionsCount(parseJsonSafe(progress['sampire-weekly'] || '{}', {}));
   const lifetimeChallengesCompleted = Math.max(lifetimeStored, dailyTotal + weeklyCount);
+  const xp = Math.max(0, parseInt(progress['sampire-xp'] || '0', 10) || 0);
+  const level = Math.max(1, Math.floor(xp / 500) + 1);
+
+  const scores = await getJson(env, `scores:user:${userId}`, []);
+  const personalBestWpm = Array.isArray(scores) && scores.length
+    ? Math.max(0, ...scores.map((row) => Math.max(0, Number(row && row.wpm) || 0)))
+    : 0;
+  const communityContributionTotal = await getCommunityContributionTotal(env, userId, user.usernameNorm || usernameNorm);
 
   return json({
     username: user.username,
     badgeIds: badgeUnique,
     lifetimeChallengesCompleted,
+    level,
+    personalBestWpm,
+    communityContributionTotal,
   }, 200);
 }

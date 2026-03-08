@@ -93,6 +93,20 @@ export default {
       });
     }
 
-    return env.ASSETS.fetch(request);
+    const assetRes = await env.ASSETS.fetch(request);
+    const reqPath = url.pathname || '/';
+    const isHtml = reqPath === '/' || reqPath.endsWith('.html');
+    if (!isHtml) return assetRes;
+
+    // Keep HTML uncached so clients always bootstrap with the newest app script.
+    const headers = new Headers(assetRes.headers);
+    headers.set('cache-control', 'no-store, no-cache, must-revalidate, max-age=0');
+    headers.set('pragma', 'no-cache');
+    headers.set('expires', '0');
+    return new Response(assetRes.body, {
+      status: assetRes.status,
+      statusText: assetRes.statusText,
+      headers,
+    });
   },
 };

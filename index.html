@@ -1070,6 +1070,59 @@
             box-shadow: none;
             transition: background 0.2s, color 0.2s, border-color 0.2s;
         }
+        .keysound-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .keysound-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 200px;
+            padding: 0.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(109, 153, 255, 0.38);
+            background: rgba(10, 15, 35, 0.96);
+            box-shadow: 0 14px 26px rgba(3, 0, 18, 0.42);
+            z-index: 260;
+            display: none;
+        }
+        .keysound-menu.show {
+            display: block;
+        }
+        .keysound-menu-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #8fb2ff;
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+        }
+        .keysound-option {
+            width: 100%;
+            text-align: left;
+            padding: 0.46rem 0.52rem;
+            border-radius: 8px;
+            border: 1px solid rgba(65, 89, 150, 0.44);
+            background: rgba(16, 21, 45, 0.84);
+            color: #d8e7ff;
+            font-size: 0.76rem;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 0.34rem;
+        }
+        .keysound-option:hover,
+        .keysound-option:focus-visible {
+            border-color: rgba(143, 201, 255, 0.7);
+            background: rgba(29, 40, 76, 0.95);
+            outline: none;
+        }
+        .keysound-option.active {
+            border-color: rgba(96, 165, 250, 0.82);
+            box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.22);
+            color: #eef6ff;
+        }
 
         .leaderboard-toggle {
             display: flex;
@@ -3837,10 +3890,18 @@
         <span>Leaderboards</span>
     </button>
 
-    <button class="keysound-toggle" id="keysound-toggle" onclick="toggleKeySounds()">
-        <span id="keysound-label">Key Sounds</span>
-        <span id="keysound-state" class="toggle-indicator off">✗</span>
-    </button>
+    <div class="keysound-wrap" id="keysound-wrap">
+        <button class="keysound-toggle" id="keysound-toggle" onclick="toggleKeySoundMenu(event)">
+            <span id="keysound-label">Key Sounds</span>
+            <span id="keysound-state" class="toggle-indicator off">✗</span>
+        </button>
+        <div class="keysound-menu" id="keysound-menu" aria-hidden="true">
+            <div class="keysound-menu-title">Sound Pack</div>
+            <button type="button" class="keysound-option" data-pack="nk-cream" onclick="selectKeySoundPack('nk-cream')">NK Creams</button>
+            <button type="button" class="keysound-option" data-pack="cherrymx-blue-abs" onclick="selectKeySoundPack('cherrymx-blue-abs')">Cherry MX Blues</button>
+            <button type="button" class="keysound-option" onclick="toggleKeySounds()">Toggle On / Off</button>
+        </div>
+    </div>
 
     <button class="music-toggle" id="music-toggle" onclick="toggleMusic()">
         <span>Music</span>
@@ -4212,6 +4273,45 @@
 </div>
 
 <script>
+const APP_STORAGE_SCHEMA_KEY = 'sampire-storage-schema-version';
+const APP_STORAGE_SCHEMA_VERSION = '2026-03-08.1';
+
+function migrateStorageSchemaOnce() {
+    try {
+        const current = localStorage.getItem(APP_STORAGE_SCHEMA_KEY) || '';
+        if (current === APP_STORAGE_SCHEMA_VERSION) return;
+
+        const keepLocal = new Map();
+        for (const key of ['sampire-auth-token']) {
+            const value = localStorage.getItem(key);
+            if (value != null) keepLocal.set(key, value);
+        }
+
+        const localKeysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key) continue;
+            if (key.startsWith('sampire-')) localKeysToRemove.push(key);
+        }
+        for (const key of localKeysToRemove) localStorage.removeItem(key);
+        for (const [key, value] of keepLocal.entries()) localStorage.setItem(key, value);
+
+        const sessionKeysToRemove = [];
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (!key) continue;
+            if (key.startsWith('sampire-')) sessionKeysToRemove.push(key);
+        }
+        for (const key of sessionKeysToRemove) sessionStorage.removeItem(key);
+
+        localStorage.setItem(APP_STORAGE_SCHEMA_KEY, APP_STORAGE_SCHEMA_VERSION);
+    } catch (e) {
+        // If storage is unavailable, continue boot without migration.
+    }
+}
+
+migrateStorageSchemaOnce();
+
 // ── Content ────────────────────────────────────────────────────────────────
 const QUOTES = [
     // ── Star Wars ──────────────────────────────────────────────────────────
@@ -5679,10 +5779,21 @@ async function localApiFetch(url, options = {}, headers = {}) {
         }
         const weeklyCount = (weeklyObj && Array.isArray(weeklyObj.completions)) ? weeklyObj.completions.length : 0;
         const lifetimeStored = Math.max(0, parseInt(progress['sampire-lifetime-challenges-completed'] || '0', 10) || 0);
+        const xp = Math.max(0, parseInt(progress['sampire-xp'] || '0', 10) || 0);
+        const level = Math.max(1, Math.floor(xp / 500) + 1);
+        const personalBestWpm = scores
+            .filter((s) => s.userId === target.id)
+            .reduce((best, s) => Math.max(best, Math.max(0, Number(s && s.wpm) || 0)), 0);
+        const contribState = getCommunityWeeklyContributionState();
+        const contribRow = (contribState && contribState.entries && contribState.entries[`user:${target.id}`]) || null;
+        const communityContributionTotal = Math.max(0, Math.floor(Number(contribRow && contribRow.words) || 0));
         return {
             username: target.username,
             badgeIds: badgeUnique,
             lifetimeChallengesCompleted: Math.max(lifetimeStored, dailyTotal + weeklyCount),
+            level,
+            personalBestWpm,
+            communityContributionTotal,
         };
     }
 
@@ -6609,11 +6720,15 @@ function renderLeaderboardUserTooltip(summary) {
     const badges = Array.isArray(summary && summary.badgeIds) ? summary.badgeIds : [];
     const badgeNames = badges.map(badgeDisplayNameById);
     const badgesText = badgeNames.length ? badgeNames.join(', ') : 'None yet';
-    const lifetime = Math.max(0, Number(summary && summary.lifetimeChallengesCompleted) || 0);
+    const level = Math.max(1, Number(summary && summary.level) || 1);
+    const pbWpm = Math.max(0, Number(summary && summary.personalBestWpm) || 0);
+    const communityTotal = Math.max(0, Number(summary && summary.communityContributionTotal) || 0);
     tooltip.innerHTML = `
         <div class="lb-user-tooltip-title">${escapeHtml(String(summary && summary.username || 'Unknown'))}</div>
+        <div class="lb-user-tooltip-line"><strong>Level:</strong> ${level}</div>
         <div class="lb-user-tooltip-line"><strong>Achievements:</strong> ${escapeHtml(badgesText)}</div>
-        <div class="lb-user-tooltip-line"><strong>Lifetime Challenges:</strong> ${lifetime}</div>
+        <div class="lb-user-tooltip-line"><strong>Total Community Damage:</strong> ${communityTotal.toLocaleString()}</div>
+        <div class="lb-user-tooltip-line"><strong>Personal Best WPM:</strong> ${pbWpm}</div>
     `;
 }
 
@@ -6625,11 +6740,19 @@ async function fetchLeaderboardUserSummary(username) {
     if (cached && (now - cached.ts) < 120000) return cached.data;
     if (lbUserSummaryInFlight.has(key)) return lbUserSummaryInFlight.get(key);
     const req = (async () => {
-        const out = await apiFetchCloudFirst(`/api/user-summary?username=${encodeURIComponent(key)}`);
+        let out = null;
+        try {
+            out = await apiFetchCloudFirst(`/api/user-summary?username=${encodeURIComponent(key)}`);
+        } catch (e) {
+            if (!shouldAllowLocalFallback(e)) throw e;
+            out = await localApiFetch(`/api/user-summary?username=${encodeURIComponent(key)}`, {}, buildAuthHeaders({}));
+        }
         const data = {
             username: String(out && out.username ? out.username : username),
             badgeIds: Array.isArray(out && out.badgeIds) ? out.badgeIds : [],
-            lifetimeChallengesCompleted: Math.max(0, Number(out && out.lifetimeChallengesCompleted) || 0),
+            level: Math.max(1, Number(out && out.level) || 1),
+            personalBestWpm: Math.max(0, Number(out && out.personalBestWpm) || 0),
+            communityContributionTotal: Math.max(0, Number(out && out.communityContributionTotal) || 0),
         };
         lbUserSummaryCache.set(key, { ts: Date.now(), data });
         return data;
@@ -8305,7 +8428,7 @@ function handleTypingKeydown(e) {
     if (isComplete) return;
 
     if (e.key === 'Tab') {
-        playKeypressSound('Tab');
+        playKeypressSound('Tab', e);
         e.preventDefault();
         e.stopPropagation();
         restart();
@@ -8314,7 +8437,7 @@ function handleTypingKeydown(e) {
 
     if (e.key === 'Backspace') {
         if (activeChallengeId === 'nobackspace') { e.preventDefault(); return; }
-        playKeypressSound('Backspace');
+        playKeypressSound('Backspace', e);
         e.preventDefault();
         if (currentIndex > 0) {
             backspaces++;
@@ -8344,7 +8467,7 @@ function handleTypingKeydown(e) {
         return;
     }
 
-    playKeypressSound(e.key);
+    playKeypressSound(e.key, e);
 
     if (!startTime) startTimer();
 
@@ -8417,7 +8540,7 @@ document.addEventListener('keydown', (e) => {
 
     if (isComplete || resultsOpen) {
         if (e.key === 'Tab') {
-            playKeypressSound('Tab');
+            playKeypressSound('Tab', e);
             e.preventDefault();
             tryAgain();
             return;
@@ -8445,6 +8568,14 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeLoginModal();
     if (e.key === 'Escape') closeAdminPanel();
     if (e.key === 'Escape') closeCommunityHub();
+    if (e.key === 'Escape') closeKeySoundMenu();
+});
+
+document.addEventListener('pointerdown', (e) => {
+    const wrap = document.getElementById('keysound-wrap');
+    if (!wrap) return;
+    if (wrap.contains(e.target)) return;
+    closeKeySoundMenu();
 });
 
 // ── Theme Soundtracks ────────────────────────────────────────────────────────
@@ -8472,9 +8603,15 @@ let rewardPreviewTimer = null;
 let rewardSoundPreviewPlaying = false;
 let auraPreviewVisible = false;
 let nebulaPreviewVisible = false;
-const KEY_SOUND_BASE = 'Sound Effects/nk-cream';
+const KEY_SOUND_BASE_ROOT = 'Sound Effects';
+const KEY_SOUND_DEFAULT_PACK = 'nk-cream';
+const KEY_SOUND_PACK_KEY = 'sampire-key-sound-pack';
 const keySoundPools = new Map();
 const KEY_SOUND_POOL_SIZE = 4;
+let keySoundPackName = KEY_SOUND_DEFAULT_PACK;
+let keySoundPackConfig = null;
+let keySoundPackLoadPromise = null;
+let keySoundPackLoadAttempted = false;
 let pbFxTimeout = null;
 
 
@@ -8560,10 +8697,54 @@ function setKeySoundToggleUI() {
     state.classList.toggle('off', !keySoundsEnabled);
 }
 
+function updateKeySoundPackMenuUI() {
+    document.querySelectorAll('#keysound-menu .keysound-option[data-pack]').forEach((btn) => {
+        const pack = String(btn.dataset.pack || '');
+        btn.classList.toggle('active', pack === keySoundPackName);
+    });
+}
+
+function openKeySoundMenu() {
+    const menu = document.getElementById('keysound-menu');
+    if (!menu) return;
+    menu.classList.add('show');
+    menu.setAttribute('aria-hidden', 'false');
+    updateKeySoundPackMenuUI();
+}
+
+function closeKeySoundMenu() {
+    const menu = document.getElementById('keysound-menu');
+    if (!menu) return;
+    menu.classList.remove('show');
+    menu.setAttribute('aria-hidden', 'true');
+}
+
+function toggleKeySoundMenu(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    const menu = document.getElementById('keysound-menu');
+    if (!menu) return;
+    if (menu.classList.contains('show')) closeKeySoundMenu();
+    else openKeySoundMenu();
+}
+
+function selectKeySoundPack(packName) {
+    setKeySoundPack(packName);
+    keySoundsEnabled = true;
+    setKeySoundToggleUI();
+    updateKeySoundPackMenuUI();
+    try { localStorage.setItem('sampire-key-sounds-enabled', '1'); } catch (e) {}
+    closeKeySoundMenu();
+}
+window.selectKeySoundPack = selectKeySoundPack;
+
 function toggleKeySounds() {
     keySoundsEnabled = !keySoundsEnabled;
     setKeySoundToggleUI();
     try { localStorage.setItem('sampire-key-sounds-enabled', keySoundsEnabled ? '1' : '0'); } catch (e) {}
+    closeKeySoundMenu();
 }
 
 function resolveKeySoundFilename(key) {
@@ -8578,9 +8759,48 @@ function resolveKeySoundFilename(key) {
     return 'a.wav';
 }
 
-function playKeypressSound(key) {
-    if (!keySoundsEnabled) return;
-    const path = `${KEY_SOUND_BASE}/${resolveKeySoundFilename(key)}`;
+function getKeySoundBase() {
+    return `${KEY_SOUND_BASE_ROOT}/${keySoundPackName}`;
+}
+
+function getKeyCodeForSoundPack(event, key) {
+    // Most downloadable keyboard packs use Linux evdev-style key codes in `defines`.
+    const evdevByCode = {
+        Backquote: 41,
+        Digit1: 2, Digit2: 3, Digit3: 4, Digit4: 5, Digit5: 6,
+        Digit6: 7, Digit7: 8, Digit8: 9, Digit9: 10, Digit0: 11,
+        Minus: 12, Equal: 13, Backspace: 14,
+        Tab: 15,
+        KeyQ: 16, KeyW: 17, KeyE: 18, KeyR: 19, KeyT: 20, KeyY: 21,
+        KeyU: 22, KeyI: 23, KeyO: 24, KeyP: 25, BracketLeft: 26, BracketRight: 27,
+        Enter: 28,
+        CapsLock: 58,
+        KeyA: 30, KeyS: 31, KeyD: 32, KeyF: 33, KeyG: 34, KeyH: 35, KeyJ: 36, KeyK: 37, KeyL: 38,
+        Semicolon: 39, Quote: 40,
+        ShiftLeft: 42,
+        KeyZ: 44, KeyX: 45, KeyC: 46, KeyV: 47, KeyB: 48, KeyN: 49, KeyM: 50,
+        Comma: 51, Period: 52, Slash: 53, ShiftRight: 54,
+        Space: 57,
+    };
+    const code = String(event && event.code || '');
+    if (code && Object.prototype.hasOwnProperty.call(evdevByCode, code)) {
+        return String(evdevByCode[code]);
+    }
+    const k = String(key || '');
+    const evdevByKey = {
+        '`': 41, '1': 2, '2': 3, '3': 4, '4': 5, '5': 6, '6': 7, '7': 8, '8': 9, '9': 10, '0': 11,
+        '-': 12, '=': 13, Backspace: 14, Tab: 15, q: 16, w: 17, e: 18, r: 19, t: 20, y: 21, u: 22, i: 23, o: 24, p: 25,
+        '[': 26, ']': 27, Enter: 28, a: 30, s: 31, d: 32, f: 33, g: 34, h: 35, j: 36, k: 37, l: 38,
+        ';': 39, "'": 40, z: 44, x: 45, c: 46, v: 47, b: 48, n: 49, m: 50, ',': 51, '.': 52, '/': 53, ' ': 57,
+    };
+    const lower = k.length === 1 ? k.toLowerCase() : k;
+    if (Object.prototype.hasOwnProperty.call(evdevByKey, lower)) return String(evdevByKey[lower]);
+    if (k === 'CapsLock') return '58';
+    if (k === 'Shift') return '42';
+    return '';
+}
+
+function getOrCreateKeySoundPool(path) {
     if (!keySoundPools.has(path)) {
         keySoundPools.set(path, {
             pool: Array.from({length: KEY_SOUND_POOL_SIZE}, () => {
@@ -8591,7 +8811,98 @@ function playKeypressSound(key) {
             i: 0
         });
     }
-    const entry = keySoundPools.get(path);
+    return keySoundPools.get(path);
+}
+
+function playAudioSpriteSegment(path, startMs, durationMs) {
+    const entry = getOrCreateKeySoundPool(path);
+    const audio = entry.pool[entry.i];
+    entry.i = (entry.i + 1) % KEY_SOUND_POOL_SIZE;
+    if (audio.__spriteStopTimer) clearTimeout(audio.__spriteStopTimer);
+    try {
+        audio.currentTime = Math.max(0, Number(startMs || 0) / 1000);
+    } catch (e) {
+        audio.currentTime = 0;
+    }
+    audio.play().catch(() => {});
+    const stopAfter = Math.max(16, Math.floor(Number(durationMs || 0)));
+    audio.__spriteStopTimer = setTimeout(() => {
+        try { audio.pause(); } catch (e) {}
+    }, stopAfter + 16);
+}
+
+function resolveConfigBasedKeySoundSpec(key, event) {
+    const cfg = keySoundPackConfig;
+    if (!cfg || !cfg.defines || typeof cfg.defines !== 'object') return null;
+    const keyCode = getKeyCodeForSoundPack(event, key);
+    if (!keyCode) return null;
+    const define = cfg.defines[keyCode];
+    if (define == null) return null;
+    if (cfg.key_define_type === 'single') {
+        if (!Array.isArray(define) || define.length < 2) return null;
+        return {
+            type: 'single',
+            path: `${getKeySoundBase()}/${String(cfg.sound || 'sound.ogg')}`,
+            startMs: Math.max(0, Number(define[0]) || 0),
+            durationMs: Math.max(1, Number(define[1]) || 1),
+        };
+    }
+    if (typeof define === 'string' && define.trim()) {
+        return { type: 'multi', path: `${getKeySoundBase()}/${define.trim()}` };
+    }
+    return null;
+}
+
+function setKeySoundPack(packName) {
+    const safe = String(packName || '').trim();
+    if (!safe) return;
+    keySoundPackName = safe;
+    keySoundPackConfig = null;
+    keySoundPackLoadPromise = null;
+    keySoundPackLoadAttempted = false;
+    keySoundPools.clear();
+    try { localStorage.setItem(KEY_SOUND_PACK_KEY, safe); } catch (e) {}
+    loadKeySoundPackConfig();
+}
+window.setKeySoundPack = setKeySoundPack;
+
+async function loadKeySoundPackConfig() {
+    if (keySoundPackLoadPromise) return keySoundPackLoadPromise;
+    keySoundPackLoadAttempted = true;
+    keySoundPackLoadPromise = (async () => {
+        try {
+            const out = await fetch(`${getKeySoundBase()}/config.json`, { cache: 'no-store' });
+            if (!out.ok) {
+                keySoundPackConfig = null;
+                return null;
+            }
+            const cfg = await out.json();
+            keySoundPackConfig = {
+                key_define_type: String(cfg && cfg.key_define_type || 'multi').toLowerCase(),
+                sound: String(cfg && cfg.sound || 'sound.ogg'),
+                defines: (cfg && cfg.defines && typeof cfg.defines === 'object' && !Array.isArray(cfg.defines)) ? cfg.defines : {},
+            };
+            return keySoundPackConfig;
+        } catch (e) {
+            keySoundPackConfig = null;
+            return null;
+        }
+    })();
+    return keySoundPackLoadPromise;
+}
+
+function playKeypressSound(key, event = null) {
+    if (!keySoundsEnabled) return;
+    if (!keySoundPackLoadAttempted) loadKeySoundPackConfig();
+    const spec = resolveConfigBasedKeySoundSpec(key, event);
+    if (spec && spec.type === 'single') {
+        playAudioSpriteSegment(spec.path, spec.startMs, spec.durationMs);
+        return;
+    }
+    const path = spec && spec.type === 'multi'
+        ? spec.path
+        : `${getKeySoundBase()}/${resolveKeySoundFilename(key)}`;
+    const entry = getOrCreateKeySoundPool(path);
     const audio = entry.pool[entry.i];
     entry.i = (entry.i + 1) % KEY_SOUND_POOL_SIZE;
     audio.currentTime = 0;
@@ -8662,7 +8973,11 @@ if (musicState) {
 }
 const storedKeySoundsEnabled = localStorage.getItem('sampire-key-sounds-enabled');
 keySoundsEnabled = storedKeySoundsEnabled === null ? true : storedKeySoundsEnabled === '1';
+const storedKeySoundPack = localStorage.getItem(KEY_SOUND_PACK_KEY);
+keySoundPackName = storedKeySoundPack ? String(storedKeySoundPack) : KEY_SOUND_DEFAULT_PACK;
+loadKeySoundPackConfig();
 setKeySoundToggleUI();
+updateKeySoundPackMenuUI();
 if (!musicMuted) playThemeSoundtrack();
 
 document.addEventListener('pointerdown', retryThemeMusicAfterGesture, { passive: true });

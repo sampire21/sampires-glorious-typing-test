@@ -136,3 +136,22 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - Weekly leaderboard row rendering after score submission: pass
   - Community contributions render in community tab when present: pass
 - Noted expected local-dev caveat with `server.js`: several cloud worker routes are absent, so local mode may show `Cloud API routes not found...` message in this environment. This is environment-specific and not from Chromium/Playwright failure.
+
+## Update 10: Keyboard sound pack compatibility (`config.json` multi/single)
+- Added compatibility layer for downloadable keyboard sound pack formats:
+  - Supports `key_define_type: "multi"` (per-key filename mapping).
+  - Supports `key_define_type: "single"` (audio sprite slicing via `[startMs, durationMs]` from a single sound file).
+- Added event-to-keycode mapping to resolve `defines` entries by legacy key code IDs used by pack configs.
+- Added lazy pack config loading from `<pack>/config.json` with safe fallback to legacy `*.wav` mapping when config is missing/invalid.
+- Added runtime pack switch helper:
+  - `window.setKeySoundPack('<folder-name>')`
+  - persisted to localStorage key `sampire-key-sound-pack`.
+- Boot now restores selected key sound pack from localStorage and preloads its config.
+- Updated keypress sound call sites to pass keyboard event context for accurate keycode mapping.
+
+### Validation
+- JS parse smoke check passed.
+- Browser smoke check passed with `setKeySoundPack('cherrymx-blue-abs')`:
+  - no console/page errors
+  - keypress dispatch (letter/space/backspace) executed with pack enabled
+  - selected pack persisted (`sampire-key-sound-pack=cherrymx-blue-abs`).
