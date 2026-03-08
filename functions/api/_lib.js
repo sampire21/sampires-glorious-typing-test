@@ -92,6 +92,23 @@ export function hasStorage(env) {
   return !!(env && env.TYPING_APP);
 }
 
+export async function looksLikeEmptyAuthNamespace(env) {
+  if (!hasStorage(env)) return false;
+  try {
+    const marker = await env.TYPING_APP.get('meta:storage-ready');
+    if (marker) return false;
+    const list = await env.TYPING_APP.list({ prefix: 'user:', limit: 1 });
+    return !(list && Array.isArray(list.keys) && list.keys.length > 0);
+  } catch {
+    return false;
+  }
+}
+
+export async function markStorageReady(env) {
+  if (!hasStorage(env)) return;
+  await env.TYPING_APP.put('meta:storage-ready', JSON.stringify({ v: 1, updatedAt: Date.now() }));
+}
+
 export async function hashPassword(password, saltBase64 = null) {
   const salt = saltBase64
     ? base64ToBytes(saltBase64)

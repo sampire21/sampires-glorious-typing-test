@@ -9,6 +9,7 @@ import {
   getSecret,
   publicUser,
   hasStorage,
+  markStorageReady,
 } from './_lib.js';
 
 export async function onRequestPost(context) {
@@ -41,6 +42,7 @@ export async function onRequestPost(context) {
 
   await env.TYPING_APP.put(`user:${id}`, JSON.stringify(user));
   await env.TYPING_APP.put(`userByName:${usernameNorm}`, id);
+  await markStorageReady(env);
 
   const token = await createToken(createSessionPayload(id), getSecret(env));
   return json({ user: publicUser(user), token }, 201);

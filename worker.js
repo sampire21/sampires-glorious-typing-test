@@ -30,6 +30,7 @@ const routes = [
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const requestId = request.headers.get('cf-ray') || crypto.randomUUID();
 
     // Handle dynamic route: /api/admin/users/:id
     const adminUserMatch = url.pathname.match(/^\/api\/admin\/users\/([^/]+)$/);
@@ -40,9 +41,20 @@ export default {
         : null;
       if (handler) {
         try {
-          return await handler({ request, env, params: { id } });
+          return await handler({ request, env, params: { id }, requestId });
         } catch (err) {
-          return new Response(JSON.stringify({ error: err.message || 'Internal server error' }), {
+          console.error('[api-error]', {
+            requestId,
+            method: request.method,
+            path: url.pathname,
+            error: err && err.message ? err.message : 'Internal server error',
+            stack: err && err.stack ? err.stack : null,
+          });
+          return new Response(JSON.stringify({
+            error: 'Internal server error',
+            code: 'INTERNAL_ERROR',
+            requestId,
+          }), {
             status: 500,
             headers: { 'content-type': 'application/json' },
           });
@@ -53,9 +65,20 @@ export default {
     const match = routes.find(r => r.method === request.method && r.path === url.pathname);
     if (match) {
       try {
-        return await match.handler({ request, env });
+        return await match.handler({ request, env, requestId });
       } catch (err) {
-        return new Response(JSON.stringify({ error: err.message || 'Internal server error' }), {
+        console.error('[api-error]', {
+          requestId,
+          method: request.method,
+          path: url.pathname,
+          error: err && err.message ? err.message : 'Internal server error',
+          stack: err && err.stack ? err.stack : null,
+        });
+        return new Response(JSON.stringify({
+          error: 'Internal server error',
+          code: 'INTERNAL_ERROR',
+          requestId,
+        }), {
           status: 500,
           headers: { 'content-type': 'application/json' },
         });
