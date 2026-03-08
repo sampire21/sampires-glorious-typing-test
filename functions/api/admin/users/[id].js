@@ -6,6 +6,10 @@ import {
   hasStorage,
   requireAdmin,
   userScoreKey,
+  validateUsername,
+  normalizeUsername,
+  hashPassword,
+  leaderboardKey,
 } from '../../_lib.js';
 
 const XP_PER_LEVEL = 500;
@@ -132,6 +136,8 @@ export async function onRequestPatch(context) {
   const setRewards = (body && typeof body.setRewards === 'object' && body.setRewards && !Array.isArray(body.setRewards))
     ? body.setRewards
     : null;
+  const resetUsernameRaw = body.resetUsername != null ? String(body.resetUsername).trim() : '';
+  const resetPassword = body.resetPassword != null ? String(body.resetPassword) : '';
 
   const hasSetOps = (
     setLevel !== null ||
@@ -143,7 +149,7 @@ export async function onRequestPatch(context) {
     setAchievements !== null ||
     !!setRewards
   );
-  if (addXp <= 0 && addSkillPoints <= 0 && unlockRewards.length === 0 && !hasSetOps) {
+  if (addXp <= 0 && addSkillPoints <= 0 && unlockRewards.length === 0 && !hasSetOps && !resetUsernameRaw && !resetPassword) {
     return json({ error: 'No grant changes provided' }, 400);
   }
 
@@ -152,9 +158,9 @@ export async function onRequestPatch(context) {
   let xp = Math.max(0, parseInt(progress['sampire-xp'] || '0', 10) || 0);
   let sp = Math.max(0, parseInt(progress['sampire-skill-points'] || '0', 10) || 0);
   const skills = parseJsonSafe(progress['sampire-skills'] || '{}', {});
-  if (setLevel !== null) xp = (setLevel - 1) * XP_PER_LEVEL;
-  if (setXp !== null) xp = setXp;
-  if (setSkillPoints !== null) sp = setSkillPoints;
+  if (setLevel !== null) xp += (setLevel - 1) * XP_PER_LEVEL;
+  if (setXp !== null) xp += setXp;
+  if (setSkillPoints !== null) sp += setSkillPoints;
   xp += addXp;
   sp += addSkillPoints;
   if (setRewards) {
@@ -200,11 +206,81 @@ export async function onRequestPatch(context) {
     soundscapes: !!skills.soundscapes,
     nebulaTrail: !!skills.nebulaTrail,
   });
+
+  let usernameChanged = false;
+  const nextUser = { ...user };
+  if (resetUsernameRaw) {
+    const usernameCheck = validateUsername(resetUsernameRaw);
+    if (!usernameCheck.ok) return json({ error: usernameCheck.error }, 400);
+    const nextNorm = normalizeUsername(usernameCheck.username);
+    if (nextNorm !== String(user.usernameNorm || '')) {
+      const existingUserId = await env.TYPING_APP.get(`userByName:${nextNorm}`);
+      if (existingUserId && existingUserId !== user.id) return json({ error: 'Username already exists' }, 409);
+      const prevNorm = normalizeUsername(user.usernameNorm || user.username || '');
+      await env.TYPING_APP.delete(`userByName:${prevNorm}`);
+      await env.TYPING_APP.put(`userByName:${nextNorm}`, user.id);
+      nextUser.username = usernameCheck.username;
+      nextUser.usernameNorm = nextNorm;
+      usernameChanged = true;
+    }
+  }
+  if (resetPassword) {
+    if (resetPassword.length < 6) return json({ error: 'Password must be at least 6 characters' }, 400);
+    const { salt, hash } = await hashPassword(resetPassword);
+    nextUser.passwordSalt = salt;
+    nextUser.passwordHash = hash;
+  }
+
+  if (usernameChanged) {
+    const rows = await getJson(env, leaderboardKey(), []);
+    let changed = false;
+    for (const row of rows) {
+      if (row.userId === user.id && row.username !== nextUser.username) {
+        row.username = nextUser.username;
+        changed = true;
+      }
+    }
+    if (changed) await putJson(env, leaderboardKey(), rows);
+    const userScores = await getJson(env, userScoreKey(user.id), []);
+    let scoreChanged = false;
+    for (const score of userScores) {
+      if (score.username !== nextUser.username) {
+        score.username = nextUser.username;
+        scoreChanged = true;
+      }
+    }
+    if (scoreChanged) await putJson(env, userScoreKey(user.id), userScores);
+  }
+
   const updatedAt = Date.now();
   await putJson(env, `progress:user:${id}`, { progress, updatedAt });
-  user.lastSeenAt = updatedAt;
-  await putJson(env, `user:${id}`, user);
+  nextUser.lastSeenAt = updatedAt;
+  await putJson(env, `user:${id}`, nextUser);
 
   const scores = await getJson(env, userScoreKey(id), []);
-  return json({ ok: true, user: buildUserDetail(user, { progress, updatedAt }, Array.isArray(scores) ? scores : []) }, 200);
+  return json({ ok: true, user: buildUserDetail(nextUser, { progress, updatedAt }, Array.isArray(scores) ? scores : []) }, 200);
+}
+
+export async function onRequestDelete(context) {
+  const { request, env, params } = context;
+  if (!hasStorage(env)) return json({ error: 'Server storage not configured (TYPING_APP KV binding missing).' }, 500);
+  const adminCheck = await requireAdmin(request, env);
+  if (!adminCheck.ok) return json({ error: adminCheck.error }, adminCheck.status);
+
+  const id = String(params.id || '').trim();
+  if (!id) return json({ error: 'Invalid user id' }, 400);
+  const user = await getJson(env, `user:${id}`, null);
+  if (!user) return json({ error: 'User not found' }, 404);
+
+  const norm = normalizeUsername(user.usernameNorm || user.username || '');
+  await env.TYPING_APP.delete(`userByName:${norm}`);
+  await env.TYPING_APP.delete(`user:${id}`);
+  await env.TYPING_APP.delete(userScoreKey(id));
+  await env.TYPING_APP.delete(`progress:user:${id}`);
+
+  const rows = await getJson(env, leaderboardKey(), []);
+  const filtered = rows.filter((row) => row.userId !== id);
+  await putJson(env, leaderboardKey(), filtered);
+
+  return json({ ok: true }, 200);
 }

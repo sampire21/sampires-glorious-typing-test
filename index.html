@@ -280,6 +280,14 @@
             color: #c9d1d9;
             box-shadow: none;
         }
+        button.secondary.toggle-on {
+            color: #c9d1d9;
+            border-color: #4c6ef5;
+            background: #223060;
+        }
+        button.secondary.toggle-on:hover {
+            background: #2b3d78;
+        }
 
         .btn-hint {
             display: inline;
@@ -3031,6 +3039,21 @@
             font-weight: 700;
             color: #e2e8f0;
         }
+        .profile-name-row {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+        .profile-streak-inline {
+            font-size: 0.74rem;
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            background: rgba(251, 191, 36, 0.12);
+            border-radius: 999px;
+            padding: 0.14rem 0.5rem;
+            line-height: 1.2;
+        }
         .profile-meta { font-size: 0.75rem; color: #6b7280; margin-top: 0.15rem; }
         .profile-stats-grid {
             display: grid;
@@ -3799,9 +3822,9 @@
         </div>
     </div>
 
-    <button class="profile-toggle" id="profile-toggle" onclick="openProfile()">
+    <button class="profile-toggle" id="profile-toggle" onclick="openProfileOrLogin()">
         <span class="profile-user-icon" id="profile-user-icon" aria-hidden="true">👤</span>
-        <span>Profile</span>
+        <span id="profile-toggle-label">Profile</span>
         <span class="profile-hover-card" id="profile-hover-card" aria-hidden="true">
             <div class="profile-hover-title" id="profile-hover-title">Not logged in</div>
             <div class="profile-hover-line" id="profile-hover-line-1">Log in to view your progress snapshot.</div>
@@ -3876,6 +3899,7 @@
     <div class="buttons" style="margin-top: 1.25rem;">
         <button class="new-test-btn" onclick="newTest()">New Quote<span class="btn-hint">(Spacebar)</span></button>
         <button class="secondary" onclick="restart()">Restart<span class="btn-hint">(Tab)</span></button>
+        <button class="secondary" id="ghost-toggle-btn" onclick="toggleGhostCursor()">Ghost Cursor: On</button>
     </div>
 </div><!-- /typing-area -->
 
@@ -3889,42 +3913,6 @@
         </div>
         <div id="history-list"></div>
         <button class="history-clear" onclick="clearHistory()">Clear history</button>
-    </div>
-
-    <div class="account-section" id="account-section">
-        <div class="account-header">
-            <span class="account-title">Account</span>
-            <span class="account-status" id="account-status">Not logged in</span>
-        </div>
-        <div class="auth-grid" id="auth-grid">
-            <label class="sr-only" for="auth-username">Username</label>
-            <input id="auth-username" name="username" type="text" maxlength="24" autocomplete="username" placeholder="username">
-            <label class="sr-only" for="auth-password">Password</label>
-            <input id="auth-password" name="password" type="password" maxlength="72" autocomplete="current-password" placeholder="password">
-            <button type="button" class="secondary" id="login-btn">Login</button>
-        </div>
-        <div class="auth-actions" id="auth-actions">
-            <div class="signup-cta" id="signup-cta">
-                <div class="signup-cta-text">Don't have an account? Create one for free to keep track of your scores, level up and earn rewards!</div>
-                <button type="button" class="create-account-btn" id="open-signup-btn">Create Account</button>
-            </div>
-            <button type="button" class="secondary" id="logout-btn" onclick="logoutUser()" style="display:none;">Logout</button>
-        </div>
-        <div class="auth-note" id="auth-note"></div>
-        <div class="cloud-metrics" id="cloud-metrics" style="display:none;">
-            <div class="cloud-metric">
-                <div class="cloud-metric-label">Cloud Best</div>
-                <div class="cloud-metric-value" id="cloud-best">0</div>
-            </div>
-            <div class="cloud-metric">
-                <div class="cloud-metric-label">Cloud Avg</div>
-                <div class="cloud-metric-value" id="cloud-avg">0</div>
-            </div>
-            <div class="cloud-metric">
-                <div class="cloud-metric-label">Cloud Tests</div>
-                <div class="cloud-metric-value" id="cloud-tests">0</div>
-            </div>
-        </div>
     </div>
 
 </div>
@@ -3955,12 +3943,50 @@
 </div>
 
 <!-- Profile modal -->
+<div class="profile-modal" id="login-modal" aria-hidden="true" onclick="handleLoginModalBackdrop(event)">
+    <div class="profile-modal-card" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div class="profile-modal-header">
+            <div class="profile-modal-title" id="login-modal-title">Login</div>
+            <button type="button" class="leaderboard-modal-close secondary" onclick="closeLoginModal()" aria-label="Close login">X</button>
+        </div>
+        <div class="auth-grid" id="auth-grid">
+            <label class="sr-only" for="auth-username">Username</label>
+            <input id="auth-username" name="username" type="text" maxlength="24" autocomplete="username" placeholder="username">
+            <label class="sr-only" for="auth-password">Password</label>
+            <input id="auth-password" name="password" type="password" maxlength="72" autocomplete="current-password" placeholder="password">
+            <button type="button" class="secondary" id="login-btn">Login</button>
+        </div>
+        <div class="auth-actions" id="auth-actions">
+            <div class="signup-cta" id="signup-cta">
+                <div class="signup-cta-text">Don't have an account? Create one for free to track your scores, level up and unlock rewards!</div>
+                <button type="button" class="create-account-btn" id="open-signup-btn">Create Account</button>
+            </div>
+        </div>
+        <div class="auth-note" id="auth-note"></div>
+        <div class="cloud-metrics" id="cloud-metrics" style="display:none;">
+            <div class="cloud-metric">
+                <div class="cloud-metric-label">Cloud Best</div>
+                <div class="cloud-metric-value" id="cloud-best">0</div>
+            </div>
+            <div class="cloud-metric">
+                <div class="cloud-metric-label">Cloud Avg</div>
+                <div class="cloud-metric-value" id="cloud-avg">0</div>
+            </div>
+            <div class="cloud-metric">
+                <div class="cloud-metric-label">Cloud Tests</div>
+                <div class="cloud-metric-value" id="cloud-tests">0</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="profile-modal" id="profile-modal" aria-hidden="true" onclick="handleProfileBackdrop(event)">
     <div class="profile-modal-card" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
         <div class="profile-modal-header">
             <div class="profile-modal-title" id="profile-modal-title">Profile</div>
             <div class="profile-modal-header-actions">
                 <button type="button" class="profile-admin-btn" id="profile-admin-btn" onclick="openAdminPanel()" style="display:none;" aria-label="Open admin panel">Admin</button>
+                <button type="button" class="secondary" id="logout-btn" onclick="logoutUser()" style="display:none;">Logout</button>
                 <button type="button" class="profile-account-cog" id="profile-account-cog" onclick="openAccountManagement()" aria-label="Manage your Account">
                     <span class="account-manage-icon" aria-hidden="true">⚙</span>
                     <span class="account-manage-tip">Manage your Account</span>
@@ -4517,6 +4543,34 @@ function getGhostIndexAtElapsed(elapsed) {
     return ghostTimeline[ghostTimeline.length - 1].index;
 }
 
+function loadGhostCursorPreference() {
+    try {
+        const stored = localStorage.getItem(GHOST_CURSOR_ENABLED_KEY);
+        if (stored === '0') ghostCursorEnabled = false;
+        else if (stored === '1') ghostCursorEnabled = true;
+    } catch (e) {}
+}
+
+function updateGhostToggleButton() {
+    const btn = document.getElementById('ghost-toggle-btn');
+    if (!btn) return;
+    btn.textContent = `Ghost Cursor: ${ghostCursorEnabled ? 'On' : 'Off'}`;
+    btn.classList.toggle('toggle-on', ghostCursorEnabled);
+}
+
+function toggleGhostCursor() {
+    ghostCursorEnabled = !ghostCursorEnabled;
+    try { localStorage.setItem(GHOST_CURSOR_ENABLED_KEY, ghostCursorEnabled ? '1' : '0'); } catch (e) {}
+    if (!ghostCursorEnabled) {
+        ghostReplayIndex = -1;
+    } else if (Array.isArray(ghostTimeline) && ghostTimeline.length > 0) {
+        const elapsed = startTime ? getElapsed() : 0;
+        ghostReplayIndex = Math.max(0, Math.min(currentQuote.length - 1, getGhostIndexAtElapsed(elapsed)));
+    }
+    updateGhostToggleButton();
+    renderQuote();
+}
+
 function recordAttemptTimelinePoint() {
     if (!startTime) return;
     const t = getElapsed();
@@ -4559,7 +4613,7 @@ function init(quote, source = '') {
     isComplete   = false;
     ghostChars   = Array.isArray(pendingGhostChars) ? pendingGhostChars.slice() : [];
     ghostTimeline = Array.isArray(pendingGhostTimeline) ? pendingGhostTimeline.slice() : [];
-    ghostReplayIndex = ghostTimeline.length > 0 ? ghostTimeline[0].index : -1;
+    ghostReplayIndex = (ghostCursorEnabled && ghostTimeline.length > 0) ? ghostTimeline[0].index : -1;
     attemptTimeline = [];
     pendingGhostChars = null;
     pendingGhostTimeline = null;
@@ -4650,10 +4704,10 @@ function makeCharSpan(i) {
         span.className = 'char-cursor';
     } else {
         span.className = 'char-untyped';
-        if (ghostChars[i] !== undefined) {
+        if (ghostCursorEnabled && ghostChars[i] !== undefined) {
             span.classList.add(ghostChars[i] === ch ? 'char-ghost-correct' : 'char-ghost-incorrect');
         }
-        if (i === ghostReplayIndex && i !== currentIndex) {
+        if (ghostCursorEnabled && i === ghostReplayIndex && i !== currentIndex) {
             span.classList.add('char-ghost-cursor');
         }
     }
@@ -4703,10 +4757,10 @@ function updateCharSpan(i) {
         span.className = 'char-cursor';
     } else {
         span.className = 'char-untyped';
-        if (ghostChars[i] !== undefined) {
+        if (ghostCursorEnabled && ghostChars[i] !== undefined) {
             span.classList.add(ghostChars[i] === ch ? 'char-ghost-correct' : 'char-ghost-incorrect');
         }
-        if (i === ghostReplayIndex && i !== currentIndex) {
+        if (ghostCursorEnabled && i === ghostReplayIndex && i !== currentIndex) {
             span.classList.add('char-ghost-cursor');
         }
     }
@@ -5044,7 +5098,7 @@ function startTimer() {
         updateStats();
         sampleWpm();
         updateLiveChart();
-        if (ghostTimeline.length > 0) {
+        if (ghostCursorEnabled && ghostTimeline.length > 0) {
             const nextGhost = Math.max(0, Math.min(currentQuote.length - 1, getGhostIndexAtElapsed(elapsed)));
             if (nextGhost !== ghostReplayIndex) {
                 const oldGhost = ghostReplayIndex;
@@ -5128,6 +5182,7 @@ const LOCAL_AUTH_USERS_KEY = 'sampire-local-auth-users';
 const LOCAL_AUTH_SCORES_KEY = 'sampire-local-auth-scores';
 const LOCAL_GUEST_SCORES_KEY = 'sampire-local-guest-scores';
 const GUEST_SESSION_ID_KEY = 'sampire-guest-session-id';
+const GHOST_CURSOR_ENABLED_KEY = 'sampire-ghost-cursor-enabled';
 const STORAGE_SAFETY_SNAPSHOT_KEY = 'sampire-storage-snapshot-v1';
 const PROGRESS_OWNER_KEY = 'sampire-progress-owner';
 const SYNC_PROGRESS_KEYS = [
@@ -5174,11 +5229,13 @@ let localApiFallbackActive = false;
 let sessionBestWpm = 0;
 let activeModalEl = null;
 let previousFocusEl = null;
+let modalStack = [];
 let signupCaptchaAnswer = null;
 let progressSyncTimer = null;
 let progressSyncInFlight = false;
 let suppressProgressSync = false;
 let progressCloudUpdatedAt = 0;
+let ghostCursorEnabled = true;
 
 function loadLocalJson(key, fallback) {
     try {
@@ -5854,12 +5911,22 @@ async function localApiFetch(url, options = {}, headers = {}) {
             const setRewards = (body && typeof body.setRewards === 'object' && body.setRewards && !Array.isArray(body.setRewards))
                 ? body.setRewards
                 : null;
+            const resetUsernameRaw = body.resetUsername != null ? String(body.resetUsername).trim() : '';
+            const resetPassword = body.resetPassword != null ? String(body.resetPassword) : '';
+            const hasSetOps = (
+                setLevel !== null || setXp !== null || setSkillPoints !== null ||
+                setStreakDays !== null || setDailyCompleted !== null ||
+                setWeeklyCompleted !== null || setAchievements !== null || !!setRewards
+            );
+            if (addXp <= 0 && addSkillPoints <= 0 && unlockRewards.length === 0 && !hasSetOps && !resetUsernameRaw && !resetPassword) {
+                localApiError(400, 'No grant changes provided');
+            }
             let xp = Math.max(0, parseInt(progress['sampire-xp'] || '0', 10) || 0);
             let sp = Math.max(0, parseInt(progress['sampire-skill-points'] || '0', 10) || 0);
             const skills = parseJsonSafe(progress['sampire-skills'] || '{}', {});
-            if (setLevel !== null) xp = (setLevel - 1) * 500;
-            if (setXp !== null) xp = setXp;
-            if (setSkillPoints !== null) sp = setSkillPoints;
+            if (setLevel !== null) xp += (setLevel - 1) * 500;
+            if (setXp !== null) xp += setXp;
+            if (setSkillPoints !== null) sp += setSkillPoints;
             xp += addXp;
             sp += addSkillPoints;
             if (setRewards) {
@@ -5891,10 +5958,45 @@ async function localApiFetch(url, options = {}, headers = {}) {
                 soundscapes: !!skills.soundscapes,
                 nebulaTrail: !!skills.nebulaTrail,
             });
+            if (resetUsernameRaw) {
+                const usernameNorm = resetUsernameRaw.toLowerCase();
+                if (!usernameNorm || usernameNorm.length < 3 || usernameNorm.length > 24 || !/^[a-z0-9_]+$/.test(usernameNorm)) {
+                    localApiError(400, 'Username must be 3-24 chars: a-z, 0-9, _');
+                }
+                const taken = users.some(u => u.usernameNorm === usernameNorm && u.id !== user.id);
+                if (taken) localApiError(409, 'Username already exists');
+                user.username = resetUsernameRaw;
+                user.usernameNorm = usernameNorm;
+                for (const row of scores) {
+                    if (row.userId === user.id) row.username = resetUsernameRaw;
+                }
+                saveLocalJson(LOCAL_AUTH_SCORES_KEY, scores);
+            }
+            if (resetPassword) {
+                if (resetPassword.length < 6) localApiError(400, 'Password must be at least 6 characters');
+                const salt = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+                    .map(b => b.toString(16).padStart(2, '0')).join('');
+                const pwHash = await localHashPassword(resetPassword, salt);
+                user.passwordSalt = salt;
+                user.passwordHash = pwHash;
+                delete user.password;
+            }
             user.progress = progress;
             user.progressUpdatedAt = Date.now();
             users[userIdx] = user;
             saveLocalJson(LOCAL_AUTH_USERS_KEY, users);
+            return { ok: true };
+        }
+        if (method === 'DELETE') {
+            const filteredUsers = users.filter(u => u.id !== user.id);
+            const filteredScores = scores.filter(s => s.userId !== user.id);
+            saveLocalJson(LOCAL_AUTH_USERS_KEY, filteredUsers);
+            saveLocalJson(LOCAL_AUTH_SCORES_KEY, filteredScores);
+            const state = getCommunityWeeklyContributionState();
+            if (state && state.entries && typeof state.entries === 'object') {
+                delete state.entries[`user:${user.id}`];
+                setCommunityWeeklyContributionState(state);
+            }
             return { ok: true };
         }
         localApiError(405, 'Method not allowed');
@@ -6071,8 +6173,15 @@ function getModalFocusableElements(modal) {
 
 function openModal(modal) {
     if (!modal) return;
-    if (activeModalEl && activeModalEl !== modal) closeModal(activeModalEl);
-    previousFocusEl = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (activeModalEl === modal) return;
+    if (!activeModalEl) {
+        previousFocusEl = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        modalStack = [];
+    } else {
+        activeModalEl.classList.remove('show');
+        activeModalEl.setAttribute('aria-hidden', 'true');
+        modalStack.push(activeModalEl);
+    }
     modal.classList.add('show');
     modal.setAttribute('aria-hidden', 'false');
     activeModalEl = modal;
@@ -6084,10 +6193,23 @@ function closeModal(modal) {
     if (!modal) return;
     modal.classList.remove('show');
     modal.setAttribute('aria-hidden', 'true');
-    const shouldRestore = activeModalEl === modal;
-    if (shouldRestore) activeModalEl = null;
-    const restoreTarget = shouldRestore ? previousFocusEl : null;
-    if (shouldRestore) previousFocusEl = null;
+    if (activeModalEl !== modal) {
+        const idx = modalStack.lastIndexOf(modal);
+        if (idx >= 0) modalStack.splice(idx, 1);
+        return;
+    }
+    if (modalStack.length > 0) {
+        const prior = modalStack.pop();
+        prior.classList.add('show');
+        prior.setAttribute('aria-hidden', 'false');
+        activeModalEl = prior;
+        const focusables = getModalFocusableElements(prior);
+        if (focusables.length > 0) focusables[0].focus();
+        return;
+    }
+    activeModalEl = null;
+    const restoreTarget = previousFocusEl;
+    previousFocusEl = null;
     if (restoreTarget && typeof restoreTarget.focus === 'function') {
         setTimeout(() => restoreTarget.focus(), 0);
     }
@@ -6134,24 +6256,53 @@ function handleSignupModalBackdrop(event) {
     if (event && event.target === document.getElementById('signup-modal')) closeSignupModal();
 }
 
+function openLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (!modal) return;
+    openModal(modal);
+    setAuthNote('');
+    const userInput = document.getElementById('auth-username');
+    const passInput = document.getElementById('auth-password');
+    if (userInput) userInput.value = '';
+    if (passInput) passInput.value = '';
+    if (userInput) userInput.focus();
+}
+
+function closeLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (!modal) return;
+    closeModal(modal);
+}
+
+function handleLoginModalBackdrop(event) {
+    if (event && event.target === document.getElementById('login-modal')) closeLoginModal();
+}
+
+function openProfileOrLogin() {
+    if (currentUser) openProfile();
+    else openLoginModal();
+}
+
 function isAdminCurrentUser() {
     return !!(currentUser && String(currentUser.username || '').trim().toLowerCase() === 'sampire');
 }
 
 function updateAuthUi() {
-    const status = document.getElementById('account-status');
     const logoutBtn = document.getElementById('logout-btn');
     const metrics = document.getElementById('cloud-metrics');
     const authGrid = document.getElementById('auth-grid');
     const signupCta = document.getElementById('signup-cta');
     const profileToggle = document.getElementById('profile-toggle');
+    const profileToggleLabel = document.getElementById('profile-toggle-label');
+    const profileUserIcon = document.getElementById('profile-user-icon');
     const adminBtn = document.getElementById('profile-admin-btn');
-    if (status) status.textContent = currentUser ? `Logged in as ${currentUser.username}` : 'Not logged in';
     if (logoutBtn) logoutBtn.style.display = currentUser ? 'inline-block' : 'none';
     if (authGrid) authGrid.style.display = currentUser ? 'none' : 'grid';
     if (signupCta) signupCta.style.display = currentUser ? 'none' : 'flex';
     if (metrics && !currentUser) metrics.style.display = 'none';
     if (profileToggle) profileToggle.style.display = 'flex';
+    if (profileToggleLabel) profileToggleLabel.textContent = currentUser ? 'Profile' : 'Login';
+    if (profileUserIcon) profileUserIcon.textContent = currentUser ? '👤' : '🔐';
     if (adminBtn) adminBtn.style.display = isAdminCurrentUser() ? 'inline-flex' : 'none';
     updateProfileToggleHoverInfo();
 }
@@ -6174,6 +6325,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         await hydrateProgressForCurrentUser();
         updateAuthUi();
+        closeLoginModal();
         setAuthNote('Account created and logged in.');
         if (usingModal) {
             setSignupNote('Account created and logged in.');
@@ -6223,6 +6375,7 @@ async function loginUser() {
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         await hydrateProgressForCurrentUser();
         updateAuthUi();
+        closeLoginModal();
         setAuthNote('Logged in successfully.');
         await refreshCloudProgress();
         await refreshLeaderboard();
@@ -6933,6 +7086,10 @@ function handleLeaderboardBackdrop(event) {
 
 // ── Profile ─────────────────────────────────────────────────────────────────
 function openProfile() {
+    if (!currentUser) {
+        openLoginModal();
+        return;
+    }
     const modal = document.getElementById('profile-modal');
     if (!modal) return;
     openModal(modal);
@@ -7021,6 +7178,8 @@ function renderAdminUserDetail(user) {
             <input id="admin-set-achievements" type="number" min="0" step="1" placeholder="Set Achievements">
             <input id="admin-add-xp" type="number" min="0" step="1" placeholder="Add XP">
             <input id="admin-add-sp" type="number" min="0" step="1" placeholder="Add Skill Points">
+            <input id="admin-reset-username" type="text" maxlength="24" placeholder="Reset Username">
+            <input id="admin-reset-password" type="password" maxlength="72" placeholder="Reset Password">
         </div>
         <div class="admin-reward-toggles">
             <label><input type="checkbox" id="admin-unlock-aura" ${user.skillsUnlocked?.includes('aura') ? 'checked' : ''}> Aura Unlocked</label>
@@ -7028,7 +7187,8 @@ function renderAdminUserDetail(user) {
             <label><input type="checkbox" id="admin-unlock-nebula" ${user.skillsUnlocked?.includes('nebulaTrail') ? 'checked' : ''}> Nebula Trail Unlocked</label>
         </div>
         <div>
-            <button type="button" class="secondary" onclick="applyAdminGrant()">Apply Grant</button>
+            <button type="button" class="secondary" onclick="applyAdminGrant()">Apply Changes</button>
+            <button type="button" class="secondary danger-btn" onclick="adminDeleteSelectedUser()" style="margin-left:0.5rem;">Delete User</button>
         </div>
     `;
 }
@@ -7113,6 +7273,8 @@ async function applyAdminGrant() {
     const setDailyCompleted = parseOptionalInt('admin-set-daily', 0);
     const setWeeklyCompleted = parseOptionalInt('admin-set-weekly', 0);
     const setAchievements = parseOptionalInt('admin-set-achievements', 0);
+    const resetUsername = String(document.getElementById('admin-reset-username')?.value || '').trim();
+    const resetPassword = String(document.getElementById('admin-reset-password')?.value || '');
     const unlockRewards = [];
     if (document.getElementById('admin-unlock-aura')?.checked) unlockRewards.push('aura');
     if (document.getElementById('admin-unlock-soundscapes')?.checked) unlockRewards.push('soundscapes');
@@ -7122,7 +7284,7 @@ async function applyAdminGrant() {
         setStreakDays !== null || setDailyCompleted !== null ||
         setWeeklyCompleted !== null || setAchievements !== null
     );
-    if (addXp <= 0 && addSkillPoints <= 0 && unlockRewards.length === 0 && !hasSetOps) {
+    if (addXp <= 0 && addSkillPoints <= 0 && unlockRewards.length === 0 && !hasSetOps && !resetUsername && !resetPassword) {
         setAdminNote('Enter at least one value to set/add, or adjust rewards.', true);
         return;
     }
@@ -7146,17 +7308,44 @@ async function applyAdminGrant() {
                 setAchievements,
                 setRewards,
                 unlockRewards,
+                resetUsername: resetUsername || null,
+                resetPassword: resetPassword || null,
             }),
         });
-        setAdminNote('Grant applied successfully.');
+        setAdminNote('Admin changes applied successfully.');
         if (currentUser && String(currentUser.id || '') === String(adminSelectedUserId)) {
             await hydrateProgressForCurrentUser();
             await refreshCloudProgress();
             if (currentMode === 'daily') renderDailyChallenges();
+            const me = await apiFetch('/api/me');
+            currentUser = me && me.user ? me.user : currentUser;
+            updateAuthUi();
         }
         await loadAdminUsers();
     } catch (e) {
         setAdminNote(e.message || 'Unable to apply grant.', true);
+    }
+}
+
+async function adminDeleteSelectedUser() {
+    if (!isAdminCurrentUser() || !adminSelectedUserId) return;
+    const target = adminUsersCache.find((u) => String(u.id) === String(adminSelectedUserId));
+    const uname = target && target.username ? String(target.username) : 'this user';
+    const ok = window.confirm(`Delete account "${uname}" permanently? This cannot be undone.`);
+    if (!ok) return;
+    try {
+        await apiFetch(`/api/admin/users/${encodeURIComponent(adminSelectedUserId)}`, { method: 'DELETE' });
+        setAdminNote('User account deleted.');
+        if (currentUser && String(currentUser.id || '') === String(adminSelectedUserId)) {
+            logoutUser();
+            closeAdminPanel();
+            setAuthNote('Your account was deleted by admin.');
+            return;
+        }
+        adminSelectedUserId = '';
+        await loadAdminUsers();
+    } catch (e) {
+        setAdminNote(e.message || 'Unable to delete user account.', true);
     }
 }
 
@@ -7395,12 +7584,21 @@ function renderProfile(scores) {
 
     const safeDisplayName = (String(displayName || '').trim() || 'Guest');
     const initial = safeDisplayName.charAt(0).toUpperCase();
+    const streakCount = Math.max(0, Number(getStreakData().streak || 0) || 0);
+    const streakMultiplier = getXPMultiplier(streakCount);
+    const streakText = `${streakCount}-day streak${streakCount >= 3 ? ' 🔥' : ''}`;
+    const xpBoostText = streakMultiplier > 1
+        ? ` · ${streakMultiplier.toFixed(1).replace('.0', '')}x XP boost`
+        : '';
 
     content.innerHTML = `
         <div class="profile-header">
             <div class="profile-avatar">${escapeHtml(initial)}</div>
             <div>
-                <div class="profile-name">${escapeHtml(safeDisplayName)}</div>
+                <div class="profile-name-row">
+                    <div class="profile-name">${escapeHtml(safeDisplayName)}</div>
+                    <div class="profile-streak-inline">${escapeHtml(streakText + xpBoostText)}</div>
+                </div>
                 <div class="profile-meta">${isGuest ? 'Local session (not synced)' : `Member since ${escapeHtml(joinStr)}`}</div>
             </div>
         </div>
@@ -8098,12 +8296,7 @@ function handleTypingKeydown(e) {
         playKeypressSound('Tab');
         e.preventDefault();
         e.stopPropagation();
-        if (activeChallengeId) {
-            playSound(SFX.below50);
-            abandonChallenge();
-        } else {
-            restart();
-        }
+        restart();
         return;
     }
 
@@ -8237,6 +8430,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeAccountManagement();
     if (e.key === 'Escape') closeDeleteAccountConfirm();
     if (e.key === 'Escape') closeSignupModal();
+    if (e.key === 'Escape') closeLoginModal();
     if (e.key === 'Escape') closeAdminPanel();
     if (e.key === 'Escape') closeCommunityHub();
 });
@@ -9605,19 +9799,19 @@ function updateChallengeHint() {
     const hint = document.getElementById('hint');
     if (!hint) return;
     if (activeChallengeId === 'nobackspace')
-        hint.textContent = `Backspace is disabled \u00b7 Tab to abandon \u00b7 ${NO_BACKSPACE_MIN_ACC}% accuracy required`;
+        hint.textContent = `Backspace is disabled \u00b7 Tab to restart \u00b7 ${NO_BACKSPACE_MIN_ACC}% accuracy required`;
     else if (activeChallengeId === 'perfectionist')
-        hint.textContent = 'Any mistake fails immediately \u00b7 Tab to abandon';
+        hint.textContent = 'Any mistake fails immediately \u00b7 Tab to restart';
     else if (activeChallengeId === 'sprint')
-        hint.textContent = '30 seconds \u00b7 100 WPM \u00b7 Tab to abandon';
+        hint.textContent = '30 seconds \u00b7 100 WPM \u00b7 Tab to restart';
     else if (activeChallengeId === 'marathon')
-        hint.textContent = 'Weekly challenge \u00b7 keep typing to build toward 10,000 words \u00b7 Tab to abandon';
+        hint.textContent = 'Weekly challenge \u00b7 keep typing to build toward 10,000 words \u00b7 Tab to restart';
     else if (activeChallengeId === 'consistent_climber')
-        hint.textContent = 'Weekly challenge \u00b7 stay within 5% of your PB for 10 tests \u00b7 Tab to abandon';
+        hint.textContent = 'Weekly challenge \u00b7 stay within 5% of your PB for 10 tests \u00b7 Tab to restart';
     else if (activeChallengeId === 'rival_week')
-        hint.textContent = 'Weekly challenge \u00b7 beat last week\'s community median \u00b7 Tab to abandon';
+        hint.textContent = 'Weekly challenge \u00b7 beat last week\'s community median \u00b7 Tab to restart';
     else if (activeChallengeId === 'above_average')
-        hint.textContent = 'Weekly challenge \u00b7 hit 5% above your average WPM in 5 tests \u00b7 Tab to abandon';
+        hint.textContent = 'Weekly challenge \u00b7 hit 5% above your average WPM in 5 tests \u00b7 Tab to restart';
     else
         hint.textContent = 'Click the text above to begin \u00b7 Tab to restart \u00b7 Backspace to correct';
 }
@@ -9658,6 +9852,8 @@ function bindAuthInputEvents() {
 
 bindAuthInputEvents();
 setupLeaderboardHoverHandlers();
+loadGhostCursorPreference();
+updateGhostToggleButton();
 renderHistory();
 newTest();
 sfxReady = true; // enable sounds after initial load

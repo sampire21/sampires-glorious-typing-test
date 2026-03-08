@@ -9,7 +9,7 @@ import { onRequestPost as handleCommunityContribute } from './functions/api/comm
 import { onRequestPatch as handleAccountPatch, onRequestDelete as handleAccountDelete } from './functions/api/account.js';
 import { onRequestGet as handleUserSummary } from './functions/api/user-summary.js';
 import { onRequestGet as handleAdminUsers } from './functions/api/admin/users.js';
-import { onRequestGet as handleAdminUserGet, onRequestPatch as handleAdminUserPatch } from './functions/api/admin/users/[id].js';
+import { onRequestGet as handleAdminUserGet, onRequestPatch as handleAdminUserPatch, onRequestDelete as handleAdminUserDelete } from './functions/api/admin/users/[id].js';
 
 const routes = [
   { method: 'POST', path: '/api/signup', handler: handleSignup },
@@ -38,6 +38,7 @@ export default {
       const id = decodeURIComponent(adminUserMatch[1]);
       const handler = request.method === 'GET' ? handleAdminUserGet
         : request.method === 'PATCH' ? handleAdminUserPatch
+        : request.method === 'DELETE' ? handleAdminUserDelete
         : null;
       if (handler) {
         try {
