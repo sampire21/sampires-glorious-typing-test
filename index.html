@@ -5436,6 +5436,15 @@ function scheduleProgressSync(delayMs = 800) {
     }, delayMs);
 }
 
+function flushProgressSyncNow() {
+    if (!currentUser || !authToken || suppressProgressSync) return;
+    if (progressSyncTimer) {
+        clearTimeout(progressSyncTimer);
+        progressSyncTimer = null;
+    }
+    pushCloudProgressSnapshot();
+}
+
 async function hydrateProgressForCurrentUser() {
     if (!currentUser || !authToken) return;
     const uid = String(currentUser.id || '');
@@ -6509,6 +6518,8 @@ async function loginUser() {
 }
 
 function logoutUser() {
+    // Try to flush pending progress before token/session teardown.
+    flushProgressSyncNow();
     authToken = null;
     currentUser = null;
     localApiFallbackActive = false;
@@ -6676,6 +6687,17 @@ let lbTooltipHideTimer = null;
 let lbTooltipActiveUsername = '';
 let lbTooltipRequestToken = 0;
 
+function normalizeSummaryUsername(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function invalidateLeaderboardUserSummaryCache(username) {
+    const key = normalizeSummaryUsername(username);
+    if (!key) return;
+    lbUserSummaryCache.delete(key);
+    lbUserSummaryInFlight.delete(key);
+}
+
 function hideLeaderboardUserTooltip(immediate = false) {
     const tooltip = document.getElementById('lb-user-tooltip');
     if (!tooltip) return;
@@ -6733,7 +6755,7 @@ function renderLeaderboardUserTooltip(summary) {
 }
 
 async function fetchLeaderboardUserSummary(username) {
-    const key = String(username || '').trim().toLowerCase();
+    const key = normalizeSummaryUsername(username);
     if (!key) throw new Error('username is required');
     const now = Date.now();
     const cached = lbUserSummaryCache.get(key);
@@ -6754,6 +6776,15 @@ async function fetchLeaderboardUserSummary(username) {
             personalBestWpm: Math.max(0, Number(out && out.personalBestWpm) || 0),
             communityContributionTotal: Math.max(0, Number(out && out.communityContributionTotal) || 0),
         };
+        // For the currently logged-in user, prefer the local badge state immediately
+        // so newly unlocked achievements appear in hover without waiting for cache TTL.
+        const currentUsernameKey = normalizeSummaryUsername(currentUser && currentUser.username);
+        if (currentUsernameKey && currentUsernameKey === key) {
+            const localBadgeIds = getEarnedBadges()
+                .map((b) => (typeof b === 'string' ? b : String(b && b.id || '')))
+                .filter(Boolean);
+            data.badgeIds = [...new Set([...(Array.isArray(data.badgeIds) ? data.badgeIds : []), ...localBadgeIds])];
+        }
         lbUserSummaryCache.set(key, { ts: Date.now(), data });
         return data;
     })();
@@ -8985,6 +9016,10 @@ document.addEventListener('keydown', retryThemeMusicAfterGesture);
 window.addEventListener('focus', retryThemeMusicAfterGesture);
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) retryThemeMusicAfterGesture();
+    if (document.hidden) flushProgressSyncNow();
+});
+window.addEventListener('pagehide', () => {
+    flushProgressSyncNow();
 });
 window.addEventListener('scroll', updateScrollHeaderState, { passive: true });
 updateScrollHeaderState();
@@ -9565,6 +9600,10 @@ function awardBadge(id) {
     if (badges.some(b => b.id === id)) return false;
     badges.push({ id, earnedAt: Date.now() });
     try { localStorage.setItem(BADGES_KEY, JSON.stringify(badges)); } catch(e) {}
+    invalidateLeaderboardUserSummaryCache(currentUser && currentUser.username);
+    // Badge unlocks are high-value progress; flush immediately so redeploy refreshes
+    // do not race and lose unsynced achievements.
+    flushProgressSyncNow();
     addXP(200);
     return true;
 }

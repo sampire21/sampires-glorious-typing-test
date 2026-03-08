@@ -155,3 +155,53 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - no console/page errors
   - keypress dispatch (letter/space/backspace) executed with pack enabled
   - selected pack persisted (`sampire-key-sound-pack=cherrymx-blue-abs`).
+
+## Update 11: GitHub deployment + comprehensive production Playwright audit
+- Deployed latest changes to GitHub `main`:
+  - remote: `https://github.com/sampire21/sampires-glorious-typing-test.git`
+  - commit pushed: `6ea28e5` (`Fix auth/leaderboard reliability and add key sound pack menu`)
+- Ran comprehensive Playwright production audit against `https://type.sherathia.com`:
+  - script: `output/full_prod_audit_v2.cjs`
+  - summary artifact: `output/playwright-full/summary.json`
+  - screenshots captured: `output/playwright-full/01-home.png` through `10-account-modal.png` (plus follow-up shots)
+- Core functional coverage that passed:
+  - page load + top controls
+  - key sounds dropdown options and pack switching (`NK Creams`, `Cherry MX Blues`)
+  - mode switching (`Quotes`, `Random Words`, `Words 30s`, `Challenges`)
+  - typing interaction metrics update
+  - leaderboard tabs render distinct layouts (`All Time`/`This Week` score columns vs `Community Goal` damage columns)
+  - leaderboard username hover tooltip includes: `Level`, `Achievements`, `Total Community Damage`, `Personal Best WPM`
+  - auth bad-credentials message path (`Invalid username or password`)
+- Follow-up targeted Playwright checks:
+  - `output/full_prod_followup_v3.cjs` validated community hub opens from clean state and account management modal opens.
+  - additional isolated auth lifecycle script confirmed signup -> logout -> re-login success (`output/auth_lifecycle_check.cjs` run result pass).
+- Notes:
+  - Initial failures in the large suite were mostly harness-level modal-overlay click interception (attempting to click background controls while a modal remained open), not functional regressions.
+  - One expected network item appears during bad-login scenario: `401 /api/login`.
+
+## Update 12: Targeted re-check for previously ambiguous cases
+- Ran focused Playwright follow-up with retries/modal-safe sequencing:
+  - script: `output/targeted_summary_final.cjs`
+  - summary: `output/playwright-full/targeted-summary-final.json`
+- All targeted checks passed:
+  - leaderboard hover tooltip includes Level/Achievements/Total Community Damage/Personal Best WPM
+  - signup -> logout -> re-login lifecycle
+  - account management modal accessibility from profile
+
+## Update 13: Achievement persistence hardening
+- Addressed report that achievements were not consistently retained after deploy/reload.
+- Added immediate progress flush when a badge is awarded (`awardBadge -> flushProgressSyncNow()`), so unlocks are pushed to `/api/progress` without waiting for debounce.
+- Added pre-logout flush (`logoutUser`) to reduce risk of losing queued progress before token/session teardown.
+- Added unload/hidden flush hooks:
+  - `document.visibilitychange` flushes when tab becomes hidden.
+  - `window.pagehide` flushes before page unload/navigation.
+- JS parse smoke test passed after patch.
+
+## Update 14: Leaderboard hover achievements freshness fix
+- Addressed issue where unlocked achievements did not appear in leaderboard hover consistently.
+- Added username-normalized cache helpers for hover summary data:
+  - `normalizeSummaryUsername`
+  - `invalidateLeaderboardUserSummaryCache`
+- On badge unlock (`awardBadge`), now invalidates the current user’s hover-summary cache key before syncing.
+- In `fetchLeaderboardUserSummary`, for the currently logged-in user, merges local earned badges into fetched badge IDs so newly unlocked achievements appear immediately in hover (without waiting for cache TTL/cloud readback).
+- JS parse smoke test passed.
