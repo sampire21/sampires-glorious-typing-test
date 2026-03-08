@@ -6,14 +6,11 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = "."
 
-# Keep KV bindings in source control so deploys cannot drop them.
-# Replace the placeholder IDs below with your real KV namespace IDs from Cloudflare.
-#
-# Example:
-# id = "0123456789abcdef0123456789abcdef"
-# preview_id = "fedcba9876543210fedcba9876543210"
+[[routes]]
+pattern = "type.sherathia.com"
+zone_name = "sherathia.com"
+custom_domain = true
 
 [[kv_namespaces]]
 binding = "TYPING_APP"
-id = "REPLACE_WITH_TYPING_APP_KV_NAMESPACE_ID"
-preview_id = "REPLACE_WITH_TYPING_APP_KV_PREVIEW_NAMESPACE_ID"
+id = "a1574fd2943b4f0c8748849a98cad7fd"
