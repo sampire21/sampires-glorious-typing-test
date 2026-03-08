@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#7c6ff7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sampire Type">
     <title>Sampire's Glorious Typing Test</title>
     <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -7807,7 +7813,7 @@ function renderProfile(scores) {
             }).join('')}
         </div>
 
-        <div class="profile-section-title">Activity <span class="profile-section-sub">(last 26 weeks)</span></div>
+        <div class="profile-section-title">Activity <span class="profile-section-sub">(last month)</span></div>
         <div class="profile-heatmap-wrap">
             <div id="profile-heatmap" class="profile-heatmap"></div>
             <div class="heatmap-legend">
@@ -7940,20 +7946,28 @@ function renderProfileHeatmap(scores) {
         countMap.set(key, (countMap.get(key) || 0) + 1);
     }
 
-    const WEEKS = 26;
+    const DAYS = 30;
     const today = new Date();
     today.setHours(23, 59, 59, 999);
 
-    // Rewind to the most recent Sunday, then back WEEKS weeks
     const start = new Date(today);
-    start.setDate(start.getDate() - start.getDay() - (WEEKS - 1) * 7);
+    start.setDate(start.getDate() - (DAYS - 1));
     start.setHours(0, 0, 0, 0);
+    const leadPad = start.getDay();
+    const totalCells = leadPad + DAYS;
+    const weeks = Math.ceil(totalCells / 7);
 
     let html = '';
-    for (let w = 0; w < WEEKS; w++) {
+    for (let w = 0; w < weeks; w++) {
         for (let d = 0; d < 7; d++) {
+            const idx = w * 7 + d;
+            if (idx < leadPad) {
+                html += '<div class="heatmap-cell" style="opacity:0"></div>';
+                continue;
+            }
+            const dayOffset = idx - leadPad;
             const cell = new Date(start);
-            cell.setDate(start.getDate() + w * 7 + d);
+            cell.setDate(start.getDate() + dayOffset);
             if (cell > today) {
                 html += '<div class="heatmap-cell" style="opacity:0"></div>';
                 continue;
@@ -10240,6 +10254,12 @@ restoreSession().then(() => {
     refreshLeaderboard();
     if (currentUser) refreshCloudProgress();
 });
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
 </script>
 </body>
 </html>

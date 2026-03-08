@@ -205,3 +205,27 @@ Original prompt: Please look through my game and ensure that it is solid from to
 - On badge unlock (`awardBadge`), now invalidates the current user’s hover-summary cache key before syncing.
 - In `fetchLeaderboardUserSummary`, for the currently logged-in user, merges local earned badges into fetched badge IDs so newly unlocked achievements appear immediately in hover (without waiting for cache TTL/cloud readback).
 - JS parse smoke test passed.
+
+## Update 15: PWA installability support
+- Added PWA manifest file: `manifest.webmanifest`
+  - name/short_name, standalone display, theme/background colors, scope/start_url
+  - icons configured for 192 and 512 sizes (including maskable entry)
+- Generated app icons from existing `Favicon.png`:
+  - `icons/icon-192.png`
+  - `icons/icon-512.png`
+  - `icons/apple-touch-icon.png`
+- Added service worker: `sw.js`
+  - pre-caches app shell assets
+  - network-first for navigations
+  - stale-while-revalidate for static same-origin GET assets
+  - bypasses cache for `/api/*` requests
+- Wired install metadata/registration in `index.html`:
+  - `<link rel=\"manifest\" href=\"/manifest.webmanifest\">`
+  - theme color + iOS web app meta tags
+  - apple touch icon link
+  - service worker registration on window `load`
+
+### Validation
+- `manifest.webmanifest` JSON parse: pass.
+- `sw.js` syntax check: pass.
+- Chromium localhost check: service worker registered successfully with scope `http://127.0.0.1:3000/`.
