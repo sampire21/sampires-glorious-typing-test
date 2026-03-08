@@ -5619,7 +5619,7 @@ async function localApiFetch(url, options = {}, headers = {}) {
                 .filter(row => row.damage > 0)
                 .sort((a, b) => b.damage - a.damage || a.username.localeCompare(b.username))
                 .slice(0, limit);
-            return { week: getWeekKey(), contributions };
+            return { week: getWeekKeyUtc(), contributions };
         }
         const mode = (params.get('mode') || '').trim();
         const bestByUserMode = new Map();
@@ -6011,7 +6011,7 @@ function buildAuthHeaders(options = {}) {
     return headers;
 }
 
-async function fetchWithTimeout(url, opts, timeoutMs = 15000) {
+async function fetchWithTimeout(url, opts, timeoutMs = 8000) {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
@@ -6048,12 +6048,6 @@ async function apiFetch(url, options = {}) {
         }
         return data;
     } catch (e) {
-        const isNetworkError = /failed to fetch|aborted/i.test(String(e && e.message || '')) || e.name === 'AbortError';
-        if (!localApiFallbackActive && isNetworkError) {
-            localApiFallbackActive = true;
-            setAuthNote('Cloud API unreachable. Using local browser storage mode.', false);
-            return localApiFetch(url, options, headers);
-        }
         throw e;
     }
 }
@@ -6098,12 +6092,19 @@ function shouldAllowLocalFallback(error) {
     return status === 404 || status >= 500;
 }
 
-async function apiFetchCloudThenLocal(url, options = {}, fallbackMessage = '') {
+function shouldAllowAuthLocalFallback(error) {
+    const status = Number(error && error.status) || 0;
+    return status === 404;
+}
+
+async function apiFetchCloudThenLocal(url, options = {}, fallbackMessage = '', fallbackRule = shouldAllowLocalFallback) {
     try {
         return await apiFetchCloudFirst(url, options);
     } catch (e) {
-        if (!shouldAllowLocalFallback(e)) throw e;
-        localApiFallbackActive = true;
+        const allowFallback = typeof fallbackRule === 'function' ? fallbackRule(e) : !!fallbackRule;
+        if (!allowFallback) throw e;
+        const status = Number(e && e.status) || 0;
+        if (status === 404) localApiFallbackActive = true;
         if (fallbackMessage) setAuthNote(fallbackMessage, false);
         const headers = buildAuthHeaders(options);
         return localApiFetch(url, options, headers);
@@ -6319,7 +6320,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
         const out = await apiFetchCloudThenLocal('/api/signup', {
             method: 'POST',
             body: JSON.stringify({ username, password }),
-        }, 'Cloud signup unavailable. Using local browser storage mode.');
+        }, 'Cloud API routes not found. Using local browser storage mode.', shouldAllowAuthLocalFallback);
         authToken = out.token;
         currentUser = out.user;
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
@@ -6361,14 +6362,17 @@ async function signupUserFromModal() {
 
 async function loginUser() {
     const _loginBtn = document.getElementById('login-btn');
-    if (_loginBtn) _loginBtn.textContent = 'Logging in...';
+    if (_loginBtn) {
+        _loginBtn.textContent = 'Logging in...';
+        _loginBtn.disabled = true;
+    }
     try {
         const username = document.getElementById('auth-username').value.trim();
         const password = document.getElementById('auth-password').value;
         const out = await apiFetchCloudThenLocal('/api/login', {
             method: 'POST',
             body: JSON.stringify({ username, password }),
-        }, 'Cloud login unavailable. Using local browser storage mode.');
+        }, 'Cloud API routes not found. Using local browser storage mode.', shouldAllowAuthLocalFallback);
         if (!out || !out.token) throw new Error('Login failed: no token returned');
         authToken = out.token;
         currentUser = out.user;
@@ -6382,7 +6386,10 @@ async function loginUser() {
     } catch (e) {
         setAuthNote(e.message || 'Login failed. Please try again.', true);
     } finally {
-        if (_loginBtn) _loginBtn.textContent = 'Login';
+        if (_loginBtn) {
+            _loginBtn.textContent = 'Login';
+            _loginBtn.disabled = false;
+        }
     }
 }
 
@@ -6705,8 +6712,7 @@ function setLbTab(tab) {
     document.querySelectorAll('.lb-tab').forEach(b => {
         b.classList.toggle('active', b.dataset.tab === tab);
     });
-    if (tab === 'community') refreshLeaderboard();
-    else renderLeaderboardRows(_lbRowsCache);
+    refreshLeaderboard();
 }
 
 function getCommunityContributionRows() {
@@ -6895,6 +6901,7 @@ async function openCommunityHub() {
         const serverRows = Array.isArray(cloudOut && cloudOut.contributions) ? cloudOut.contributions : [];
         _communityRowsCache = mergeCommunityContributionRows(serverRows, localRows);
     } catch (e) {
+        if (reqId !== leaderboardReqId) return;
         _communityRowsCache = localRows;
     }
     renderCommunityHub();
@@ -7011,6 +7018,7 @@ async function refreshLeaderboard() {
     const reqId = ++leaderboardReqId;
     const listEl = document.getElementById('leaderboard-list');
     if (!listEl) return;
+    listEl.innerHTML = '<div class="history-empty">Loading leaderboard...</div>';
     if (lbActiveTab === 'community') {
         const localRows = getCommunityContributionRows();
         try {
@@ -7025,7 +7033,7 @@ async function refreshLeaderboard() {
             // Fall through to existing fallback path.
         }
         try {
-            const out = await apiFetch('/api/leaderboard?community=1&limit=1000');
+            const out = await localApiFetch('/api/leaderboard?community=1&limit=1000', {}, buildAuthHeaders({}));
             if (reqId !== leaderboardReqId) return;
             const serverRows = Array.isArray(out.contributions) ? out.contributions : [];
             _communityRowsCache = mergeCommunityContributionRows(serverRows, localRows);
@@ -7053,7 +7061,7 @@ async function refreshLeaderboard() {
             return;
         }
         try {
-            const out = await apiFetch('/api/leaderboard?limit=100');
+            const out = await localApiFetch('/api/leaderboard?limit=100', {}, buildAuthHeaders({}));
             if (reqId !== leaderboardReqId) return;
             const rows = Array.isArray(out.leaderboard) ? out.leaderboard : [];
             renderLeaderboardRows(rows);
@@ -8792,6 +8800,17 @@ function getWeekKey(baseDate = new Date()) {
     return formatDateKey(getWeekStartDate(baseDate));
 }
 
+function getWeekStartDateUtc(baseDate = new Date()) {
+    const d = new Date(baseDate);
+    d.setUTCHours(0, 0, 0, 0);
+    d.setUTCDate(d.getUTCDate() - d.getUTCDay()); // Sunday
+    return d;
+}
+
+function getWeekKeyUtc(baseDate = new Date()) {
+    return formatDateKey(getWeekStartDateUtc(baseDate));
+}
+
 function normalizeCompletionList(value) {
     if (!Array.isArray(value)) return [];
     return [...new Set(value.map(v => String(v)).filter(Boolean))];
@@ -8891,7 +8910,7 @@ function markWeeklyChallengeComplete(id) {
 }
 
 function getCommunityWeeklyGoalState() {
-    const currentWeek = getWeekKey();
+    const currentWeek = getWeekKeyUtc();
     try {
         const raw = JSON.parse(localStorage.getItem(COMMUNITY_WEEKLY_GOAL_KEY) || '{}');
         if (raw.week === currentWeek && Number.isFinite(raw.words) && raw.words >= 0) {
@@ -8906,14 +8925,14 @@ function getCommunityWeeklyGoalState() {
 
 function setCommunityWeeklyGoalState(state) {
     const safeState = {
-        week: String(state && state.week ? state.week : getWeekKey()),
+        week: String(state && state.week ? state.week : getWeekKeyUtc()),
         words: Math.max(0, Math.floor(Number(state && state.words) || 0)),
     };
     try { localStorage.setItem(COMMUNITY_WEEKLY_GOAL_KEY, JSON.stringify(safeState)); } catch (e) {}
 }
 
 function getCommunityWeeklyContributionState() {
-    const currentWeek = getWeekKey();
+    const currentWeek = getWeekKeyUtc();
     try {
         const raw = JSON.parse(localStorage.getItem(COMMUNITY_WEEKLY_CONTRIB_KEY) || '{}');
         if (raw.week === currentWeek && raw.entries && typeof raw.entries === 'object' && !Array.isArray(raw.entries)) {
@@ -8925,7 +8944,7 @@ function getCommunityWeeklyContributionState() {
 
 function setCommunityWeeklyContributionState(state) {
     const safeState = {
-        week: String(state && state.week ? state.week : getWeekKey()),
+        week: String(state && state.week ? state.week : getWeekKeyUtc()),
         entries: (state && state.entries && typeof state.entries === 'object' && !Array.isArray(state.entries)) ? state.entries : {},
     };
     try { localStorage.setItem(COMMUNITY_WEEKLY_CONTRIB_KEY, JSON.stringify(safeState)); } catch (e) {}

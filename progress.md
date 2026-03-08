@@ -96,3 +96,43 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - Escape now closes login modal
 - Kept logout available in profile header actions.
 - JS parse smoke check passed.
+
+## Update 8: Auth fallback + leaderboard reliability hardening
+- Tightened cloud/local fallback behavior to stop intermittent cloud outages from presenting as local auth failures:
+  - `apiFetch` no longer auto-switches the entire session to local mode on network timeout/abort.
+  - Added `shouldAllowAuthLocalFallback()` and used it for signup/login so auth only falls back to local on API-route missing (`404`) instead of `5xx`/network issues.
+- Improved login flow resilience:
+  - Login button is now disabled while request is in-flight to prevent duplicate concurrent submissions/races.
+- Leaderboard tab correctness + stale-view fix:
+  - `setLbTab()` now always calls `refreshLeaderboard()` so Weekly/All Time don't reuse stale cached rows.
+  - Added explicit loading state while leaderboard requests are in-flight.
+  - Added request-id guard in `openCommunityHub()` catch path to avoid race-based stale overwrite.
+- Community week alignment fix:
+  - Added `getWeekKeyUtc()` and switched community-only week keys/state to UTC to match cloud API week bucketing.
+  - Local community leaderboard response now returns UTC week key.
+- Reduced perceived hangs:
+  - `fetchWithTimeout` lowered from 15s to 8s.
+- Local fallback usage in leaderboard refresh is now explicit (`localApiFetch`) rather than re-entering cloud fetch paths.
+
+### Validation
+- `index.html` script parse smoke test passed (`new Function` parse).
+- Playwright loop still blocked in this environment because `playwright` package is missing.
+
+### Remaining TODOs / next agent
+- Install `playwright` and run `develop-web-game` loop to visually verify:
+  - login failure messaging under cloud 5xx/network faults
+  - leaderboard tab switching (All Time / This Week / Community) with no stale carryover
+  - community contribution visibility across UTC week boundary scenarios
+
+## Update 9: Chromium Playwright validation run (post-install)
+- Installed Playwright in project and validated Chromium launch.
+- Because the skill client script resolves modules from its own directory, ran it from a copied local path (`tmp_web_game_playwright_client.mjs`) so project `node_modules/playwright` is used.
+- Ran action-loop screenshots at `output/web-game/shot-0.png..shot-2.png` and manually inspected them.
+- Ran direct Playwright Chromium validation script for auth + leaderboard behavior:
+  - Signup/login success path: pass
+  - Bad password path returns `Invalid username or password`: pass
+  - Simulated `/api/login` 503 displays server error (`Server Down`) instead of silent local fallback: pass
+  - Leaderboard tabs render distinct data/layouts (Community vs Weekly): pass
+  - Weekly leaderboard row rendering after score submission: pass
+  - Community contributions render in community tab when present: pass
+- Noted expected local-dev caveat with `server.js`: several cloud worker routes are absent, so local mode may show `Cloud API routes not found...` message in this environment. This is environment-specific and not from Chromium/Playwright failure.
