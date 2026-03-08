@@ -1,5 +1,7 @@
 .git
 node_modules
+.wrangler
+output
 data
 *.toml
 *.md
