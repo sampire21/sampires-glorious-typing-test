@@ -5374,18 +5374,22 @@ async function hydrateProgressForCurrentUser() {
 }
 
 // Patch storage writes so progress sync stays automatic across all existing code paths.
-const _rawSetItem = localStorage.setItem.bind(localStorage);
-const _rawRemoveItem = localStorage.removeItem.bind(localStorage);
-localStorage.setItem = function patchedSetItem(key, value) {
-    const result = _rawSetItem(String(key), String(value));
-    if (isProgressSyncKey(key)) scheduleProgressSync();
-    return result;
-};
-localStorage.removeItem = function patchedRemoveItem(key) {
-    const result = _rawRemoveItem(String(key));
-    if (isProgressSyncKey(key)) scheduleProgressSync();
-    return result;
-};
+try {
+    const _rawSetItem = localStorage.setItem.bind(localStorage);
+    const _rawRemoveItem = localStorage.removeItem.bind(localStorage);
+    localStorage.setItem = function patchedSetItem(key, value) {
+        const result = _rawSetItem(String(key), String(value));
+        if (isProgressSyncKey(key)) scheduleProgressSync();
+        return result;
+    };
+    localStorage.removeItem = function patchedRemoveItem(key) {
+        const result = _rawRemoveItem(String(key));
+        if (isProgressSyncKey(key)) scheduleProgressSync();
+        return result;
+    };
+} catch (e) {
+    // Storage can be blocked in strict browser privacy modes. Keep app bootable.
+}
 
 function snapshotCriticalStorageOnce() {
     try {
