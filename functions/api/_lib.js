@@ -160,6 +160,21 @@ export async function getAuthUser(request, env) {
   return user || null;
 }
 
+export function isAdminUser(user, env) {
+  if (!user) return false;
+  const adminUserId = String((env && env.ADMIN_USER_ID) || '').trim();
+  if (adminUserId && String(user.id || '') === adminUserId) return true;
+  const adminUsername = normalizeUsername((env && env.ADMIN_USERNAME) || 'sampire');
+  return normalizeUsername(user.usernameNorm || user.username || '') === adminUsername;
+}
+
+export async function requireAdmin(request, env) {
+  const user = await getAuthUser(request, env);
+  if (!user) return { ok: false, status: 401, error: 'Unauthorized' };
+  if (!isAdminUser(user, env)) return { ok: false, status: 403, error: 'Forbidden' };
+  return { ok: true, user };
+}
+
 export async function getJson(env, key, fallback = null) {
   if (!hasStorage(env)) return fallback;
   const raw = await env.TYPING_APP.get(key);
@@ -182,6 +197,24 @@ export function userScoreKey(userId) {
 
 export function leaderboardKey() {
   return 'leaderboard:v1';
+}
+
+export function formatDateKeyUtc(dateObj) {
+  const y = dateObj.getUTCFullYear();
+  const m = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export function getWeekKeyUtc(baseDateMs = Date.now()) {
+  const d = new Date(Number(baseDateMs) || Date.now());
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+  return formatDateKeyUtc(d);
+}
+
+export function communityContributionKey(weekKey) {
+  return `community-contrib:v1:${String(weekKey || getWeekKeyUtc())}`;
 }
 
 export function createSessionPayload(userId) {

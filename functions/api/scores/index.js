@@ -26,6 +26,7 @@ export async function onRequestPost(context) {
     rawWpm: Number(body.rawWpm) || 0,
     consistency: Number(body.consistency) || 0,
     time: Number(body.time) || 0,
+    typedWords: Math.max(0, Math.floor(Number(body.typedWords) || 0)),
     mode: normalizeMode(body.mode),
     date: Number(body.date) || Date.now(),
     createdAt: Date.now(),
@@ -79,6 +80,9 @@ export async function onRequestPost(context) {
   leaderboard.sort((a, b) => b.wpm - a.wpm || b.accuracy - a.accuracy || b.date - a.date);
   if (leaderboard.length > 300) leaderboard.length = 300;
   await putJson(env, lbKey, leaderboard);
+
+  user.lastSeenAt = Date.now();
+  await putJson(env, `user:${user.id}`, user);
 
   return json({ ok: true, score }, 201);
 }

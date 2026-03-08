@@ -1,12 +1,40 @@
-import { json, getJson, leaderboardKey, normalizeMode, hasStorage } from './_lib.js';
+import {
+  json,
+  getJson,
+  leaderboardKey,
+  normalizeMode,
+  hasStorage,
+  getWeekKeyUtc,
+  communityContributionKey,
+} from './_lib.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
   if (!hasStorage(env)) return json({ error: 'Server storage not configured (TYPING_APP KV binding missing).' }, 500);
   const url = new URL(request.url);
-  const limit = Math.max(1, Math.min(100, Number(url.searchParams.get('limit') || 20)));
+  const limit = Math.max(1, Math.min(1000, Number(url.searchParams.get('limit') || 20)));
+  const community = url.searchParams.get('community') === '1' || (url.searchParams.get('tab') || '').trim() === 'community';
   const modeParam = (url.searchParams.get('mode') || '').trim();
   const mode = modeParam ? normalizeMode(modeParam) : '';
+
+  if (community) {
+    const weekKey = getWeekKeyUtc();
+    const contribKey = communityContributionKey(weekKey);
+    const state = await getJson(env, contribKey, { week: weekKey, entries: {} });
+    const entries = (state && typeof state.entries === 'object' && !Array.isArray(state.entries))
+      ? state.entries
+      : {};
+    const contributions = Object.values(entries)
+      .map((row) => ({
+        id: String(row.id || ''),
+        username: String(row.username || 'Unknown'),
+        damage: Math.max(0, Math.floor(Number(row.damage) || 0)),
+      }))
+      .filter((row) => row.damage > 0)
+      .sort((a, b) => b.damage - a.damage || a.username.localeCompare(b.username))
+      .slice(0, limit);
+    return json({ week: weekKey, contributions }, 200);
+  }
 
   const allRows = await getJson(env, leaderboardKey(), []);
   const bestByUserMode = new Map();

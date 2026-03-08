@@ -7,6 +7,7 @@ import {
   createSessionPayload,
   getSecret,
   publicUser,
+  putJson,
   hasStorage,
 } from './_lib.js';
 
@@ -26,6 +27,11 @@ export async function onRequestPost(context) {
 
   const { hash } = await hashPassword(password, user.passwordSalt);
   if (hash !== user.passwordHash) return json({ error: 'Invalid username or password' }, 401);
+
+  const now = Date.now();
+  user.lastLoginAt = now;
+  user.lastSeenAt = now;
+  await putJson(env, `user:${user.id}`, user);
 
   const token = await createToken(createSessionPayload(user.id), getSecret(env));
   return json({ user: publicUser(user), token }, 200);

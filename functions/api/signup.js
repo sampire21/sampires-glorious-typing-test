@@ -27,13 +27,16 @@ export async function onRequestPost(context) {
 
   const id = crypto.randomUUID();
   const { salt, hash } = await hashPassword(password);
+  const now = Date.now();
   const user = {
     id,
     username: usernameCheck.username,
     usernameNorm,
     passwordHash: hash,
     passwordSalt: salt,
-    createdAt: Date.now(),
+    createdAt: now,
+    lastLoginAt: now,
+    lastSeenAt: now,
   };
 
   await env.TYPING_APP.put(`user:${id}`, JSON.stringify(user));
