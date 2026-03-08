@@ -5969,6 +5969,7 @@ function setAuthNote(message, isError = false) {
     if (!note) return;
     note.textContent = message || '';
     note.style.color = isError ? '#ff8ab8' : '#8fd3ff';
+    if (message) note.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function setSignupNote(message, isError = false) {
@@ -7730,10 +7731,10 @@ function renderHistory() {
 }
 
 // ── Completion ─────────────────────────────────────────────────────────────
-function showResults() {
+function showResults(capturedElapsed) {
     clearInterval(timerHandle);
 
-    const elapsedRaw = getElapsed();
+    const elapsedRaw = capturedElapsed != null ? capturedElapsed : getElapsed();
     const elapsed  = isTimedMode() ? Math.min(elapsedRaw, RANDOM_WORDS_DURATION) : elapsedRaw;
     const wpm      = getWPM(elapsed);
     const rawWpm   = getRawWPM(elapsed);
@@ -8085,7 +8086,8 @@ function handleTypingKeydown(e) {
 
     if (!isTimedMode() && currentIndex === currentQuote.length) {
         isComplete = true;
-        setTimeout(showResults, 400);
+        const _capturedElapsed = getElapsed();
+        setTimeout(() => showResults(_capturedElapsed), 400);
     }
 }
 
