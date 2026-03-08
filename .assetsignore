@@ -1,0 +1,12 @@
+.git
+node_modules
+data
+*.toml
+*.md
+worker.js
+server.js
+functions
+package.json
+package-lock.json
+.gitignore
+.assetsignore
