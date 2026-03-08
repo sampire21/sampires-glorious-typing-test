@@ -32,7 +32,13 @@ export async function onRequestPost(context) {
     createdAt: Date.now(),
   };
 
-  if (score.wpm < 0 || score.wpm > 400 || score.accuracy < 0 || score.accuracy > 100) {
+  if (
+    score.wpm < 0 || score.wpm > 500 ||
+    score.rawWpm < 0 || score.rawWpm > 600 ||
+    score.accuracy < 0 || score.accuracy > 100 ||
+    score.consistency < 0 || score.consistency > 100 ||
+    score.time < 0 || score.time > 3600
+  ) {
     return json({ error: 'Invalid score payload' }, 400);
   }
 

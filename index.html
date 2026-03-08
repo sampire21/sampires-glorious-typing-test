@@ -4185,15 +4185,82 @@
     </div>
 </div>
 
-<script src="data/quotes.js"></script>
 <script>
 // ── Content ────────────────────────────────────────────────────────────────
-const FALLBACK_QUOTES = [
-    { text: "Stay focused and keep typing.", source: "System Fallback" },
+const QUOTES = [
+    // ── Star Wars ──────────────────────────────────────────────────────────
+    { text: "Do or do not. There is no try.",
+      source: "Yoda — Star Wars: The Empire Strikes Back" },
+    { text: "May the Force be with you.",
+      source: "Han Solo — Star Wars: A New Hope" },
+    { text: "The Force will be with you. Always.",
+      source: "Obi-Wan Kenobi — Star Wars: A New Hope" },
+    { text: "In my experience, there is no such thing as luck.",
+      source: "Obi-Wan Kenobi — Star Wars: A New Hope" },
+    { text: "Your focus determines your reality.",
+      source: "Qui-Gon Jinn — Star Wars: The Phantom Menace" },
+    { text: "Fear is the path to the dark side. Fear leads to anger. Anger leads to hate. Hate leads to suffering.",
+      source: "Yoda — Star Wars: The Phantom Menace" },
+    { text: "Wars not make one great.",
+      source: "Yoda — Star Wars: The Empire Strikes Back" },
+    { text: "The greatest teacher, failure is.",
+      source: "Yoda — Star Wars: The Last Jedi" },
+    { text: "Named must your fear be before banish it you can.",
+      source: "Yoda — Star Wars: The Empire Strikes Back" },
+    { text: "Never tell me the odds!",
+      source: "Han Solo — Star Wars: The Empire Strikes Back" },
+    { text: "I find your lack of faith disturbing.",
+      source: "Darth Vader — Star Wars: A New Hope" },
+    { text: "I am one with the Force, and the Force is with me.",
+      source: "Chirrut Imwe — Star Wars: Rogue One" },
+    { text: "This is the way.",
+      source: "The Mandalorian — The Mandalorian" },
+    { text: "You were the chosen one! It was said that you would destroy the Sith, not join them!",
+      source: "Obi-Wan Kenobi — Star Wars: Revenge of the Sith" },
+    { text: "Help me, Obi-Wan Kenobi. You're my only hope.",
+      source: "Princess Leia — Star Wars: A New Hope" },
+    { text: "Strike me down and I will become more powerful than you can possibly imagine.",
+      source: "Obi-Wan Kenobi — Star Wars: A New Hope" },
+    { text: "It's a trap!",
+      source: "Admiral Ackbar — Star Wars: Return of the Jedi" },
+    { text: "I've got a bad feeling about this.",
+      source: "Various characters — Star Wars" },
+    { text: "No. I am your father.",
+      source: "Darth Vader — Star Wars: The Empire Strikes Back" },
+    { text: "To be Jedi is to face the truth and choose. Give off light or darkness.",
+      source: "Yoda — Star Wars: Yoda: Dark Rendezvous" },
+    // ── The Lord of the Rings ───────────────────────────────────────────────
+    { text: "All we have to decide is what to do with the time that is given us.",
+      source: "Gandalf — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "Even the smallest person can change the course of the future.",
+      source: "Galadriel — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "Not all those who wander are lost.",
+      source: "Bilbo Baggins — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "There is some good in this world, and it is worth fighting for.",
+      source: "Samwise Gamgee — The Lord of the Rings: The Two Towers" },
+    { text: "It's a dangerous business, Frodo, going out your door. You step onto the road, and if you don't keep your feet, there is no knowing where you might be swept off to.",
+      source: "Bilbo Baggins — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "Even darkness must pass. A new day will come. And when the sun shines it will shine out the clearer.",
+      source: "Samwise Gamgee — The Lord of the Rings: The Two Towers" },
+    { text: "I wish it need not have happened in my time.",
+      source: "Frodo Baggins — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "End? No, the journey doesn't end here. Death is just another path, one that we all must take.",
+      source: "Gandalf — The Lord of the Rings: The Return of the King" },
+    { text: "Many that live deserve death. And some that die deserve life. Can you give it to them? Then do not be too eager to deal out death in judgement.",
+      source: "Gandalf — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "I will take the Ring, though I do not know the way.",
+      source: "Frodo Baggins — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "Faithless is he that says farewell when the road darkens.",
+      source: "Gimli — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "You shall not pass!",
+      source: "Gandalf — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "I would rather share one lifetime with you than face all the ages of this world alone.",
+      source: "Arwen — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "Courage is found in unlikely places.",
+      source: "Gildor — The Lord of the Rings: The Fellowship of the Ring" },
+    { text: "All that is gold does not glitter, not all those who wander are lost; the old that is strong does not wither, deep roots are not reached by the frost.",
+      source: "Bilbo Baggins — The Lord of the Rings: The Fellowship of the Ring" },
 ];
-const QUOTES = Array.isArray(window.APP_QUOTES) && window.APP_QUOTES.length > 0
-    ? window.APP_QUOTES
-    : FALLBACK_QUOTES;
 
 const WORD_LIST = [
     'about','above','across','after','again','against','age','ago','air','all',
@@ -6119,6 +6186,7 @@ async function loginUser() {
 function logoutUser() {
     authToken = null;
     currentUser = null;
+    localApiFallbackActive = false;
     localStorage.removeItem(AUTH_TOKEN_KEY);
     updateAuthUi();
     setAuthNote('Logged out.');

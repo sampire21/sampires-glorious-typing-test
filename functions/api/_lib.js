@@ -84,7 +84,8 @@ function constantTimeEqual(a, b) {
 }
 
 export function getSecret(env) {
-  return env.TOKEN_SECRET || 'change-me-cloudflare-secret';
+  if (!env.TOKEN_SECRET) throw new Error('TOKEN_SECRET environment variable is not set. Set it in your Cloudflare Worker settings.');
+  return env.TOKEN_SECRET;
 }
 
 export function hasStorage(env) {
