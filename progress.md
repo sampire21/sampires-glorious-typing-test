@@ -218,6 +218,24 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - pre-caches app shell assets
   - network-first for navigations
   - stale-while-revalidate for static same-origin GET assets
+
+## Update 16: Sector map starlight accessibility shine
+- Implemented conditional accessible-system starlight behavior using `.sector-node.is-unlocked` and `.sector-node.is-locked` classes.
+- Added/used `#starlight-glow` SVG filter with `feGaussianBlur` to create a soft aura around accessible system halos.
+- Added `pulse-starlight` animation loop and hover/focus amplification for accessible stars:
+  - faster pulse and brighter glow on interaction to indicate readiness for travel.
+- Enforced "cold" locked systems:
+  - dimmed/greyed core + halo
+  - no pulse animation/filter glow
+  - removed keyboard focus from locked nodes (`tabindex="-1"`).
+- Added computed access resolution (`isAccessible`) from either `requiredLevel` or explicit `unlocked` path state.
+- Updated tactical overlay to reflect real-time accessibility:
+  - shows `Travel Ready` for accessible systems
+  - shows lock requirement (`Locked until level X`) when inaccessible.
+
+### Validation
+- `index.html` script parse smoke test passed (`new Function` parse).
+- Playwright smoke run executed (`output/starlight-check/shot-0.png`); no runtime JS errors from this feature were reported.
   - bypasses cache for `/api/*` requests
 - Wired install metadata/registration in `index.html`:
   - `<link rel=\"manifest\" href=\"/manifest.webmanifest\">`
@@ -656,3 +674,293 @@ Original prompt: Please look through my game and ensure that it is solid from to
 - `index.html` script parse smoke check passed.
 - ESM bundle/syntax validation passed with `esbuild` for all modified API/worker files.
 - Ran Playwright loop artifacts (`output/web-game-phase3/`): no new auth-flow runtime JS exceptions surfaced; one static-server file 404 console error persisted in this environment.
+
+## Update 6: Visual refresh preview pass (no logic changes)
+- Added a dedicated CSS override block (`#ui-refresh-preview`) in `index.html` right before `</head>`.
+- Scope: visual polish only (palette, card surfaces, tab/button styling, quote panel, modal cards, progress bar, readability colors).
+- No gameplay/state/auth/leaderboard JavaScript changes in this pass.
+- Goal: provide a reviewable UI preview before deciding whether to keep/refine/push.
+
+## Update 7: UI preview screenshots captured
+- Started local server (`npm start`) and captured full-page previews with Playwright.
+- Saved screenshots:
+  - `output/ui-preview/home-full.png`
+  - `output/ui-preview/leaderboard-modal.png`
+  - `output/ui-preview/login-modal.png`
+- Note: local client script (`tmp_web_game_playwright_client.mjs`) captured only chart canvas by default and logged expected API console errors for unauth cloud endpoints (401/404) in this environment; full-page captures were produced with direct Playwright script.
+
+## Update 16: Words 30s compact scrolling typing bar
+- Implemented a dedicated compact typing viewport for timed mode (`Words 30s`):
+  - Added `.quote-display.words30-compact` styling to replace the large wrapped text block with a smaller single-line bar.
+  - Enabled horizontal overflow for the compact bar and hid the scrollbar visuals.
+  - Added mobile-specific compact sizing overrides under the existing responsive media query.
+- Added viewport behavior wiring:
+  - `shouldUseCompactTypingViewport()`
+  - `updateTypingViewportMode(resetScroll)`
+  - `syncTypingViewportScroll(resetScroll)`
+- The compact mode is toggled during mode switches and test init; scroll position resets when appropriate.
+- As the user types/backspaces, the bar auto-scrolls so the active cursor remains in view.
+- Added resize handling to keep cursor visibility stable after viewport changes.
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `<script>` block).
+- Playwright skill client run executed (artifact: `output/web-game-words30/shot-0.png`; limited to canvas-only capture for this app).
+- Targeted Playwright DOM validation (elevated due sandbox browser constraints):
+  - artifact screenshot: `output/words30-compact-check/quote-display-after-typing.png`
+  - state artifact: `output/words30-compact-check/state-after-typing.json`
+  - confirmed compact class + horizontal scroll movement while typing:
+    - `className`: `quote-display words30-compact focused`
+    - `scrollLeft`: `2334` (`> 0`, proving scroll advances)
+- Console errors observed during local checks are pre-existing local API noise (`401`/`404`), no new JS runtime exceptions introduced by this change.
+
+## Update 17: Challenges tab collapsible Daily/Weekly dropdown sections
+- Changed Challenges UI behavior so Daily and Weekly quest lists are no longer always visible when entering `Challenges` mode.
+- Added per-section dropdown toggle buttons in each header:
+  - Daily Challenges toggle
+  - Weekly Challenges toggle
+- Both sections now default to collapsed and expand/collapse independently.
+- Added `challengeSectionsOpen` state + helpers:
+  - `isChallengeSectionOpen(section)`
+  - `toggleChallengeSection(section)` (exported on `window` for header button handlers)
+- Updated `renderDailyChallenges()` to conditionally render each section's quest cards only when expanded.
+- Updated `jumpToChallengeFromProgress(challengeId)` to auto-expand the correct section (daily/weekly) before attempting to scroll to the target card, preserving existing progress deep-link UX.
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `index.html` script block).
+
+## Update 18: Community Goal section added under Weekly Challenges
+- Added a new `Community Goal` section below Weekly Challenges in the Challenges tab (`renderDailyChallenges`).
+- Reused the existing invasion/alien fleet card renderer via `getCommunityHubCardHtml()` so the full battle visualization is visible directly from Challenges.
+- Added `Open Hub` button in the new section header to jump to the full Community Hub modal.
+- Added a lightweight cache seed in challenge render (`_communityRowsCache = getCommunityContributionRows()`) when cache is empty, so local contribution progress still shows in this section.
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `index.html` script block).
+
+## Update 19: Community Hub emergency transmission visual theme
+- Reskinned only the Community Hub modal (`#community-hub-modal`) to a distinct "spaceship emergency transmission" UI treatment.
+- Added Community Hub specific styling (scoped under `#community-hub-modal`) so other menus are unchanged:
+  - alert-red/teal backdrop and modal glow
+  - terminal-style panel background with scanline overlays
+  - hazard-striped command header + `EMERGENCY TRANSMISSION` status text
+  - monospaced, uppercase signal typography for key headings
+  - red-alert progress bars and control surfaces
+  - stronger segmented panel look for goal card, mode cards, and leaderboard rows
+- Added mobile guard to hide the emergency header status text on small screens to avoid header crowding.
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `index.html` script block).
+
+## Update 20: Locked music/key-sound click popup to Shop
+- Added a cursor-anchored popup for locked music/theme and key sound pack selections:
+  - popup text: `Unlock in the shop!`
+  - appears near latest pointer position
+  - clicking popup closes the sound menus and opens the Shop modal (`openSkills()`)
+- Updated menu option handlers to pass click event context:
+  - `selectMusicTheme(theme, event)`
+  - `selectKeySoundPack(packName, event)`
+- Locked options are now clickable (no `disabled` attribute) so they can trigger the popup instead of silently blocking input.
+- Added popup styling and fade-in animation (`.unlock-shop-hint`, `@keyframes unlockHintPopIn`).
+- Added pointer tracking + outside-click cleanup for popup lifecycle.
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `index.html` script block).
+
+## Update 21: Shop purchase animation + Purchase 1 SFX hook
+- Added purchase highlight animation for newly bought shop items:
+  - `.skill-card.purchase-fx` with `@keyframes shopPurchasePulse`.
+- Added purchase effect state management:
+  - `shopPurchaseFxKey`, `shopPurchaseFxExpiresAt`
+  - `triggerShopPurchaseFx(key)`
+  - `getShopPurchaseFxClass(key)`
+- Wired purchase effect to both buy paths:
+  - reward unlocks via `spendSkillPoint(skillId)`
+  - key sound pack unlocks via `unlockShopKeySoundPack(packName)`
+- Updated `renderSkillsModal()` card classes so only the purchased card gets the temporary animated pulse.
+- Added `SFX.purchase1` using `Sound Effects/Purchase 1.wav`.
+
+### Note
+- In the current workspace listing, `Sound Effects/Purchase 1.wav` was not present. The hook is now in place and will play automatically once that file exists at that path.
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `index.html` script block).
+
+## Update 22: Inventory categories + keyboard sound pack ownership visibility
+- Reworked Inventory modal into three category sections:
+  - `Soundscapes`
+  - `Cosmetics`
+  - `Keyboard Sound Packs`
+- Added category-specific empty states so each section communicates unlock status independently.
+- Added keyboard sound pack ownership rendering in inventory using `SHOP_KEY_SOUND_PACKS` + `isKeySoundPackUnlocked(...)`.
+- Added inventory equip action for keyboard sound packs:
+  - new `equipKeySoundPackFromInventory(packName)`
+  - sets active pack, enables key sounds, refreshes menus, and re-renders inventory.
+- Added `Equipped` state/metadata for currently active pack.
+- Added supporting inventory section styles (`inventory-section`, `inventory-section-title`, `inventory-section-empty`, `inventory-item-meta`).
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `index.html` script block).
+
+## Update 23: Reward naming + inventory preview panel refresh
+- Renamed reward display names in Shop and Inventory:
+  - `Soundscapes Reward` -> `Your Own Personal Universe`
+  - `Aura Reward` -> `Word Glow`
+  - `Nebula Trail Reward` -> `Nebula Trail`
+- Updated `spendSkillPoint` labels so unlock/error messages use the new reward names.
+- Removed emoji icons from reward listings/titles in Inventory category cards/headers.
+- Reworked Inventory reward cards to include a right-side preview panel (similar to Shop preview layout):
+  - `Word Glow` uses clickable glow word preview.
+  - `Nebula Trail` uses clickable trail stage preview.
+  - `Your Own Personal Universe` uses play/pause preview control.
+- Added reusable preview helpers with target IDs for inventory-specific preview elements:
+  - `previewAuraRewardAt(targetId)`
+  - `previewNebulaTrailRewardAt(stageId)`
+
+### Validation
+- JS parse smoke check passed (`new Function` parse over `index.html` script block).
+
+## Update 24: Mining FX toggle + asteroid mining visuals
+- Added new UI toggle beside Ghost Cursor: `Mining FX: On/Off` (`#mining-fx-toggle-btn`).
+- Added persisted preference key `sampire-mining-visuals-enabled` with load/update/toggle wiring:
+  - `loadMiningVisualsPreference()`
+  - `updateMiningFxToggleButton()`
+  - `toggleMiningVisuals()`
+- Added purple asteroid shatter effect on completed words:
+  - `maybeTriggerMiningShatter(typedIndex)`
+  - `emitMiningShatterAtWord(wordIndex)`
+  - Triggered from typing flow when a correctly typed character completes a word boundary.
+- Added mining laser overlay from bottom of viewport to active word:
+  - DOM: `#mining-laser-overlay`
+  - `updateMiningLaserAtActiveWord()` updates beam angle/length/width/hue.
+  - Laser color/width scales with WPM.
+  - Overlay clears when hidden/disabled/results/daily mode.
+- Added supporting CSS animations/styles:
+  - `.mining-shatter-particle`, `@keyframes miningShatterBurst`
+  - `.mining-laser-overlay`, `.mining-laser-beam`, `.mining-laser-core`, `@keyframes miningLaserPulse`
+
+### Validation (Update 24)
+- Script parse smoke test passed for `index.html` inline JS (`new Function` parse).
+- Ran skill Playwright client:
+  - `node tmp_web_game_playwright_client.mjs --url http://127.0.0.1:3000 --actions-file /home/sampire/.codex/skills/develop-web-game/references/action_payloads.json --click-selector "#quote-display" --iterations 2 --pause-ms 250 --screenshot-dir output/web-game-mining`
+  - Artifacts: `output/web-game-mining/shot-0.png`, `output/web-game-mining/errors-0.json`.
+  - Console artifact contains one existing 404 resource load error in this environment.
+- Attempted direct full-page Playwright screenshot for visual confirmation of laser/shatter UI; blocked in this sandbox by Chromium launch failure (`sandbox_host_linux.cc` fatal). The skill client run itself completed successfully.
+
+## Update 25: Mining laser origin ship adjustment
+- Changed mining laser origin from viewport-bottom to typing box-bottom anchor.
+- Added floating origin ship in mining overlay (`#mining-laser-ship`) using the same community-goals player ship SVG via `getCommunityShipSprite('player')`.
+- Laser now computes origin from quote box geometry:
+  - `originX` = quote box center
+  - `shipBottom` = relative to quote box bottom
+  - laser starts near ship nose (`originY = shipBottom + shipHeight - 6`)
+- Added ship hover animation (`@keyframes miningShipHover`) and ship styling to align with existing community ship visuals.
+- Parse smoke test passed.
+
+## Update 26: Laser/ship targeting refinement
+- Moved mining ship origin to bottom-left of typing box (instead of center/bottom-screen behavior).
+- Increased quote box vertical space and bottom padding so ship has dedicated clearance beneath text.
+- Adjusted Words 30s compact viewport to preserve extra lower clearance.
+- Added dynamic ship rotation toward active word (`--ship-angle`) while preserving hover animation.
+- Laser origin now uses ship-mounted coordinates and continues to track active word/WPM coloring.
+- Re-ran skill Playwright client (`output/web-game-mining-ship-v2`); same existing 404 console resource warning observed.
+
+## Update 27: 16-bit mining explosion style
+- Replaced mining word-completion burst from purple cloud-like particles to retro 16-bit style explosion.
+- Added blocky pixel shard styling (`.mining-shatter-particle`) with step-based animation and classic explosion palette (yellow/orange/red).
+- Added center sprite-like blast (`.mining-shatter-core`) for quick arcade-style pop.
+- Updated `emitMiningShatterAtWord()` to emit pixel-color fragments and core flash instead of hue-based nebula particles.
+- Parse smoke test passed.
+- Re-ran skill Playwright client (`output/web-game-mining-pixel`); same existing 404 console resource warning observed.
+
+## Update 28: Ship right-side origin + word-complete laser SFX
+- Copied user-provided audio to project: `Sound Effects/laser.mp3` (from `/home/sampire/Downloads/laser.mp3`).
+- Moved mining ship/laser origin from left side to right side of quote box:
+  - `originX` now uses `quoteRect.right - 44`.
+- Added word-complete SFX trigger in `maybeTriggerMiningShatter()`:
+  - Plays `playSound(SFX.laser)` when a correctly typed word boundary is completed.
+- Added `laser` entry to `SFX` map: `new Audio('Sound Effects/laser.mp3')`.
+- Parse smoke test passed.
+
+## Update 29: Per-keystroke mining laser shots
+- Replaced persistent long mining beam with short-lived per-keystroke shots.
+- Removed static overlay beam/core markup and styles.
+- Added transient shot styles/animation:
+  - `.mining-laser-shot`
+  - `.mining-laser-shot-core`
+  - `@keyframes miningLaserShot`
+- Added geometry helpers for ship/target alignment:
+  - `getMiningLaserAnchorElement(charIndex)`
+  - `getMiningLaserGeometry(anchorEl)`
+- Added `emitMiningLaserShotAtWord(typedIndex)` and wired it into key handling so each accepted keypress fires an individual laser at the current typed word.
+- Ship remains visible and rotates toward current target; overlay no longer renders one continuous beam.
+- Parse smoke test passed.
+- Playwright client rerun (`output/web-game-mining-shots`) with same pre-existing 404 resource warning.
+
+## Update 30: Laser shot origin fix + sound refresh
+- Overwrote in-project laser SFX with latest user-provided file:
+  - copied `/home/sampire/Downloads/laser.mp3` -> `Sound Effects/laser.mp3`.
+- Fixed per-keystroke mining shot origin mismatch:
+  - Shot CSS now uses `bottom` positioning (not `top`).
+  - Shot JS now passes `originYFromBottom` for `--shot-origin-y`.
+- This aligns the shot spawn point with the ship-mounted bottom-origin geometry used by the overlay/rotation math.
+- Parse smoke test passed.
+
+## Update 31: Mining laser SFX mute toggle
+- Added a second compact toggle next to Mining FX: `Laser SFX: On/Muted` (`#mining-fx-sfx-toggle-btn`).
+- Toggle visibility is conditional:
+  - shown only when `Mining FX` is On
+  - hidden when `Mining FX` is Off.
+- Added persisted preference key:
+  - `sampire-mining-laser-sound-enabled`
+  - load/update/toggle functions wired:
+    - `loadMiningLaserSoundPreference()`
+    - `updateMiningLaserSoundToggleButton()`
+    - `toggleMiningLaserSound()`
+- Laser audio playback now respects this setting in `maybeTriggerMiningShatter()`.
+- Parse smoke test passed.
+
+## Update 32: Sector Map button + full-screen navigation modal
+- Added `Sector Map` button to stats header row, right-aligned to the right of `Time`.
+- Button visibility is mode-aware: shown in `Random Words` mode (`currentMode === 'words'`), hidden otherwise.
+- Added full-screen Sector Map modal (`#sector-map-modal`) with:
+  - dark deep-space SVG background
+  - pulsing grid overlay (`.sector-grid-pulse`)
+  - glowing orb system nodes by difficulty:
+    - Easy = blue
+    - Medium = purple
+    - High stakes = gold
+  - dashed constellation links between unlocked nodes only
+- Added keyboard-focus + hover tactical overlay (`#sector-tactical-overlay`) showing avg WPM requirement for focused node.
+- Added open/close handlers:
+  - `openSectorMap()`, `closeSectorMap()`, `handleSectorMapBackdrop()`
+  - Esc key closes sector map.
+- Parse smoke test passed.
+- Playwright client run for regression sanity (`output/web-game-sector-map`), with same existing 404 resource warning.
+
+## Update 33: Sector Map parallax + radar sweep
+- Added starfield parallax for Sector Map:
+  - Mouse move over `.sector-map-wrap` now translates `#sector-map-stars` subtly for depth.
+  - Added reset on mouse leave and close.
+- Added rotating radar sweep centered on map:
+  - New SVG radar layer (`#sector-map-radar`) with ring + sweep line/cone.
+  - Sweep rotation is driven by `requestAnimationFrame` in `animateSectorMapRadar()`.
+- Added node pass-highlighting during sweep:
+  - Nodes get `.radar-hit` class when sweep angle passes over their angular position.
+  - CSS boosts core/halo intensity while hit.
+- Added lifecycle controls:
+  - `startSectorMapRadar()` on open
+  - `stopSectorMapRadar()` on close
+  - one-time parallax event binding via `bindSectorMapParallax()`.
+- Parse smoke test passed.
+- Playwright sanity run (`output/web-game-sector-map-parallax-radar`) completed; same existing 404 resource warning present.
+
+## Update 34: Sector radar removed + map expanded
+- Removed Sector Map radar entirely:
+  - deleted radar SVG group and sweep assets
+  - removed radar CSS classes/animations
+  - removed radar JS constants/functions and open/close hooks.
+- Expanded Sector Map to fill screen more aggressively:
+  - modal card width increased to `min(1400px, 99vw)`
+  - modal max height increased to `98vh`
+  - map viewport height increased to `min(92vh, 900px)`.
+- Parse smoke test passed.

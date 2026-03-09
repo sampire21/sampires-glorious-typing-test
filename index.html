@@ -140,6 +140,8 @@
             gap: 1rem;
             margin-bottom: 1.25rem;
             justify-content: center;
+            align-items: center;
+            position: relative;
         }
 
         .stat {
@@ -164,6 +166,202 @@
             font-weight: 700;
             color: #e2e8f0;
             font-variant-numeric: tabular-nums;
+        }
+        .sector-map-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 112px;
+            padding: 0.56rem 0.72rem;
+            border-radius: 10px;
+            border: 1px solid rgba(125, 211, 252, 0.54);
+            background: linear-gradient(135deg, rgba(20, 46, 108, 0.88), rgba(30, 76, 165, 0.92));
+            color: #dbeafe;
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            line-height: 1;
+            text-align: center;
+            text-transform: uppercase;
+            box-shadow: 0 8px 18px rgba(15, 30, 80, 0.35);
+        }
+        .sector-map-btn:hover {
+            border-color: rgba(147, 197, 253, 0.8);
+            background: linear-gradient(135deg, rgba(26, 60, 132, 0.94), rgba(43, 102, 206, 0.98));
+            color: #eff6ff;
+            transform: translateY(calc(-50% - 1px));
+        }
+        #sector-map-modal .leaderboard-modal-card {
+            width: min(1400px, 99vw);
+            max-height: 98vh;
+            padding: 0.55rem 0.62rem 0.7rem;
+            border: 1px solid rgba(56, 189, 248, 0.24);
+            background: radial-gradient(130% 120% at 50% 0%, rgba(20, 36, 78, 0.92), rgba(3, 8, 24, 0.98));
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.58);
+        }
+        .sector-map-soon-banner {
+            margin: 0.12rem 0 0.5rem;
+            padding: 0.44rem 0.62rem;
+            border-radius: 9px;
+            border: 1px solid rgba(74, 222, 128, 0.62);
+            background: linear-gradient(180deg, rgba(22, 101, 52, 0.9), rgba(20, 83, 45, 0.9));
+            box-shadow: 0 8px 18px rgba(22, 163, 74, 0.3);
+            color: #dcfce7;
+            text-align: center;
+            font-size: 0.73rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .sector-map-wrap {
+            position: relative;
+            border: 1px solid rgba(109, 153, 255, 0.25);
+            border-radius: 12px;
+            overflow: hidden;
+            height: min(92vh, 900px);
+            background: radial-gradient(120% 120% at 50% 18%, rgba(30, 58, 138, 0.18), rgba(2, 6, 23, 0.96) 56%);
+        }
+        .sector-map-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: radial-gradient(120% 120% at 50% 12%, rgba(59, 130, 246, 0.09), rgba(1, 4, 15, 0.98) 58%);
+        }
+        .sector-grid-pulse {
+            animation: sectorGridPulse 2.7s ease-in-out infinite;
+        }
+        .sector-stars-layer {
+            pointer-events: none;
+            transition: transform 0.18s ease-out;
+        }
+        .sector-star {
+            animation-name: twinkle;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            opacity: 0.18;
+        }
+        .sector-link {
+            stroke: rgba(147, 197, 253, 0.52);
+            stroke-width: 1.5;
+            stroke-dasharray: 6 5;
+            fill: none;
+        }
+        .sector-node {
+            cursor: pointer;
+            outline: none;
+        }
+        .sector-node .node-core {
+            stroke-width: 1.7;
+        }
+        .sector-node .node-halo {
+            opacity: 0.38;
+        }
+        .sector-node.is-unlocked:focus .node-core,
+        .sector-node.is-unlocked:hover .node-core {
+            stroke: #ffffff;
+            stroke-width: 2.2;
+        }
+        .sector-node.is-unlocked:focus .node-halo,
+        .sector-node.is-unlocked:hover .node-halo {
+            opacity: 0.62;
+        }
+        .sector-node.is-unlocked .node-halo {
+            filter: url(#starlight-glow);
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: pulse-starlight 3s ease-in-out infinite;
+        }
+        .sector-node.is-unlocked:hover .node-halo,
+        .sector-node.is-unlocked:focus .node-halo {
+            animation-duration: 1.5s;
+            opacity: 0.85;
+            filter: url(#starlight-glow) brightness(1.22);
+        }
+        .sector-node.is-locked {
+            cursor: pointer;
+        }
+        .sector-node.is-locked .node-core {
+            fill: rgba(107, 114, 128, 0.42) !important;
+            stroke: rgba(148, 163, 184, 0.5) !important;
+        }
+        .sector-node.is-locked .node-halo {
+            fill: rgba(100, 116, 139, 0.22) !important;
+            opacity: 0.2;
+            filter: none !important;
+            animation: none !important;
+        }
+        .sector-tactical-overlay {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: min(280px, 34vw);
+            padding: 0.56rem 0.62rem;
+            border-radius: 10px;
+            border: 1px solid rgba(125, 211, 252, 0.4);
+            background: linear-gradient(180deg, rgba(6, 16, 42, 0.9), rgba(8, 22, 58, 0.92));
+            box-shadow: 0 8px 24px rgba(1, 6, 20, 0.48);
+            color: #dbeafe;
+            font-size: 0.73rem;
+            line-height: 1.45;
+        }
+        .sector-tactical-title {
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #93c5fd;
+            margin-bottom: 0.24rem;
+        }
+        .sector-node-hover-bubble {
+            position: absolute;
+            left: 0;
+            top: 0;
+            max-width: 280px;
+            padding: 0.52rem 0.58rem;
+            border-radius: 10px;
+            border: 1px solid rgba(248, 113, 113, 0.62);
+            background: linear-gradient(180deg, rgba(69, 10, 10, 0.96), rgba(127, 29, 29, 0.94));
+            box-shadow: 0 10px 24px rgba(127, 29, 29, 0.48);
+            color: #fee2e2;
+            font-size: 0.71rem;
+            line-height: 1.34;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate3d(0, 0, 0) scale(0.96);
+            transition: opacity 0.12s ease, transform 0.12s ease;
+            z-index: 8;
+        }
+        .sector-node-hover-bubble.is-ready {
+            border-color: rgba(96, 165, 250, 0.72);
+            background: linear-gradient(180deg, rgba(8, 47, 73, 0.96), rgba(30, 58, 138, 0.94));
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.42);
+            color: #dbeafe;
+        }
+        .sector-node-hover-bubble.show {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+        }
+        @keyframes sectorGridPulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.42; }
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--min-o, 0.1); }
+            50% { opacity: var(--max-o, 1); }
+        }
+        @keyframes pulse-starlight {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(0.92);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.04);
+            }
         }
         .bible-mode-inline {
             display: none;
@@ -237,22 +435,65 @@
 
         /* ── Quote display ── */
         .quote-display {
-            background: #1a1a2e;
+            --quote-panel-bg: #1a1a2e;
+            background: var(--quote-panel-bg);
             border: 1px solid #2a2a45;
             border-radius: 12px;
-            padding: 2rem 2.25rem;
+            padding: 1.85rem 2.25rem 3.15rem;
             font-family: 'Ubuntu Mono', 'Courier New', Courier, monospace;
             font-size: 1.25rem;
             line-height: 1.9;
             letter-spacing: 0.04em;
             cursor: text;
             margin-bottom: 1rem;
-            min-height: 130px;
+            min-height: 156px;
             user-select: none;
             position: relative;
             transition: border-color 0.2s;
             overflow: hidden;
             overflow-wrap: break-word;
+        }
+        .quote-display.words30-compact {
+            min-height: 0;
+            height: 98px;
+            padding: 0.74rem 1.1rem 1.8rem;
+            font-size: 1.15rem;
+            line-height: 1.1;
+            white-space: nowrap;
+            display: flex;
+            align-items: flex-start;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .quote-display.words30-compact > * {
+            flex: 0 0 auto;
+        }
+        .quote-display.words30-compact::-webkit-scrollbar {
+            display: none;
+        }
+        .quote-display.words30-compact .quote-word {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .quote-display.words30-compact::before,
+        .quote-display.words30-compact::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 42px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .quote-display.words30-compact::before {
+            left: 0;
+            background: linear-gradient(90deg, var(--quote-panel-bg) 22%, rgba(26, 26, 46, 0) 100%);
+        }
+        .quote-display.words30-compact::after {
+            right: 0;
+            background: linear-gradient(270deg, var(--quote-panel-bg) 22%, rgba(26, 26, 46, 0) 100%);
         }
         #quote-display,
         #quote-display span,
@@ -309,6 +550,103 @@
             box-shadow: 0 0 0 1px var(--aura-ring, rgba(90, 180, 255, 0.5)),
                         0 0 14px var(--aura-glow, rgba(90, 180, 255, 0.36));
         }
+        .mining-shatter-particle {
+            position: absolute;
+            width: var(--size, 6px);
+            height: var(--size, 6px);
+            left: var(--x, 0px);
+            top: var(--y, 0px);
+            border-radius: 0;
+            background: var(--pixel, #f97316);
+            box-shadow:
+                0 0 0 1px rgba(24, 12, 2, 0.55),
+                0 0 10px rgba(249, 115, 22, 0.28);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 8;
+            image-rendering: pixelated;
+            animation: miningShatterBurst var(--dur, 0.42s) steps(6, end) forwards;
+        }
+        .mining-shatter-core {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            left: var(--x, 0px);
+            top: var(--y, 0px);
+            border-radius: 0;
+            background: #fde047;
+            transform: translate(-50%, -50%) scale(0.55);
+            pointer-events: none;
+            z-index: 9;
+            image-rendering: pixelated;
+            box-shadow:
+                -8px 0 0 #fb923c,
+                8px 0 0 #fb923c,
+                0 -8px 0 #fb923c,
+                0 8px 0 #fb923c,
+                -8px -8px 0 #ef4444,
+                8px -8px 0 #ef4444,
+                -8px 8px 0 #ef4444,
+                8px 8px 0 #ef4444;
+            animation: miningShatterCore 0.24s steps(4, end) forwards;
+        }
+        .mining-laser-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 120;
+            opacity: 0;
+            transition: opacity 0.14s ease;
+        }
+        .mining-laser-overlay.show {
+            opacity: 1;
+        }
+        .mining-laser-ship {
+            position: absolute;
+            left: var(--laser-origin-x, 50vw);
+            bottom: var(--ship-bottom, 0px);
+            width: 38px;
+            height: 38px;
+            transform: translate(-50%, 0) rotate(var(--ship-angle, 0deg));
+            z-index: 2;
+            animation: miningShipHover 2.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
+        }
+        .mining-laser-ship .community-ship-svg {
+            transform: rotate(90deg);
+            transform-origin: center;
+            filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.45));
+        }
+        .mining-laser-shot,
+        .mining-laser-shot-core {
+            position: absolute;
+            left: var(--shot-origin-x, 50vw);
+            bottom: var(--shot-origin-y, 0px);
+            height: var(--shot-length, 0px);
+            transform-origin: 50% 100%;
+            transform: translateX(-50%) rotate(var(--shot-angle, 0deg));
+            border-radius: 999px;
+            pointer-events: none;
+        }
+        .mining-laser-shot {
+            width: var(--shot-width, 11px);
+            background: linear-gradient(180deg,
+                hsla(var(--shot-hue, 275), 90%, 78%, 0) 0%,
+                hsla(var(--shot-hue, 275), 96%, 62%, 0.25) 26%,
+                hsla(var(--shot-hue, 275), 98%, 60%, 0.65) 74%,
+                hsla(var(--shot-hue, 275), 100%, 72%, 0.96) 100%);
+            filter: blur(3.5px);
+            animation: miningLaserShot 0.16s steps(2, end) forwards;
+        }
+        .mining-laser-shot-core {
+            width: var(--shot-core-width, 2.5px);
+            background: linear-gradient(180deg,
+                hsla(var(--shot-hue, 275), 100%, 92%, 0) 0%,
+                hsla(var(--shot-hue, 275), 100%, 88%, 0.4) 22%,
+                hsla(var(--shot-hue, 275), 100%, 86%, 1) 100%);
+            box-shadow: 0 0 14px hsla(var(--shot-hue, 275), 96%, 62%, 0.86);
+            animation: miningLaserShot 0.16s steps(2, end) forwards;
+        }
 
         .nebula-particle {
             position: absolute;
@@ -363,6 +701,35 @@
             14%  { opacity: 1; transform: translate(-50%, -28%) scale(1.2); }
             100% { opacity: 0; transform: translate(-50%, -340%) scale(1.45); }
         }
+        @keyframes miningShatterBurst {
+            0% {
+                opacity: 0.96;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(1);
+            }
+        }
+        @keyframes miningShatterCore {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+        @keyframes miningLaserShot {
+            0% { opacity: 0; transform: translateX(-50%) rotate(var(--shot-angle, 0deg)) scaleY(0.12); }
+            35% { opacity: 1; transform: translateX(-50%) rotate(var(--shot-angle, 0deg)) scaleY(0.96); }
+            100% { opacity: 0; transform: translateX(-50%) rotate(var(--shot-angle, 0deg)) scaleY(1.02); }
+        }
+        @keyframes miningShipHover {
+            0%, 100% { transform: translate(-50%, 0px) rotate(var(--ship-angle, 0deg)); }
+            50% { transform: translate(calc(-50% + 1px), -3px) rotate(var(--ship-angle, 0deg)); }
+        }
 
         @keyframes blink {
             0%, 100% { border-color: #7c6ff7; }
@@ -384,6 +751,7 @@
             display: flex;
             gap: 0.75rem;
             justify-content: center;
+            align-items: center;
         }
 
         button {
@@ -427,6 +795,34 @@
         }
         button.secondary.toggle-on:hover {
             background: #2b3d78;
+        }
+        button.secondary.small-toggle {
+            padding: 0.52rem 0.88rem;
+            font-size: 0.78rem;
+            letter-spacing: 0.02em;
+        }
+        button.secondary.mining-sfx-icon-toggle {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            padding: 0;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        button.secondary.mining-sfx-icon-toggle.on {
+            color: #86efac;
+            border-color: rgba(74, 222, 128, 0.62);
+            background: rgba(20, 83, 45, 0.45);
+        }
+        button.secondary.mining-sfx-icon-toggle.muted {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.6);
+            background: rgba(127, 29, 29, 0.42);
         }
 
         .btn-hint {
@@ -1249,7 +1645,7 @@
         }
         .music-option.locked {
             opacity: 0.48;
-            cursor: not-allowed;
+            cursor: pointer;
         }
         .menu-volume-row {
             display: flex;
@@ -1345,7 +1741,34 @@
         }
         .keysound-option.locked {
             opacity: 0.45;
-            cursor: not-allowed;
+            cursor: pointer;
+        }
+        .unlock-shop-hint {
+            position: fixed;
+            z-index: 420;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid rgba(248, 113, 113, 0.58);
+            background: linear-gradient(160deg, rgba(69, 10, 10, 0.95), rgba(127, 29, 29, 0.92));
+            color: #fee2e2;
+            border-radius: 10px;
+            padding: 0.44rem 0.62rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            box-shadow: 0 12px 28px rgba(3, 7, 18, 0.5), 0 0 0 1px rgba(248, 113, 113, 0.14);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            animation: unlockHintPopIn 0.14s ease-out;
+        }
+        .unlock-shop-hint:hover {
+            border-color: rgba(252, 165, 165, 0.76);
+            background: linear-gradient(160deg, rgba(127, 29, 29, 0.96), rgba(153, 27, 27, 0.92));
+        }
+        @keyframes unlockHintPopIn {
+            from { opacity: 0; transform: translateY(4px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         #keysound-menu .menu-volume-label {
             color: #9dc1ff;
@@ -1634,6 +2057,7 @@
         body .quote-display,
         body .history-row,
         body .result-card {
+            --quote-panel-bg: rgba(12, 10, 34, 0.72);
             background: rgba(12, 10, 34, 0.72);
             border-color: rgba(120, 102, 255, 0.38);
             box-shadow:
@@ -2112,6 +2536,242 @@
             97% { opacity: 0.62; transform: translate3d(-1px, 0, 0); }
             98% { opacity: 0; transform: translate3d(0, 0, 0); }
         }
+        #community-hub-modal {
+            background:
+                radial-gradient(840px 520px at 50% 10%, rgba(248, 113, 113, 0.16), rgba(8, 10, 24, 0) 56%),
+                radial-gradient(1200px 740px at 50% 110%, rgba(34, 211, 238, 0.09), rgba(5, 7, 22, 0) 62%),
+                rgba(3, 4, 12, 0.82);
+        }
+        #community-hub-modal .leaderboard-modal-card {
+            width: min(960px, 100%);
+            max-height: min(86vh, 820px);
+            border-radius: 8px;
+            border: 1px solid rgba(248, 113, 113, 0.58);
+            background:
+                linear-gradient(160deg, rgba(10, 16, 28, 0.96), rgba(9, 13, 24, 0.94)),
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(148, 163, 184, 0.03) 0px,
+                    rgba(148, 163, 184, 0.03) 1px,
+                    rgba(10, 14, 24, 0) 1px,
+                    rgba(10, 14, 24, 0) 3px
+                );
+            box-shadow:
+                0 0 0 1px rgba(248, 113, 113, 0.18),
+                0 0 30px rgba(248, 113, 113, 0.18),
+                0 18px 40px rgba(1, 3, 9, 0.74);
+            position: relative;
+            overflow: hidden;
+        }
+        #community-hub-modal .leaderboard-modal-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(248, 113, 113, 0.06), rgba(34, 211, 238, 0.04), rgba(248, 113, 113, 0.06));
+            mix-blend-mode: screen;
+            pointer-events: none;
+            opacity: 0.75;
+        }
+        #community-hub-modal .leaderboard-modal-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(226, 232, 240, 0.04) 0px,
+                    rgba(226, 232, 240, 0.04) 1px,
+                    rgba(2, 6, 23, 0) 1px,
+                    rgba(2, 6, 23, 0) 4px
+                );
+            pointer-events: none;
+            opacity: 0.28;
+            animation: communityScanlinesShift 7s linear infinite;
+        }
+        #community-hub-modal .leaderboard-modal-header {
+            position: relative;
+            margin: -0.15rem -0.2rem 0.72rem;
+            padding: 0.62rem 0.72rem;
+            border-bottom: 1px solid rgba(248, 113, 113, 0.34);
+            background:
+                linear-gradient(90deg, rgba(127, 29, 29, 0.34), rgba(15, 23, 42, 0.08)),
+                repeating-linear-gradient(
+                    -45deg,
+                    rgba(248, 113, 113, 0.24) 0px,
+                    rgba(248, 113, 113, 0.24) 8px,
+                    rgba(127, 29, 29, 0.12) 8px,
+                    rgba(127, 29, 29, 0.12) 16px
+                );
+        }
+        #community-hub-modal .leaderboard-modal-header::before {
+            content: 'EMERGENCY TRANSMISSION';
+            position: absolute;
+            right: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: rgba(254, 202, 202, 0.85);
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(248, 113, 113, 0.55);
+        }
+        #community-hub-modal .leaderboard-modal-header::after {
+            content: '';
+            position: absolute;
+            top: -38%;
+            bottom: -38%;
+            left: -35%;
+            width: 38%;
+            background: linear-gradient(
+                100deg,
+                rgba(248, 113, 113, 0) 0%,
+                rgba(248, 113, 113, 0.08) 30%,
+                rgba(248, 113, 113, 0.45) 50%,
+                rgba(248, 113, 113, 0.1) 70%,
+                rgba(248, 113, 113, 0) 100%
+            );
+            filter: blur(0.5px);
+            mix-blend-mode: screen;
+            pointer-events: none;
+            animation: emergencyHeaderSweep 2.2s linear infinite;
+        }
+        #community-hub-modal .leaderboard-modal-title {
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            color: #fecaca;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-shadow: 0 0 9px rgba(248, 113, 113, 0.62);
+        }
+        #community-hub-modal .leaderboard-modal-close {
+            border-color: rgba(248, 113, 113, 0.44);
+            color: #fecaca;
+            background: rgba(127, 29, 29, 0.22);
+        }
+        #community-hub-modal .leaderboard-modal-close:hover {
+            border-color: rgba(252, 165, 165, 0.7);
+            background: rgba(153, 27, 27, 0.38);
+            color: #fee2e2;
+        }
+        #community-hub-modal .community-goal-card,
+        #community-hub-modal .community-hub-right,
+        #community-hub-modal .community-modes,
+        #community-hub-modal .community-mode-card,
+        #community-hub-modal .community-hub-row {
+            border-radius: 6px;
+        }
+        #community-hub-modal .community-goal-card {
+            border-color: rgba(248, 113, 113, 0.58);
+            background:
+                radial-gradient(130% 170% at 0% 0%, rgba(248, 113, 113, 0.2) 0%, rgba(248, 113, 113, 0) 50%),
+                radial-gradient(115% 140% at 100% 100%, rgba(34, 211, 238, 0.14) 0%, rgba(34, 211, 238, 0) 52%),
+                linear-gradient(160deg, rgba(9, 14, 26, 0.92), rgba(5, 10, 20, 0.9));
+            box-shadow:
+                inset 0 0 0 1px rgba(248, 113, 113, 0.15),
+                0 12px 26px rgba(2, 6, 23, 0.6);
+        }
+        #community-hub-modal .community-goal-title {
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            color: #fca5a5;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        #community-hub-modal .community-goal-words {
+            color: #7dd3fc;
+        }
+        #community-hub-modal .community-goal-sub {
+            color: #cbd5e1;
+        }
+        #community-hub-modal .community-goal-bar {
+            border: 1px solid rgba(248, 113, 113, 0.34);
+            background: rgba(69, 10, 10, 0.38);
+        }
+        #community-hub-modal .community-goal-fill {
+            background: linear-gradient(90deg, #f43f5e, #fb7185, #f59e0b);
+            box-shadow: 0 0 14px rgba(248, 113, 113, 0.5);
+        }
+        #community-hub-modal .community-fleet-level {
+            color: #cbd5e1;
+        }
+        #community-hub-modal .community-fleet-level.active {
+            color: #ffe4e6;
+        }
+        #community-hub-modal .community-fleet-health {
+            background: rgba(69, 10, 10, 0.42);
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+        #community-hub-modal .community-fleet-health-fill {
+            background: linear-gradient(90deg, #ef4444, #fb923c);
+        }
+        #community-hub-modal .community-hub-right {
+            border-color: rgba(248, 113, 113, 0.44);
+            background: linear-gradient(170deg, rgba(8, 12, 22, 0.84), rgba(6, 11, 20, 0.88));
+            box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.14);
+        }
+        #community-hub-modal .community-hub-title,
+        #community-hub-modal .community-modes-title {
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            color: #fecaca;
+            letter-spacing: 0.09em;
+        }
+        #community-hub-modal .community-hub-row {
+            border-color: rgba(125, 211, 252, 0.28);
+            background: rgba(12, 21, 35, 0.74);
+        }
+        #community-hub-modal .community-hub-rank { color: #fda4af; }
+        #community-hub-modal .community-hub-user { color: #e2e8f0; }
+        #community-hub-modal .community-hub-dmg { color: #86efac; }
+        #community-hub-modal .community-modes {
+            border-color: rgba(248, 113, 113, 0.4);
+            background: rgba(15, 20, 31, 0.82);
+        }
+        #community-hub-modal .community-mode-card {
+            border-color: rgba(125, 211, 252, 0.34);
+            background: rgba(11, 19, 33, 0.84);
+        }
+        #community-hub-modal .community-mode-card.active {
+            border-color: rgba(248, 113, 113, 0.62);
+            box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.22), 0 0 14px rgba(248, 113, 113, 0.18);
+        }
+        #community-hub-modal .community-mode-title {
+            color: #fde68a;
+        }
+        #community-hub-modal .community-mode-desc {
+            color: #bfdbfe;
+        }
+        #community-hub-modal .community-mode-btn {
+            border-color: rgba(248, 113, 113, 0.58);
+            background: rgba(127, 29, 29, 0.34);
+            color: #fee2e2;
+        }
+        #community-hub-modal .community-mode-btn:hover {
+            border-color: rgba(252, 165, 165, 0.72);
+            background: rgba(153, 27, 27, 0.52);
+        }
+        @keyframes communityScanlinesShift {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(3px); }
+        }
+        @keyframes emergencyHeaderSweep {
+            0% {
+                transform: translateX(0);
+                opacity: 0;
+            }
+            12% {
+                opacity: 0.22;
+            }
+            48% {
+                opacity: 0.88;
+            }
+            82% {
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateX(410%);
+                opacity: 0;
+            }
+        }
 
         .leaderboard-modal-close {
             min-width: 30px;
@@ -2133,7 +2793,85 @@
         .xp-display {
             display: flex;
             align-items: center;
+            gap: 0.42rem;
             min-width: 185px;
+        }
+        .xp-streak-indicator {
+            position: relative;
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 999px;
+            border: 1px solid rgba(74, 222, 128, 0.62);
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.95), rgba(22, 163, 74, 0.9));
+            color: #06240f;
+            font-size: 0.58rem;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 12px rgba(38, 22, 4, 0.45), 0 0 10px rgba(250, 204, 21, 0.38);
+            cursor: help;
+            user-select: none;
+        }
+        .xp-streak-icon {
+            font-size: 0.86rem;
+            line-height: 1;
+            font-weight: 900;
+            transform: translateY(-0.5px);
+            animation: xpStreakPulse 2.2s ease-in-out infinite;
+        }
+        .xp-streak-indicator.show {
+            display: inline-flex;
+        }
+        .xp-streak-indicator .xp-streak-tooltip {
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 7px);
+            transform: translateX(-50%);
+            min-width: 205px;
+            max-width: 280px;
+            border-radius: 10px;
+            border: 1px solid rgba(74, 222, 128, 0.56);
+            background: linear-gradient(170deg, rgba(5, 36, 19, 0.95), rgba(9, 52, 28, 0.94));
+            color: #dcfce7;
+            padding: 0.44rem 0.52rem;
+            font-size: 0.64rem;
+            line-height: 1.38;
+            text-align: left;
+            letter-spacing: 0.01em;
+            box-shadow: 0 10px 22px rgba(14, 9, 3, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 12;
+        }
+        .xp-streak-indicator .xp-streak-tooltip::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: -6px;
+            width: 10px;
+            height: 10px;
+            transform: translateX(-50%) rotate(45deg);
+            border-left: 1px solid rgba(74, 222, 128, 0.56);
+            border-top: 1px solid rgba(74, 222, 128, 0.56);
+            background: rgba(6, 38, 20, 0.98);
+        }
+        .xp-streak-indicator:hover .xp-streak-tooltip,
+        .xp-streak-indicator:focus-visible .xp-streak-tooltip {
+            opacity: 1;
+        }
+        @keyframes xpStreakPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 5px 12px rgba(3, 26, 14, 0.45), 0 0 10px rgba(74, 222, 128, 0.38);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 7px 15px rgba(3, 26, 14, 0.52), 0 0 16px rgba(74, 222, 128, 0.58);
+            }
         }
         .level-badge {
             font-size: 0.66rem;
@@ -2185,16 +2923,69 @@
             border-radius: 999px;
             white-space: nowrap;
         }
+        .aether-crystal-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 0.92rem;
+            height: 0.92rem;
+            margin-left: 0.12rem;
+            border-radius: 0.24rem;
+            transform: rotate(45deg);
+            background: radial-gradient(circle at 35% 30%, #d7f4ff 0%, #76cbff 35%, #3f96ff 62%, #1d4ed8 100%);
+            border: 1px solid rgba(147, 197, 253, 0.7);
+            box-shadow: 0 0 0 1px rgba(30, 64, 175, 0.28), 0 0 8px rgba(59, 130, 246, 0.48);
+            vertical-align: -0.12rem;
+        }
 
         /* ── Daily Challenges panel ── */
         .challenge-panel { padding: 0.25rem 0 0.5rem; }
         .daily-header {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: space-between;
             margin-bottom: 1.1rem;
             flex-wrap: wrap;
             gap: 0.3rem;
+        }
+        .challenge-section-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .challenge-section-toggle {
+            width: 1.95rem;
+            height: 1.95rem;
+            border-radius: 8px;
+            border: 1px solid rgba(109, 153, 255, 0.34);
+            background: rgba(109, 153, 255, 0.12);
+            color: #cfe6ff;
+            font-size: 0.95rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.18s;
+            flex-shrink: 0;
+        }
+        .challenge-section-toggle:hover {
+            background: rgba(109, 153, 255, 0.24);
+            border-color: rgba(147, 197, 253, 0.56);
+            color: #e8f3ff;
+        }
+        .challenge-section-toggle[aria-expanded="true"] {
+            background: rgba(74, 222, 128, 0.16);
+            border-color: rgba(74, 222, 128, 0.42);
+            color: #b8f7d1;
+        }
+        .challenge-section-toggle .chevron {
+            display: inline-block;
+            transition: transform 0.18s ease;
+            transform: rotate(0deg);
+        }
+        .challenge-section-toggle[aria-expanded="true"] .chevron {
+            transform: rotate(180deg);
         }
         .daily-title {
             font-size: 1rem;
@@ -2232,6 +3023,17 @@
             align-items: center;
             gap: 0.45rem;
             min-width: 0;
+        }
+        .challenge-title-toggle {
+            margin-left: 0.08rem;
+        }
+        .challenge-title-openhub {
+            width: auto;
+            min-width: 5.6rem;
+            padding: 0 0.62rem;
+            white-space: nowrap;
+            font-size: 0.74rem;
+            letter-spacing: 0.02em;
         }
         .daily-title-icon {
             width: 1.5rem;
@@ -2923,6 +3725,115 @@
             border-color: rgba(74, 222, 128, 0.56);
             background: rgba(22, 101, 52, 0.22);
         }
+        .skill-card.purchase-fx {
+            animation: shopPurchasePulse 0.95s cubic-bezier(0.2, 0.7, 0.2, 1);
+            border-color: rgba(250, 204, 21, 0.9);
+            box-shadow:
+                0 0 0 1px rgba(250, 204, 21, 0.38),
+                0 0 26px rgba(250, 204, 21, 0.3),
+                0 12px 26px rgba(10, 20, 46, 0.44);
+        }
+        .shop-purchase-burst {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+            overflow: hidden;
+        }
+        .shop-purchase-burst .burst-ring {
+            position: absolute;
+            left: 50%;
+            top: 52%;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 2px solid rgba(250, 204, 21, 0.86);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: purchaseRingExpand 0.9s ease-out forwards;
+        }
+        .shop-purchase-burst .burst-flare {
+            position: absolute;
+            left: 50%;
+            top: 52%;
+            width: 130px;
+            height: 130px;
+            border-radius: 999px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(250, 204, 21, 0.35) 0%, rgba(250, 204, 21, 0.14) 34%, rgba(250, 204, 21, 0) 66%);
+            opacity: 0;
+            animation: purchaseFlarePulse 0.82s ease-out forwards;
+        }
+        .shop-purchase-burst .burst-unlocked {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 0.11em;
+            color: #fde68a;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.8);
+            opacity: 0;
+            animation: purchaseUnlockedPop 0.9s ease-out forwards;
+            white-space: nowrap;
+        }
+        .shop-purchase-burst .burst-spark {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 9px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(250, 204, 21, 1), rgba(253, 224, 71, 0.1));
+            transform-origin: 0 50%;
+            opacity: 0;
+            animation: purchaseSparkShoot 0.85s ease-out forwards;
+        }
+        .shop-purchase-burst .burst-spark.s1 { transform: translate(-50%, -50%) rotate(8deg); animation-delay: 0.03s; }
+        .shop-purchase-burst .burst-spark.s2 { transform: translate(-50%, -50%) rotate(52deg); animation-delay: 0.07s; }
+        .shop-purchase-burst .burst-spark.s3 { transform: translate(-50%, -50%) rotate(98deg); animation-delay: 0.11s; }
+        .shop-purchase-burst .burst-spark.s4 { transform: translate(-50%, -50%) rotate(148deg); animation-delay: 0.15s; }
+        .shop-purchase-burst .burst-spark.s5 { transform: translate(-50%, -50%) rotate(208deg); animation-delay: 0.09s; }
+        .shop-purchase-burst .burst-spark.s6 { transform: translate(-50%, -50%) rotate(262deg); animation-delay: 0.05s; }
+        .shop-purchase-burst .burst-spark.s7 { transform: translate(-50%, -50%) rotate(315deg); animation-delay: 0.13s; }
+        @keyframes purchaseRingExpand {
+            0% { transform: translate(-50%, -50%) scale(0.34); opacity: 0.95; }
+            100% { transform: translate(-50%, -50%) scale(3.8); opacity: 0; }
+        }
+        @keyframes purchaseFlarePulse {
+            0% { transform: translate(-50%, -50%) scale(0.36); opacity: 0.84; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+        }
+        @keyframes purchaseUnlockedPop {
+            0% { transform: translate(-50%, 12%) scale(0.7); opacity: 0; }
+            36% { transform: translate(-50%, -2%) scale(1.12); opacity: 1; }
+            100% { transform: translate(-50%, -36%) scale(0.98); opacity: 0; }
+        }
+        @keyframes purchaseSparkShoot {
+            0% { opacity: 0; width: 5px; }
+            24% { opacity: 1; }
+            100% { opacity: 0; width: 34px; }
+        }
+        @keyframes shopPurchasePulse {
+            0% {
+                transform: translateY(0) scale(0.985);
+                filter: brightness(1);
+            }
+            28% {
+                transform: translateY(-2px) scale(1.02);
+                filter: brightness(1.2);
+            }
+            62% {
+                transform: translateY(0) scale(1.008);
+                filter: brightness(1.08);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                filter: brightness(1);
+            }
+        }
         .skill-card-title {
             position: absolute;
             top: 0.34rem;
@@ -3215,6 +4126,73 @@
             color: #eff7ff;
             box-shadow: 0 10px 22px rgba(16, 42, 112, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
+        .profile-briefing-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.38rem;
+            min-width: 232px;
+            padding: 0.72rem 1.2rem;
+            border-radius: 999px;
+            border: 1px solid rgba(248, 113, 113, 0.74);
+            background: linear-gradient(135deg, rgba(127, 29, 29, 0.9), rgba(185, 28, 28, 0.94));
+            color: #fee2e2;
+            font-size: 0.88rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            box-shadow: 0 0 0 1px rgba(127, 29, 29, 0.35), 0 10px 24px rgba(127, 29, 29, 0.4);
+            animation: missionBriefingPulse 2s ease-in-out infinite;
+        }
+        .profile-briefing-btn:hover {
+            background: linear-gradient(135deg, rgba(153, 27, 27, 0.96), rgba(220, 38, 38, 0.98));
+            border-color: rgba(252, 165, 165, 0.88);
+            color: #fff1f2;
+            box-shadow: 0 0 0 1px rgba(185, 28, 28, 0.38), 0 12px 28px rgba(127, 29, 29, 0.52);
+        }
+        .mission-briefing-card {
+            width: min(760px, 100%);
+            border-radius: 14px;
+            border: 1px solid rgba(248, 113, 113, 0.4);
+            background: linear-gradient(180deg, rgba(34, 8, 18, 0.98), rgba(24, 8, 18, 0.98));
+            box-shadow: 0 16px 46px rgba(0, 0, 0, 0.68), inset 0 0 0 1px rgba(248, 113, 113, 0.08);
+        }
+        .mission-briefing-body {
+            padding: 0.2rem 0.2rem 0.35rem;
+            color: #fecdd3;
+            display: grid;
+            gap: 0.7rem;
+        }
+        .mission-briefing-lead {
+            color: #ffe4e6;
+            font-size: 0.84rem;
+            line-height: 1.55;
+            margin: 0;
+        }
+        .mission-briefing-list {
+            margin: 0;
+            padding-left: 1.1rem;
+            display: grid;
+            gap: 0.4rem;
+            color: #fecdd3;
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+        .mission-briefing-footer {
+            color: #fda4af;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-top: 0.1rem;
+        }
+        @keyframes missionBriefingPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 1px rgba(127, 29, 29, 0.35), 0 10px 24px rgba(127, 29, 29, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.52), 0 10px 24px rgba(153, 27, 27, 0.5), 0 0 22px rgba(248, 113, 113, 0.45);
+            }
+        }
         .inventory-grid {
             display: grid;
             gap: 0.7rem;
@@ -3226,6 +4204,15 @@
             padding: 0.75rem 0.85rem;
             display: grid;
             gap: 0.35rem;
+        }
+        .inventory-item.reward-item {
+            grid-template-columns: 1fr;
+            gap: 0.36rem;
+        }
+        .inventory-item-main {
+            min-width: 0;
+            display: grid;
+            gap: 0.32rem;
         }
         .inventory-item-top {
             display: flex;
@@ -3245,6 +4232,35 @@
             color: #9fb6dd;
             font-size: 0.72rem;
             line-height: 1.4;
+        }
+        .inventory-preview-panel {
+            border: 1px solid rgba(109, 153, 255, 0.28);
+            border-radius: 9px;
+            min-height: 54px;
+            width: min(100%, 188px);
+            justify-self: center;
+            padding: 0.28rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(13, 23, 48, 0.82), rgba(9, 18, 39, 0.9));
+        }
+        .inventory-preview-btn {
+            width: 100%;
+            background: rgba(32, 44, 84, 0.86);
+            border: 1px solid rgba(109, 153, 255, 0.34);
+            color: #bfe2ff;
+            padding: 0.34rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .inventory-preview-btn:hover {
+            background: rgba(44, 66, 128, 0.92);
+            border-color: rgba(143, 201, 255, 0.58);
+            color: #e6f4ff;
         }
         .inventory-toggle {
             font-size: 0.72rem;
@@ -3270,6 +4286,69 @@
             border: 1px dashed rgba(109, 153, 255, 0.22);
             border-radius: 10px;
             background: rgba(10, 16, 38, 0.45);
+        }
+        .inventory-section {
+            display: grid;
+            gap: 0.55rem;
+            margin-bottom: 0.9rem;
+        }
+        .inventory-section:last-child {
+            margin-bottom: 0;
+        }
+        .inventory-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.45rem;
+            padding: 0.38rem 0.48rem;
+            border-radius: 10px;
+            border: 1px solid rgba(109, 153, 255, 0.22);
+            background: rgba(17, 14, 44, 0.42);
+        }
+        .inventory-section-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.42rem;
+        }
+        .inventory-section-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: #c7d8ff;
+        }
+        .inventory-section-empty {
+            color: #8ea8d6;
+            font-size: 0.72rem;
+            line-height: 1.35;
+            border: 1px dashed rgba(109, 153, 255, 0.22);
+            border-radius: 10px;
+            padding: 0.62rem 0.68rem;
+            background: rgba(10, 16, 38, 0.35);
+        }
+        .inventory-item-meta {
+            color: #7fa3d6;
+            font-size: 0.67rem;
+            line-height: 1.35;
+        }
+        .inventory-pack-preview {
+            display: grid;
+            gap: 0.24rem;
+            margin-top: 0.1rem;
+        }
+        .inventory-pack-preview-label {
+            font-size: 0.64rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #9fc3f7;
+        }
+        .inventory-item-meta .equipped {
+            color: #86efac;
+            font-weight: 700;
         }
         .skill-points-row {
             margin-top: 0.38rem;
@@ -3485,7 +4564,10 @@
         /* ── Responsive ── */
         @media (max-width: 500px) {
             h1 { font-size: 1.45rem; }
-            .quote-display { font-size: 1.05rem; padding: 1.25rem; }
+            .quote-display { font-size: 1.05rem; min-height: 144px; padding: 1.15rem 1rem 2.45rem; }
+            .quote-display.words30-compact { height: 88px; padding: 0.66rem 0.78rem 1.6rem; font-size: 1rem; }
+            .stats { padding-right: 122px; }
+            .sector-map-btn { min-width: 98px; padding: 0.48rem 0.58rem; font-size: 0.62rem; }
             .stat-value { font-size: 1.4rem; }
             .history-row { grid-template-columns: 58px 52px 66px 50px 1fr; font-size: 0.75rem; }
             .wpm-chart         { height: 90px; }
@@ -4183,6 +5265,9 @@
                 width: calc(100% - 1.5rem);
                 max-width: 360px;
             }
+            #community-hub-modal .leaderboard-modal-header::before {
+                display: none;
+            }
             .bible-mode-inline { width: 100%; justify-content: center; }
             .community-mode-popup {
                 flex-wrap: wrap;
@@ -4239,6 +5324,10 @@
 
 <div class="top-controls">
     <div class="xp-display" id="xp-display">
+        <span class="xp-streak-indicator" id="xp-streak-indicator" tabindex="0" aria-label="XP streak boost details">
+            <span class="xp-streak-icon" aria-hidden="true">!</span>
+            <span class="xp-streak-tooltip" id="xp-streak-tooltip"></span>
+        </span>
         <div class="xp-bar-wrap">
             <div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div>
             <div class="xp-bar-overlay">
@@ -4275,12 +5364,12 @@
                 <span class="menu-volume-value" id="keysound-volume-value">100%</span>
             </div>
             <input type="range" class="menu-volume-slider" id="keysound-volume-slider" min="0" max="100" step="1" value="100" oninput="handleKeySoundVolumeInput(event)" aria-label="Keyboard sound volume">
-            <button type="button" class="keysound-option" data-pack="nk-cream" onclick="selectKeySoundPack('nk-cream')">NK Creams</button>
-            <button type="button" class="keysound-option" data-pack="cherrymx-blue-abs" onclick="selectKeySoundPack('cherrymx-blue-abs')">Cherry MX Blues</button>
-            <button type="button" class="keysound-option" data-pack="Buckling Springs" onclick="selectKeySoundPack('Buckling Springs')">Buckling Springs</button>
-            <button type="button" class="keysound-option" data-pack="Cherry MX Blacks" onclick="selectKeySoundPack('Cherry MX Blacks')">Cherry MX Blacks</button>
-            <button type="button" class="keysound-option" data-pack="Cherry MX Browns" onclick="selectKeySoundPack('Cherry MX Browns')">Cherry MX Browns</button>
-            <button type="button" class="keysound-option" data-pack="Cherry MX Reds" onclick="selectKeySoundPack('Cherry MX Reds')">Cherry MX Reds</button>
+            <button type="button" class="keysound-option" data-pack="nk-cream" onclick="selectKeySoundPack('nk-cream', event)">NK Creams</button>
+            <button type="button" class="keysound-option" data-pack="cherrymx-blue-abs" onclick="selectKeySoundPack('cherrymx-blue-abs', event)">Cherry MX Blues</button>
+            <button type="button" class="keysound-option" data-pack="Buckling Springs" onclick="selectKeySoundPack('Buckling Springs', event)">Buckling Springs</button>
+            <button type="button" class="keysound-option" data-pack="Cherry MX Blacks" onclick="selectKeySoundPack('Cherry MX Blacks', event)">Cherry MX Blacks</button>
+            <button type="button" class="keysound-option" data-pack="Cherry MX Browns" onclick="selectKeySoundPack('Cherry MX Browns', event)">Cherry MX Browns</button>
+            <button type="button" class="keysound-option" data-pack="Cherry MX Reds" onclick="selectKeySoundPack('Cherry MX Reds', event)">Cherry MX Reds</button>
             <button type="button" class="keysound-option" onclick="toggleKeySounds()">Toggle On / Off</button>
         </div>
     </div>
@@ -4294,11 +5383,11 @@
             <div class="music-menu-title">Main Menu Theme</div>
             <div class="menu-volume-row">
                 <span class="menu-volume-label">Volume</span>
-                <span class="menu-volume-value" id="music-volume-value">35%</span>
+                <span class="menu-volume-value" id="music-volume-value">100%</span>
             </div>
-            <input type="range" class="menu-volume-slider" id="music-volume-slider" min="0" max="100" step="1" value="35" oninput="handleMusicVolumeInput(event)" aria-label="Music volume">
-            <button type="button" class="music-option" data-theme="dark" onclick="selectMusicTheme('dark')">Dark Main Theme</button>
-            <button type="button" class="music-option" data-theme="universe" onclick="selectMusicTheme('universe')">Your Own Personal Universe</button>
+            <input type="range" class="menu-volume-slider" id="music-volume-slider" min="0" max="100" step="1" value="100" oninput="handleMusicVolumeInput(event)" aria-label="Music volume">
+            <button type="button" class="music-option" data-theme="dark" onclick="selectMusicTheme('dark', event)">Dark Main Theme</button>
+            <button type="button" class="music-option" data-theme="universe" onclick="selectMusicTheme('universe', event)">Your Own Personal Universe</button>
             <button type="button" class="music-option" onclick="toggleMusicMuteFromMenu()">Toggle On / Off</button>
         </div>
     </div>
@@ -4348,6 +5437,7 @@
             <div class="stat-label">Time</div>
             <div class="stat-value" id="timer">0s</div>
         </div>
+        <button type="button" class="sector-map-btn" id="sector-map-btn" onclick="openSectorMap()">Sector Map</button>
     </div>
 
     <div class="progress-bar">
@@ -4355,6 +5445,9 @@
     </div>
 
     <div class="quote-display" id="quote-display" onclick="focusInput()"></div>
+    <div class="mining-laser-overlay" id="mining-laser-overlay" aria-hidden="true">
+        <span class="mining-laser-ship" id="mining-laser-ship" aria-hidden="true"></span>
+    </div>
     <div class="quote-source" id="quote-source"></div>
 
     <canvas id="wpm-chart" class="wpm-chart" aria-hidden="true"></canvas>
@@ -4371,6 +5464,8 @@
         <button class="new-test-btn" onclick="newTest()">New Quote<span class="btn-hint">(Spacebar)</span></button>
         <button class="secondary" onclick="restart()">Restart<span class="btn-hint">(Tab)</span></button>
         <button class="secondary" id="ghost-toggle-btn" onclick="toggleGhostCursor()">Ghost Cursor: On</button>
+        <button class="secondary" id="mining-fx-toggle-btn" onclick="toggleMiningVisuals()">Mining FX: On</button>
+        <button class="secondary mining-sfx-icon-toggle on" id="mining-fx-sfx-toggle-btn" onclick="toggleMiningLaserSound()" style="display:none;" aria-label="Mute laser sounds" title="Mute laser sounds">🔊</button>
     </div>
 </div><!-- /typing-area -->
 
@@ -4400,6 +5495,53 @@
             <button class="lb-tab" data-tab="community" onclick="setLbTab('community')">Community Goal</button>
         </div>
         <div class="leaderboard-list" id="leaderboard-list"></div>
+    </div>
+</div>
+
+<div class="leaderboard-modal" id="sector-map-modal" aria-hidden="true" onclick="handleSectorMapBackdrop(event)">
+    <div class="leaderboard-modal-card" role="dialog" aria-modal="true" aria-labelledby="sector-map-title">
+        <div class="leaderboard-modal-header">
+            <div class="leaderboard-modal-title" id="sector-map-title">Sector Map</div>
+            <button type="button" class="leaderboard-modal-close secondary" onclick="closeSectorMap()" aria-label="Close sector map">X</button>
+        </div>
+        <div class="sector-map-soon-banner">Sector Map Coming Soon!</div>
+        <div class="sector-map-wrap">
+            <svg id="sector-map-svg" class="sector-map-svg" viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg" aria-label="Sector map systems and constellation routes">
+                <defs>
+                    <pattern id="sector-grid-pattern" width="48" height="48" patternUnits="userSpaceOnUse">
+                        <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(148, 163, 184, 0.18)" stroke-width="1"/>
+                    </pattern>
+                    <filter id="sector-easy-glow" x="-180%" y="-180%" width="460%" height="460%">
+                        <feGaussianBlur stdDeviation="4.2" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="sector-medium-glow" x="-180%" y="-180%" width="460%" height="460%">
+                        <feGaussianBlur stdDeviation="5.6" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="sector-high-glow" x="-180%" y="-180%" width="460%" height="460%">
+                        <feGaussianBlur stdDeviation="7.2" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="starlight-glow" x="-250%" y="-250%" width="600%" height="600%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="4.6" result="softBlur"/>
+                        <feMerge>
+                            <feMergeNode in="softBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <rect x="0" y="0" width="1200" height="720" fill="url(#sector-grid-pattern)" class="sector-grid-pulse"/>
+                <g id="sector-map-stars" class="sector-stars-layer"></g>
+                <g id="sector-map-links"></g>
+                <g id="sector-map-nodes"></g>
+            </svg>
+            <div class="sector-tactical-overlay" id="sector-tactical-overlay">
+                <div class="sector-tactical-title">Sector Map Guide</div>
+                <div id="sector-tactical-body">Bright stars are travel-ready sectors. Dim stars are locked until your level and average WPM are high enough. Dotted links show active routes between sectors you can currently access.</div>
+            </div>
+            <div class="sector-node-hover-bubble" id="sector-node-hover-bubble" aria-hidden="true"></div>
+        </div>
     </div>
 </div>
 
@@ -4467,6 +5609,26 @@
             </div>
         </div>
         <div id="profile-content"><div class="profile-loading">Loading...</div></div>
+    </div>
+</div>
+
+<div class="profile-modal" id="mission-briefing-modal" aria-hidden="true" onclick="handleMissionBriefingBackdrop(event)">
+    <div class="profile-modal-card mission-briefing-card" role="dialog" aria-modal="true" aria-labelledby="mission-briefing-title">
+        <div class="profile-modal-header">
+            <div class="profile-modal-title" id="mission-briefing-title">Mission Briefing</div>
+            <button type="button" class="leaderboard-modal-close secondary" onclick="closeMissionBriefing()" aria-label="Close mission briefing">X</button>
+        </div>
+        <div class="mission-briefing-body">
+            <p class="mission-briefing-lead">
+                Welcome to the stars, pilot! Command has high hopes for you! Your goal is simple: Mine the asteroids in this sector for Aether Crystals.
+            </p>
+            <ul class="mission-briefing-list">
+                <li>Every typing test is an asteroid run. Your speed and accuracy determine how efficiently you mine.</li>
+                <li>Aether Crystals are your mission currency. Earn them through progress, then spend them in the Shop.</li>
+                <li>Use Aether Crystals to unlock rewards like Soundscapes, Cosmetics, and Keyboard Sound Packs.</li>
+            </ul>
+            <div class="mission-briefing-footer">Stay sharp, pilot. The fleet depends on your output.</div>
+        </div>
     </div>
 </div>
 
@@ -5020,6 +6182,7 @@ function updateBibleModeUi() {
     if (stat) stat.style.display = currentMode === 'quotes' ? 'flex' : 'none';
     if (toggle) toggle.checked = !!bibleModeEnabled;
     updatePrimaryNewTestButtons();
+    updateSectorMapButtonVisibility();
     updateCommunityModePopup();
 }
 
@@ -5042,6 +6205,8 @@ function setMode(mode) {
     currentMode = mode;
     document.querySelectorAll('.mode-tab').forEach(btn =>
         btn.classList.toggle('active', btn.dataset.mode === mode));
+    updateTypingViewportMode(true);
+    updateSectorMapButtonVisibility();
     updateBibleModeUi();
     const panel = document.getElementById('challenge-panel');
     const area  = document.getElementById('typing-area');
@@ -5049,6 +6214,7 @@ function setMode(mode) {
         if (sfxReady && previousMode !== 'daily') playSound(SFX.changeMode);
         if (panel) panel.style.display = 'block';
         if (area)  area.style.display  = 'none';
+        clearMiningLaserOverlay();
         renderDailyChallenges();
     } else {
         if (panel) panel.style.display = 'none';
@@ -5310,11 +6476,46 @@ function loadGhostCursorPreference() {
     } catch (e) {}
 }
 
+function loadMiningVisualsPreference() {
+    try {
+        const stored = localStorage.getItem(MINING_VISUALS_ENABLED_KEY);
+        if (stored === '0') miningVisualsEnabled = false;
+        else if (stored === '1') miningVisualsEnabled = true;
+    } catch (e) {}
+}
+
+function loadMiningLaserSoundPreference() {
+    try {
+        const stored = localStorage.getItem(MINING_LASER_SOUND_ENABLED_KEY);
+        if (stored === '0') miningLaserSoundEnabled = false;
+        else if (stored === '1') miningLaserSoundEnabled = true;
+    } catch (e) {}
+}
+
 function updateGhostToggleButton() {
     const btn = document.getElementById('ghost-toggle-btn');
     if (!btn) return;
     btn.textContent = `Ghost Cursor: ${ghostCursorEnabled ? 'On' : 'Off'}`;
     btn.classList.toggle('toggle-on', ghostCursorEnabled);
+}
+
+function updateMiningLaserSoundToggleButton() {
+    const btn = document.getElementById('mining-fx-sfx-toggle-btn');
+    if (!btn) return;
+    btn.textContent = miningLaserSoundEnabled ? '🔊' : '🔇';
+    btn.classList.toggle('on', miningLaserSoundEnabled);
+    btn.classList.toggle('muted', !miningLaserSoundEnabled);
+    btn.setAttribute('aria-label', miningLaserSoundEnabled ? 'Mute laser sounds' : 'Enable laser sounds');
+    btn.title = miningLaserSoundEnabled ? 'Mute laser sounds' : 'Enable laser sounds';
+    btn.style.display = miningVisualsEnabled ? 'inline-flex' : 'none';
+}
+
+function updateMiningFxToggleButton() {
+    const btn = document.getElementById('mining-fx-toggle-btn');
+    if (!btn) return;
+    btn.textContent = `Mining FX: ${miningVisualsEnabled ? 'On' : 'Off'}`;
+    btn.classList.toggle('toggle-on', miningVisualsEnabled);
+    updateMiningLaserSoundToggleButton();
 }
 
 function toggleGhostCursor() {
@@ -5328,6 +6529,23 @@ function toggleGhostCursor() {
     }
     updateGhostToggleButton();
     renderQuote();
+}
+
+function toggleMiningVisuals() {
+    miningVisualsEnabled = !miningVisualsEnabled;
+    try { localStorage.setItem(MINING_VISUALS_ENABLED_KEY, miningVisualsEnabled ? '1' : '0'); } catch (e) {}
+    updateMiningFxToggleButton();
+    if (!miningVisualsEnabled) {
+        clearMiningLaserOverlay();
+    } else {
+        updateMiningLaserAtActiveWord();
+    }
+}
+
+function toggleMiningLaserSound() {
+    miningLaserSoundEnabled = !miningLaserSoundEnabled;
+    try { localStorage.setItem(MINING_LASER_SOUND_ENABLED_KEY, miningLaserSoundEnabled ? '1' : '0'); } catch (e) {}
+    updateMiningLaserSoundToggleButton();
 }
 
 function recordAttemptTimelinePoint() {
@@ -5351,6 +6569,8 @@ const hintEl            = document.getElementById('hint');
 const resultOverlay     = document.getElementById('result-overlay');
 const chartCanvas       = document.getElementById('wpm-chart');
 const chartCanvasResult = document.getElementById('wpm-chart-result');
+const miningLaserOverlay = document.getElementById('mining-laser-overlay');
+const miningLaserShip = document.getElementById('mining-laser-ship');
 
 // ── Core logic ─────────────────────────────────────────────────────────────
 function clearChart(canvas) {
@@ -5403,6 +6623,7 @@ function init(quote, source = '') {
     const sourceEl = document.getElementById('quote-source');
     if (sourceEl) sourceEl.textContent = source;
 
+    updateTypingViewportMode(true);
     renderQuote();
     focusInput();
 }
@@ -5452,6 +6673,41 @@ function focusInput() {
     }
     quoteDisplay.classList.add('focused');
 }
+
+function shouldUseCompactTypingViewport() {
+    return isTimedMode();
+}
+
+function updateTypingViewportMode(resetScroll = false) {
+    if (!quoteDisplay) return;
+    const compact = shouldUseCompactTypingViewport();
+    quoteDisplay.classList.toggle('words30-compact', compact);
+    syncTypingViewportScroll(resetScroll);
+}
+
+function syncTypingViewportScroll(resetScroll = false) {
+    if (!quoteDisplay) return;
+    if (!quoteDisplay.classList.contains('words30-compact')) {
+        if (resetScroll || quoteDisplay.scrollLeft !== 0) quoteDisplay.scrollLeft = 0;
+        return;
+    }
+    if (!charSpans.length) {
+        quoteDisplay.scrollLeft = 0;
+        return;
+    }
+    const anchorIndex = Math.max(0, Math.min(currentIndex, charSpans.length - 1));
+    const anchor = charSpans[anchorIndex];
+    if (!anchor) return;
+    const maxScroll = Math.max(0, quoteDisplay.scrollWidth - quoteDisplay.clientWidth);
+    const leadSpace = Math.max(72, quoteDisplay.clientWidth * 0.28);
+    const target = Math.max(0, Math.min(maxScroll, anchor.offsetLeft - leadSpace));
+    quoteDisplay.scrollLeft = target;
+}
+
+window.addEventListener('resize', () => {
+    syncTypingViewportScroll(false);
+    updateMiningLaserAtActiveWord();
+});
 
 // ── Rendering ──────────────────────────────────────────────────────────────
 function makeCharSpan(i) {
@@ -5504,6 +6760,8 @@ function renderQuote() {
         }
     }
     applyAuraStyles();
+    syncTypingViewportScroll(true);
+    updateMiningLaserAtActiveWord();
 }
 
 // Update a single character span in-place — avoids full DOM rebuild per keystroke.
@@ -5550,6 +6808,186 @@ function getCurrentWordIndex() {
         if (idx >= range.start && idx < range.end) return i;
     }
     return -1;
+}
+
+function getWordIndexForChar(charIndex) {
+    if (!wordRanges.length) return -1;
+    const idx = Math.max(0, Math.min(currentQuote.length - 1, Number(charIndex) || 0));
+    for (let i = 0; i < wordRanges.length; i++) {
+        const range = wordRanges[i];
+        if (idx >= range.start && idx < range.end) return i;
+    }
+    return -1;
+}
+
+function emitMiningShatterAtWord(wordIndex) {
+    if (!miningVisualsEnabled) return;
+    if (!quoteDisplay || !wordSpans.length) return;
+    if (wordIndex < 0 || wordIndex >= wordSpans.length) return;
+    const wordEl = wordSpans[wordIndex];
+    if (!wordEl) return;
+
+    const hostRect = quoteDisplay.getBoundingClientRect();
+    const wordRect = wordEl.getBoundingClientRect();
+    const centerX = wordRect.left - hostRect.left + (wordRect.width * 0.5);
+    const centerY = wordRect.top - hostRect.top + (wordRect.height * 0.58);
+    const burstCount = 18;
+    const palette = ['#fde047', '#fb923c', '#f97316', '#ef4444', '#facc15'];
+
+    const core = document.createElement('span');
+    core.className = 'mining-shatter-core';
+    core.style.setProperty('--x', `${centerX.toFixed(1)}px`);
+    core.style.setProperty('--y', `${centerY.toFixed(1)}px`);
+    quoteDisplay.appendChild(core);
+    core.addEventListener('animationend', () => core.remove(), { once: true });
+
+    for (let i = 0; i < burstCount; i++) {
+        const p = document.createElement('span');
+        p.className = 'mining-shatter-particle';
+        const theta = (Math.PI * 2 * i / burstCount) + (Math.random() * 0.34);
+        const travel = 16 + Math.random() * 24;
+        const dx = Math.cos(theta) * travel;
+        const dy = Math.sin(theta) * travel - (4 + Math.random() * 7);
+        const size = 4 + Math.random() * 4;
+        const duration = 0.3 + Math.random() * 0.16;
+        const color = palette[Math.floor(Math.random() * palette.length)];
+
+        p.style.setProperty('--x', `${centerX.toFixed(1)}px`);
+        p.style.setProperty('--y', `${centerY.toFixed(1)}px`);
+        p.style.setProperty('--dx', `${dx.toFixed(1)}px`);
+        p.style.setProperty('--dy', `${dy.toFixed(1)}px`);
+        p.style.setProperty('--size', `${size.toFixed(1)}px`);
+        p.style.setProperty('--dur', `${duration.toFixed(2)}s`);
+        p.style.setProperty('--pixel', color);
+
+        quoteDisplay.appendChild(p);
+        p.addEventListener('animationend', () => p.remove(), { once: true });
+    }
+}
+
+function maybeTriggerMiningShatter(typedIndex) {
+    if (!miningVisualsEnabled) return;
+    const idx = Number(typedIndex);
+    if (!Number.isFinite(idx) || idx < 0 || idx >= currentQuote.length) return;
+    if (typedChars[idx] !== currentQuote[idx]) return;
+    const nextChar = currentQuote[idx + 1];
+    if (idx !== currentQuote.length - 1 && nextChar !== ' ') return;
+    const wordIndex = getWordIndexForChar(idx);
+    if (wordIndex < 0 || wordIndex >= wordRanges.length) return;
+    const range = wordRanges[wordIndex];
+    if (!range) return;
+    for (let i = range.start; i < range.end; i++) {
+        if (typedChars[i] !== currentQuote[i]) return;
+    }
+    emitMiningShatterAtWord(wordIndex);
+    if (miningLaserSoundEnabled) playSound(SFX.laser);
+}
+
+function clearMiningLaserOverlay() {
+    if (!miningLaserOverlay) return;
+    miningLaserOverlay.classList.remove('show');
+}
+
+function getMiningLaserAnchorElement(charIndex = null) {
+    if (Number.isFinite(charIndex)) {
+        const widx = getWordIndexForChar(charIndex);
+        if (widx >= 0 && wordSpans[widx]) return wordSpans[widx];
+    }
+    const currentWordIndex = getCurrentWordIndex();
+    if (currentWordIndex >= 0 && wordSpans[currentWordIndex]) return wordSpans[currentWordIndex];
+    if (currentIndex > 0 && charSpans[currentIndex - 1]) return charSpans[currentIndex - 1];
+    return charSpans[Math.max(0, Math.min(currentIndex, charSpans.length - 1))] || null;
+}
+
+function getMiningLaserGeometry(anchorEl = null) {
+    if (!miningLaserOverlay) return null;
+    const typingArea = document.getElementById('typing-area');
+    if (!miningVisualsEnabled || !typingArea || typingArea.style.display === 'none' || !quoteDisplay || !charSpans.length || quoteDisplay.offsetParent === null) return null;
+
+    const anchor = anchorEl || getMiningLaserAnchorElement();
+    if (!anchor) return null;
+
+    const rect = anchor.getBoundingClientRect();
+    const targetX = rect.left + (rect.width * 0.5);
+    const targetY = rect.top + (rect.height * 0.58);
+    const quoteRect = quoteDisplay.getBoundingClientRect();
+    const shipHeight = 38;
+    const originX = quoteRect.right - 44;
+    const shipBottom = Math.max(0, window.innerHeight - quoteRect.bottom + 8);
+    const originYFromBottom = shipBottom + (shipHeight * 0.52);
+    const originY = window.innerHeight - originYFromBottom;
+    const dx = targetX - originX;
+    const dy = targetY - originY;
+    if (dy > -6) return null;
+
+    const length = Math.max(0, Math.sqrt((dx * dx) + (dy * dy)));
+    const angleDeg = Math.atan2(dx, -dy) * 180 / Math.PI;
+    const shipAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const wpm = getWPM(getElapsed());
+    const speedRatio = Math.max(0, Math.min(1, wpm / 140));
+    const hue = Math.round(286 - speedRatio * 136);
+    const beamWidth = (11 + speedRatio * 9).toFixed(2);
+    const coreWidth = (2.2 + speedRatio * 2.1).toFixed(2);
+
+    return { originX, originY, originYFromBottom, shipBottom, shipAngle, length, angleDeg, hue, beamWidth, coreWidth };
+}
+
+function updateMiningLaserAtActiveWord() {
+    if (!miningLaserOverlay) return;
+    if (!miningVisualsEnabled || !startTime || isComplete) {
+        clearMiningLaserOverlay();
+        return;
+    }
+    if (miningLaserShip && !miningLaserShip.firstElementChild) {
+        miningLaserShip.innerHTML = getCommunityShipSprite('player');
+    }
+    const g = getMiningLaserGeometry();
+    if (!g) {
+        clearMiningLaserOverlay();
+        return;
+    }
+    miningLaserOverlay.style.setProperty('--laser-origin-x', `${g.originX.toFixed(1)}px`);
+    miningLaserOverlay.style.setProperty('--ship-bottom', `${g.shipBottom.toFixed(1)}px`);
+    miningLaserOverlay.style.setProperty('--ship-angle', `${g.shipAngle.toFixed(2)}deg`);
+    miningLaserOverlay.classList.add('show');
+}
+
+function emitMiningLaserShotAtWord(typedIndex = null) {
+    if (!miningVisualsEnabled || !miningLaserOverlay) return;
+    if (miningLaserShip && !miningLaserShip.firstElementChild) {
+        miningLaserShip.innerHTML = getCommunityShipSprite('player');
+    }
+    const anchorEl = getMiningLaserAnchorElement(Number.isFinite(typedIndex) ? typedIndex : null);
+    const g = getMiningLaserGeometry(anchorEl);
+    if (!g) return;
+
+    miningLaserOverlay.style.setProperty('--laser-origin-x', `${g.originX.toFixed(1)}px`);
+    miningLaserOverlay.style.setProperty('--ship-bottom', `${g.shipBottom.toFixed(1)}px`);
+    miningLaserOverlay.style.setProperty('--ship-angle', `${g.shipAngle.toFixed(2)}deg`);
+    miningLaserOverlay.classList.add('show');
+
+    const shot = document.createElement('span');
+    shot.className = 'mining-laser-shot';
+    shot.style.setProperty('--shot-origin-x', `${g.originX.toFixed(1)}px`);
+    shot.style.setProperty('--shot-origin-y', `${g.originYFromBottom.toFixed(1)}px`);
+    shot.style.setProperty('--shot-length', `${g.length.toFixed(1)}px`);
+    shot.style.setProperty('--shot-angle', `${g.angleDeg.toFixed(2)}deg`);
+    shot.style.setProperty('--shot-hue', String(g.hue));
+    shot.style.setProperty('--shot-width', `${g.beamWidth}px`);
+
+    const core = document.createElement('span');
+    core.className = 'mining-laser-shot-core';
+    core.style.setProperty('--shot-origin-x', `${g.originX.toFixed(1)}px`);
+    core.style.setProperty('--shot-origin-y', `${g.originYFromBottom.toFixed(1)}px`);
+    core.style.setProperty('--shot-length', `${g.length.toFixed(1)}px`);
+    core.style.setProperty('--shot-angle', `${g.angleDeg.toFixed(2)}deg`);
+    core.style.setProperty('--shot-hue', String(g.hue));
+    core.style.setProperty('--shot-core-width', `${g.coreWidth}px`);
+
+    miningLaserOverlay.appendChild(shot);
+    miningLaserOverlay.appendChild(core);
+    shot.addEventListener('animationend', () => shot.remove(), { once: true });
+    core.addEventListener('animationend', () => core.remove(), { once: true });
 }
 
 function applyAuraStyles() {
@@ -5637,8 +7075,8 @@ function emitXzLaserAtCursor(keyChar) {
     laser.addEventListener('animationend', () => laser.remove(), { once: true });
 }
 
-function previewAuraReward() {
-    const target = document.getElementById('aura-preview-word');
+function previewAuraRewardAt(targetId = 'aura-preview-word') {
+    const target = document.getElementById(String(targetId || 'aura-preview-word'));
     if (!target) return;
 
     const hue = 195 + Math.round(Math.random() * 85);
@@ -5650,9 +7088,12 @@ function previewAuraReward() {
     target.classList.add('aura-on');
     setTimeout(() => target.classList.remove('aura-on'), 1200);
 }
+function previewAuraReward() {
+    previewAuraRewardAt('aura-preview-word');
+}
 
-function previewNebulaTrailReward() {
-    const stage = document.getElementById('nebula-preview-stage');
+function previewNebulaTrailRewardAt(stageId = 'nebula-preview-stage') {
+    const stage = document.getElementById(String(stageId || 'nebula-preview-stage'));
     if (!stage) return;
     const rect = stage.getBoundingClientRect();
     const baseX = rect.width * 0.76;
@@ -5681,6 +7122,9 @@ function previewNebulaTrailReward() {
         stage.appendChild(p);
         p.addEventListener('animationend', () => p.remove(), { once: true });
     }
+}
+function previewNebulaTrailReward() {
+    previewNebulaTrailRewardAt('nebula-preview-stage');
 }
 
 // ── Stats ──────────────────────────────────────────────────────────────────
@@ -5731,6 +7175,7 @@ function updateStats() {
         : (currentIndex / currentQuote.length * 100);
     progressEl.style.width = progress + '%';
     applyAuraStyles();
+    updateMiningLaserAtActiveWord();
 }
 
 // ── WPM Chart ──────────────────────────────────────────────────────────────
@@ -5977,6 +7422,8 @@ const LOCAL_AUTH_SCORES_KEY = 'sampire-local-auth-scores';
 const LOCAL_GUEST_SCORES_KEY = 'sampire-local-guest-scores';
 const GUEST_SESSION_ID_KEY = 'sampire-guest-session-id';
 const GHOST_CURSOR_ENABLED_KEY = 'sampire-ghost-cursor-enabled';
+const MINING_VISUALS_ENABLED_KEY = 'sampire-mining-visuals-enabled';
+const MINING_LASER_SOUND_ENABLED_KEY = 'sampire-mining-laser-sound-enabled';
 const BIBLE_MODE_KEY = 'sampire-bible-mode';
 const LIFETIME_TESTS_KEY = 'sampire-lifetime-tests-completed';
 const LIFETIME_WORDS_TYPED_KEY = 'sampire-lifetime-words-typed';
@@ -6010,6 +7457,8 @@ const SYNC_PROGRESS_KEYS = [
     'sampire-music-volume',
     'sampire-key-sounds-enabled',
     'sampire-key-sound-volume',
+    MINING_VISUALS_ENABLED_KEY,
+    MINING_LASER_SOUND_ENABLED_KEY,
     BIBLE_MODE_KEY,
 ];
 const CRITICAL_STORAGE_KEYS = [
@@ -6035,6 +7484,8 @@ const CRITICAL_STORAGE_KEYS = [
     'sampire-community-weekly-contrib',
     'sampire-skill-points',
     'sampire-skills',
+    MINING_VISUALS_ENABLED_KEY,
+    MINING_LASER_SOUND_ENABLED_KEY,
     BIBLE_MODE_KEY,
 ];
 let authToken = null;
@@ -6051,6 +7502,8 @@ let suppressProgressSync = false;
 let progressCloudUpdatedAt = 0;
 let cloudRefreshPromise = null;
 let ghostCursorEnabled = true;
+let miningVisualsEnabled = true;
+let miningLaserSoundEnabled = true;
 let bibleModeEnabled = false;
 let bibleModeMissingWarned = false;
 let skillStateCache = null;
@@ -7154,7 +8607,7 @@ function updateProfileToggleHoverInfo() {
     const weeklyLeft = Math.max(0, WEEKLY_CHALLENGES.length - getWeeklyCompletions().length);
 
     title.textContent = `Logged in as ${currentUser.username}`;
-    line1.textContent = `Level: ${level} · Skill Points: ${skillPoints}`;
+    line1.textContent = `Level: ${level} · Aether Crystals: ${skillPoints}`;
     line2.textContent = `Daily challenges left: ${dailyLeft}`;
     line3.textContent = `Weekly challenges left: ${weeklyLeft}`;
 }
@@ -7338,6 +8791,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
             setSignupNote('Account created and logged in.');
             closeSignupModal();
         }
+        openMissionBriefing();
         await refreshCloudProgress();
         await refreshLeaderboard();
     } catch (e) {
@@ -7829,6 +9283,262 @@ function setLbTab(tab) {
     refreshLeaderboard();
 }
 
+const SECTOR_MAP_SYSTEMS = [
+    { id: 'lyra', name: 'Lyra Gate', x: 150, y: 480, difficulty: 'easy', avgWpm: 35, requiredLevel: 1, unlocked: true, links: ['orion'] },
+    { id: 'orion', name: 'Orion Drift', x: 300, y: 390, difficulty: 'easy', avgWpm: 45, requiredLevel: 2, unlocked: true, links: ['perseus', 'vega'] },
+    { id: 'perseus', name: 'Perseus Spine', x: 470, y: 450, difficulty: 'medium', avgWpm: 60, requiredLevel: 4, unlocked: false, links: ['vega', 'antares'] },
+    { id: 'vega', name: 'Vega Expanse', x: 520, y: 280, difficulty: 'medium', avgWpm: 72, requiredLevel: 6, unlocked: false, links: ['antares', 'helios'] },
+    { id: 'antares', name: 'Antares Rift', x: 700, y: 380, difficulty: 'medium', avgWpm: 82, requiredLevel: 8, unlocked: false, links: ['helios', 'zenith'] },
+    { id: 'helios', name: 'Helios Crown', x: 810, y: 240, difficulty: 'high', avgWpm: 95, requiredLevel: 10, unlocked: false, links: ['zenith'] },
+    { id: 'zenith', name: 'Zenith Core', x: 1030, y: 310, difficulty: 'high', avgWpm: 110, requiredLevel: 12, unlocked: false, links: [] },
+];
+let sectorMapResolvedSystems = [];
+
+function getSectorDifficultyStyle(level) {
+    if (level === 'easy') {
+        return { glow: 'url(#sector-easy-glow)', r: 8, hr: 17 };
+    }
+    if (level === 'medium') {
+        return { glow: 'url(#sector-medium-glow)', r: 9, hr: 20 };
+    }
+    return { glow: 'url(#sector-high-glow)', r: 10, hr: 23 };
+}
+
+const SECTOR_NODE_COLORS = {
+    lyra: { core: '#4cc9f0', stroke: '#d6f8ff', halo: 'rgba(76, 201, 240, 0.64)' },
+    orion: { core: '#4895ef', stroke: '#dbeafe', halo: 'rgba(72, 149, 239, 0.64)' },
+    perseus: { core: '#7b6cff', stroke: '#ebe6ff', halo: 'rgba(123, 108, 255, 0.66)' },
+    vega: { core: '#b5179e', stroke: '#f5d6ef', halo: 'rgba(181, 23, 158, 0.64)' },
+    antares: { core: '#f72585', stroke: '#ffe1ef', halo: 'rgba(247, 37, 133, 0.66)' },
+    helios: { core: '#fb8500', stroke: '#ffedd5', halo: 'rgba(251, 133, 0, 0.66)' },
+    zenith: { core: '#ffd166', stroke: '#fff5cc', halo: 'rgba(255, 209, 102, 0.68)' },
+};
+
+function getSectorNodeColorStyle(nodeId) {
+    return SECTOR_NODE_COLORS[String(nodeId || '').toLowerCase()]
+        || { core: '#93c5fd', stroke: '#e0f2fe', halo: 'rgba(147, 197, 253, 0.62)' };
+}
+
+function updateSectorTacticalOverlay(systemId = '') {
+    const body = document.getElementById('sector-tactical-body');
+    if (!body) return;
+    body.textContent = 'Bright stars are travel-ready sectors. Dim stars are locked until your level and average WPM are high enough. Dotted links show active routes between sectors you can currently access.';
+}
+
+function positionSectorNodeHoverBubble(event) {
+    if (!event) return;
+    const bubble = document.getElementById('sector-node-hover-bubble');
+    const wrap = document.querySelector('#sector-map-modal .sector-map-wrap');
+    if (!bubble || !wrap) return;
+    const rect = wrap.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const offset = 14;
+    const bubbleWidth = Math.max(120, bubble.offsetWidth || 0);
+    const bubbleHeight = Math.max(54, bubble.offsetHeight || 0);
+    let x = event.clientX - rect.left + offset;
+    let y = event.clientY - rect.top + offset;
+    if (x + bubbleWidth > rect.width - 8) x = Math.max(8, rect.width - bubbleWidth - 8);
+    if (y + bubbleHeight > rect.height - 8) y = Math.max(8, rect.height - bubbleHeight - 8);
+    bubble.style.left = `${Math.max(8, x)}px`;
+    bubble.style.top = `${Math.max(8, y)}px`;
+}
+
+function showSectorNodeHoverBubble(systemId, event) {
+    const bubble = document.getElementById('sector-node-hover-bubble');
+    if (!bubble || !systemId) return;
+    const source = Array.isArray(sectorMapResolvedSystems) && sectorMapResolvedSystems.length ? sectorMapResolvedSystems : SECTOR_MAP_SYSTEMS;
+    const node = source.find((s) => s.id === systemId);
+    if (!node) return;
+    const requiredLevel = Math.max(1, Number(node.requiredLevel) || 1);
+    const requiredAvgWpm = Math.max(0, Number(node.avgWpm) || 0);
+    const statusReasons = [];
+    if (!node.pathUnlocked) statusReasons.push(`reach level ${requiredLevel}`);
+    if (!node.wpmQualified) statusReasons.push(`raise account average to ${Math.round(requiredAvgWpm)} WPM`);
+    const accessText = node.isAccessible ? 'Travel Ready' : `Locked: ${statusReasons.join(' and ')}`;
+    bubble.classList.toggle('is-ready', !!node.isAccessible);
+    bubble.innerHTML = `<strong>${escapeHtml(node.name)}</strong><br>Average WPM required to mine here: <strong>${Math.round(node.avgWpm)}</strong><br>Status: <strong>${escapeHtml(accessText)}</strong>`;
+    bubble.classList.add('show');
+    bubble.setAttribute('aria-hidden', 'false');
+    positionSectorNodeHoverBubble(event);
+}
+
+function hideSectorNodeHoverBubble() {
+    const bubble = document.getElementById('sector-node-hover-bubble');
+    if (!bubble) return;
+    bubble.classList.remove('show');
+    bubble.setAttribute('aria-hidden', 'true');
+}
+
+function renderSectorMap() {
+    const starsLayer = document.getElementById('sector-map-stars');
+    const nodesLayer = document.getElementById('sector-map-nodes');
+    const linksLayer = document.getElementById('sector-map-links');
+    if (!starsLayer || !nodesLayer || !linksLayer) return;
+    starsLayer.innerHTML = '';
+    nodesLayer.innerHTML = '';
+    linksLayer.innerHTML = '';
+    const playerLevel = getLevel(getTotalXP());
+    const history = loadHistory();
+    const validWpmValues = history
+        .map((entry) => Math.max(0, Number(entry && entry.wpm) || 0))
+        .filter((value) => value > 0);
+    const accountAvgWpm = validWpmValues.length
+        ? validWpmValues.reduce((sum, value) => sum + value, 0) / validWpmValues.length
+        : 0;
+    const systems = SECTOR_MAP_SYSTEMS.map((node) => ({
+        ...node,
+        pathUnlocked: !!node.unlocked || playerLevel >= Math.max(1, Number(node.requiredLevel) || 1),
+        wpmQualified: accountAvgWpm >= Math.max(0, Number(node.avgWpm) || 0),
+        isAccessible: (!!node.unlocked || playerLevel >= Math.max(1, Number(node.requiredLevel) || 1))
+            && accountAvgWpm >= Math.max(0, Number(node.avgWpm) || 0),
+    }));
+    sectorMapResolvedSystems = systems;
+
+    const starCount = 100 + Math.floor(Math.random() * 51);
+    const regularStarPalette = ['#eff6ff', '#e2e8f0', '#dbeafe', '#bfdbfe'];
+    const aetherStarPalette = ['#ddd6fe', '#c4b5fd', '#fde68a', '#facc15'];
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const isAetherTint = Math.random() < 0.1;
+        const palette = isAetherTint ? aetherStarPalette : regularStarPalette;
+        const color = palette[Math.floor(Math.random() * palette.length)];
+        const cx = Math.random() * 1200;
+        const cy = Math.random() * 720;
+        const r = 0.5 + Math.random() * 1.5;
+        const duration = 1.6 + Math.random() * 3.6;
+        const delay = Math.random() * 6.5;
+        const minOpacity = 0.06 + Math.random() * 0.18;
+        const maxOpacity = 0.72 + Math.random() * 0.28;
+
+        star.setAttribute('class', 'sector-star');
+        star.setAttribute('cx', cx.toFixed(2));
+        star.setAttribute('cy', cy.toFixed(2));
+        star.setAttribute('r', r.toFixed(2));
+        star.setAttribute('fill', color);
+        star.style.animationDuration = `${duration.toFixed(2)}s`;
+        star.style.animationDelay = `${delay.toFixed(2)}s`;
+        star.style.setProperty('--min-o', minOpacity.toFixed(2));
+        star.style.setProperty('--max-o', maxOpacity.toFixed(2));
+        starsLayer.appendChild(star);
+    }
+
+    const byId = new Map(systems.map((node) => [node.id, node]));
+    const drawn = new Set();
+    for (const a of systems) {
+        if (!a.isAccessible) continue;
+        for (const bId of a.links || []) {
+            const b = byId.get(bId);
+            if (!b || !b.isAccessible) continue;
+            const key = [a.id, b.id].sort().join(':');
+            if (drawn.has(key)) continue;
+            drawn.add(key);
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', String(a.x));
+            line.setAttribute('y1', String(a.y));
+            line.setAttribute('x2', String(b.x));
+            line.setAttribute('y2', String(b.y));
+            line.setAttribute('class', 'sector-link');
+            linksLayer.appendChild(line);
+        }
+    }
+
+    for (const node of systems) {
+        const style = getSectorDifficultyStyle(node.difficulty);
+        const colorStyle = getSectorNodeColorStyle(node.id);
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        const importanceClass = node.difficulty === 'high' ? 'sector-importance-high' : 'sector-importance-standard';
+        g.setAttribute('class', `sector-node ${node.isAccessible ? 'is-unlocked' : 'is-locked'} ${importanceClass}`);
+        g.setAttribute('tabindex', node.isAccessible ? '0' : '-1');
+        g.setAttribute('role', 'button');
+        g.setAttribute('aria-label', `${node.name}, average WPM ${Math.round(node.avgWpm)}, ${node.isAccessible ? 'accessible' : 'locked'}`);
+        g.dataset.nodeId = node.id;
+        g.addEventListener('focus', () => updateSectorTacticalOverlay(node.id));
+        g.addEventListener('blur', hideSectorNodeHoverBubble);
+        g.addEventListener('mouseover', (event) => {
+            updateSectorTacticalOverlay(node.id);
+            showSectorNodeHoverBubble(node.id, event);
+        });
+        g.addEventListener('mousemove', positionSectorNodeHoverBubble);
+        g.addEventListener('mouseleave', hideSectorNodeHoverBubble);
+
+        const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        halo.setAttribute('cx', String(node.x));
+        halo.setAttribute('cy', String(node.y));
+        halo.setAttribute('r', String(style.hr));
+        halo.setAttribute('class', 'node-halo');
+        halo.setAttribute('fill', colorStyle.halo);
+        halo.setAttribute('filter', style.glow);
+
+        const core = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        core.setAttribute('cx', String(node.x));
+        core.setAttribute('cy', String(node.y));
+        core.setAttribute('r', String(style.r));
+        core.setAttribute('class', 'node-core');
+        core.setAttribute('fill', colorStyle.core);
+        core.setAttribute('stroke', colorStyle.stroke);
+        core.setAttribute('filter', style.glow);
+
+        g.appendChild(halo);
+        g.appendChild(core);
+        nodesLayer.appendChild(g);
+    }
+    updateSectorTacticalOverlay('');
+}
+
+function updateSectorStarsParallaxFromMouse(event) {
+    const wrap = document.querySelector('#sector-map-modal .sector-map-wrap');
+    const starsLayer = document.getElementById('sector-map-stars');
+    if (!wrap || !starsLayer || !event) return;
+    const rect = wrap.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const relX = ((event.clientX - rect.left) / rect.width) - 0.5;
+    const relY = ((event.clientY - rect.top) / rect.height) - 0.5;
+    const tx = (-relX * 16).toFixed(2);
+    const ty = (-relY * 10).toFixed(2);
+    starsLayer.setAttribute('transform', `translate(${tx} ${ty})`);
+}
+
+function resetSectorStarsParallax() {
+    const starsLayer = document.getElementById('sector-map-stars');
+    if (!starsLayer) return;
+    starsLayer.setAttribute('transform', 'translate(0 0)');
+}
+
+function bindSectorMapParallax() {
+    const wrap = document.querySelector('#sector-map-modal .sector-map-wrap');
+    if (!wrap || wrap.dataset.parallaxBound === '1') return;
+    wrap.dataset.parallaxBound = '1';
+    wrap.addEventListener('mousemove', updateSectorStarsParallaxFromMouse);
+    wrap.addEventListener('mouseleave', resetSectorStarsParallax);
+}
+
+function openSectorMap() {
+    const modal = document.getElementById('sector-map-modal');
+    if (!modal) return;
+    renderSectorMap();
+    bindSectorMapParallax();
+    openModal(modal);
+}
+
+function closeSectorMap() {
+    const modal = document.getElementById('sector-map-modal');
+    if (!modal) return;
+    resetSectorStarsParallax();
+    hideSectorNodeHoverBubble();
+    closeModal(modal);
+}
+
+function handleSectorMapBackdrop(event) {
+    if (event && event.target === document.getElementById('sector-map-modal')) closeSectorMap();
+}
+
+function updateSectorMapButtonVisibility() {
+    const btn = document.getElementById('sector-map-btn');
+    if (!btn) return;
+    const show = currentMode === 'words';
+    btn.style.display = show ? 'inline-flex' : 'none';
+}
+
 function getCommunityContributionRows() {
     const state = getCommunityWeeklyContributionState();
     return Object.values(state.entries || {})
@@ -8246,6 +9956,22 @@ function handleProfileBackdrop(event) {
     if (event && event.target === document.getElementById('profile-modal')) closeProfile();
 }
 
+function openMissionBriefing() {
+    const modal = document.getElementById('mission-briefing-modal');
+    if (!modal) return;
+    openModal(modal);
+}
+
+function closeMissionBriefing() {
+    const modal = document.getElementById('mission-briefing-modal');
+    if (!modal) return;
+    closeModal(modal);
+}
+
+function handleMissionBriefingBackdrop(event) {
+    if (event && event.target === document.getElementById('mission-briefing-modal')) closeMissionBriefing();
+}
+
 function renderLifetimeStatsModal() {
     const content = document.getElementById('lifetime-stats-content');
     if (!content) return;
@@ -8375,7 +10101,7 @@ function renderAdminUserDetail(user) {
         <div class="admin-stat-grid">
             <div class="admin-stat"><div class="admin-stat-label">Level</div><div class="admin-stat-value">${Math.max(1, Number(user.level) || 1)}</div></div>
             <div class="admin-stat"><div class="admin-stat-label">XP</div><div class="admin-stat-value">${Math.max(0, Number(user.xp) || 0)}</div></div>
-            <div class="admin-stat"><div class="admin-stat-label">Skill Points</div><div class="admin-stat-value">${Math.max(0, Number(user.skillPoints) || 0)}</div></div>
+            <div class="admin-stat"><div class="admin-stat-label">Aether Crystals</div><div class="admin-stat-value">${Math.max(0, Number(user.skillPoints) || 0)}</div></div>
             <div class="admin-stat"><div class="admin-stat-label">Daily Streak</div><div class="admin-stat-value">${Math.max(0, Number(user.streakDays) || 0)}</div></div>
             <div class="admin-stat"><div class="admin-stat-label">Daily Done</div><div class="admin-stat-value">${Math.max(0, Number(user.dailyCompleted) || 0)}</div></div>
             <div class="admin-stat"><div class="admin-stat-label">Weekly Done</div><div class="admin-stat-value">${Math.max(0, Number(user.weeklyCompleted) || 0)}</div></div>
@@ -8386,13 +10112,13 @@ function renderAdminUserDetail(user) {
         <div class="admin-actions">
             <input id="admin-set-level" type="number" min="1" step="1" placeholder="Set Level">
             <input id="admin-set-xp" type="number" min="0" step="1" placeholder="Set XP">
-            <input id="admin-set-sp" type="number" min="0" step="1" placeholder="Set Skill Points">
+            <input id="admin-set-sp" type="number" min="0" step="1" placeholder="Set Aether Crystals">
             <input id="admin-set-streak" type="number" min="0" step="1" placeholder="Set Daily Streak">
             <input id="admin-set-daily" type="number" min="0" step="1" placeholder="Set Daily Completed">
             <input id="admin-set-weekly" type="number" min="0" step="1" placeholder="Set Weekly Completed">
             <input id="admin-set-achievements" type="number" min="0" step="1" placeholder="Set Achievements">
             <input id="admin-add-xp" type="number" min="0" step="1" placeholder="Add XP">
-            <input id="admin-add-sp" type="number" min="0" step="1" placeholder="Add Skill Points">
+            <input id="admin-add-sp" type="number" min="0" step="1" placeholder="Add Aether Crystals">
             <input id="admin-reset-username" type="text" maxlength="24" placeholder="Reset Username">
             <input id="admin-reset-password" type="password" maxlength="72" placeholder="Reset Password">
         </div>
@@ -8947,17 +10673,18 @@ function renderProfileExtra() {
                 `<div class="profile-xp-bar-wrap"><div class="profile-xp-bar-fill" style="width:${(getLevelProgress(xp)*100).toFixed(1)}%"></div></div>` +
                 `<div class="profile-xp-label">${xpInLevel} / ${XP_PER_LEVEL} XP &nbsp;·&nbsp; ${streak}-day streak${streak >= 3 ? ' 🔥' : ''}</div>` +
                 '<div class="skill-points-row">' +
-                    `<span class="skill-point-badge" id="skill-point-badge">Skill Points: ${skillPoints}</span>` +
+                    `<span class="skill-point-badge" id="skill-point-badge">Aether Crystals: ${skillPoints}</span>` +
                     '<span class="skill-info-wrap">' +
                         '<span class="skill-info-icon" aria-hidden="true">i</span>' +
-                        '<span class="skill-info-tooltip">Earn Skill Points by levelling up! You can cash them in at the shop for fun rewards!</span>' +
+                        '<span class="skill-info-tooltip">Earn Aether Crystals by levelling up! You can cash them in at the shop for fun rewards!</span>' +
                     '</span>' +
                 '</div>' +
             '</div>' +
         '</div>' +
         `<div class="level-tier-list">${tierHtml}</div>` +
         '<div class="profile-shop-row"><button class="profile-shop-btn" onclick="openSkills()"><span class="profile-shop-icon" aria-hidden="true">🛒</span><span>Shop</span></button></div>' +
-        '<div class="profile-shop-row"><button class="profile-inventory-btn" onclick="openInventory()"><span class="profile-shop-icon" aria-hidden="true">🎒</span><span>Inventory</span></button></div>';
+        '<div class="profile-shop-row"><button class="profile-inventory-btn" onclick="openInventory()"><span class="profile-shop-icon" aria-hidden="true">🎒</span><span>Inventory</span></button></div>' +
+        '<div class="profile-shop-row"><button class="profile-briefing-btn" onclick="openMissionBriefing()">Mission Briefing</button></div>';
 
     // Achievements — show all, earned = bright, unearned = dimmed with requirement
     const allBadgesHtml = BADGE_DEFS.map(def => {
@@ -9304,6 +11031,7 @@ function clearHistory() {
 
 function closeResults() {
     resultOverlay.classList.remove('show');
+    updateMiningLaserAtActiveWord();
     if (returnToDailyAfterResult) {
         returnToDailyAfterResult = false;
         setMode('daily');
@@ -9350,6 +11078,7 @@ function renderHistory() {
 function showResults(capturedElapsed) {
     resultsPendingOpen = false;
     clearInterval(timerHandle);
+    clearMiningLaserOverlay();
 
     const elapsedRaw = capturedElapsed != null ? capturedElapsed : getElapsed();
     const elapsed  = isTimedMode() ? Math.min(elapsedRaw, RANDOM_WORDS_DURATION) : elapsedRaw;
@@ -9690,6 +11419,7 @@ function handleTypingKeydown(e) {
             } else {
                 renderQuote();
             }
+            syncTypingViewportScroll();
             updateStats();
         }
         return;
@@ -9725,6 +11455,9 @@ function handleTypingKeydown(e) {
     } else {
         renderQuote(); // fallback for post-extension rebuilds
     }
+    maybeTriggerMiningShatter(prevIdx);
+    if (e.key !== ' ' && typedChars[prevIdx] === currentQuote[prevIdx]) emitMiningLaserShotAtWord(prevIdx);
+    syncTypingViewportScroll();
     emitNebulaTrailAtCursor();
     emitXzLaserAtCursor(e.key);
     updateStats();
@@ -9814,19 +11547,25 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeLoginModal();
     if (e.key === 'Escape') closeAdminPanel();
     if (e.key === 'Escape') closeCommunityHub();
+    if (e.key === 'Escape') closeSectorMap();
     if (e.key === 'Escape') closeLifetimeStatsModal();
+    if (e.key === 'Escape') closeMissionBriefing();
     if (e.key === 'Escape') closeKeySoundMenu();
     if (e.key === 'Escape') closeMusicMenu();
 });
 
 document.addEventListener('pointerdown', (e) => {
+    updateLastPointerPositionFromEvent(e);
     const keyWrap = document.getElementById('keysound-wrap');
     const musicWrap = document.getElementById('music-wrap');
     if (keyWrap && keyWrap.contains(e.target)) return;
     if (musicWrap && musicWrap.contains(e.target)) return;
+    if (unlockShopHintEl && unlockShopHintEl.contains(e.target)) return;
+    hideUnlockShopHint();
     closeKeySoundMenu();
     closeMusicMenu();
 });
+document.addEventListener('pointermove', updateLastPointerPositionFromEvent, { passive: true });
 
 // ── Theme Soundtracks ────────────────────────────────────────────────────────
 const themeMusic = {
@@ -9836,7 +11575,7 @@ const themeMusic = {
 const soundscapePreviewAudio = new Audio('Sound Effects/Your Own Personal Universe.mp3');
 const MUSIC_VOLUME_KEY = 'sampire-music-volume';
 const KEY_SOUND_VOLUME_KEY = 'sampire-key-sound-volume';
-const DEFAULT_MUSIC_VOLUME = 0.35;
+const DEFAULT_MUSIC_VOLUME = 1;
 const DEFAULT_KEY_SOUND_VOLUME = 1;
 
 themeMusic.dark.loop = true;
@@ -9859,6 +11598,12 @@ let rewardPreviewTimer = null;
 let rewardSoundPreviewPlaying = false;
 let auraPreviewVisible = false;
 let nebulaPreviewVisible = false;
+let shopPurchaseFxKey = '';
+let shopPurchaseFxExpiresAt = 0;
+let unlockShopHintEl = null;
+let unlockShopHintTimer = null;
+let lastPointerX = window.innerWidth * 0.5;
+let lastPointerY = window.innerHeight * 0.5;
 const KEY_SOUND_BASE_ROOT = 'Sound Effects';
 const KEY_SOUND_DEFAULT_PACK = 'nk-cream';
 const KEY_SOUND_PACK_KEY = 'sampire-key-sound-pack';
@@ -9948,14 +11693,25 @@ function updateMusicMenuUI() {
         const theme = String(btn.dataset.theme || '');
         const isActive = theme === activeMusicTheme;
         btn.classList.toggle('active', isActive);
+        btn.onmouseenter = null;
+        btn.onmouseleave = null;
+        btn.onfocus = null;
+        btn.onblur = null;
         if (theme === 'universe') {
             const locked = !isSkillUnlocked('soundscapes');
             btn.classList.toggle('locked', locked);
-            btn.disabled = locked;
-            btn.title = locked ? 'Unlock Soundscapes reward to use this theme.' : '';
+            btn.title = '';
+            if (locked) {
+                btn.onmouseenter = (event) => {
+                    updateLastPointerPositionFromEvent(event);
+                    showUnlockShopHintNearCursor('Unlock in the shop!');
+                };
+                btn.onmouseleave = hideUnlockShopHint;
+                btn.onfocus = () => showUnlockShopHintNearCursor('Unlock in the shop!');
+                btn.onblur = hideUnlockShopHint;
+            }
         } else {
             btn.classList.remove('locked');
-            btn.disabled = false;
             btn.title = '';
         }
     });
@@ -9988,7 +11744,59 @@ function toggleMusicMenu(event) {
     else openMusicMenu();
 }
 
-function selectMusicTheme(theme) {
+function updateLastPointerPositionFromEvent(event) {
+    if (!event) return;
+    if (Number.isFinite(event.clientX)) lastPointerX = event.clientX;
+    if (Number.isFinite(event.clientY)) lastPointerY = event.clientY;
+}
+
+function hideUnlockShopHint() {
+    if (unlockShopHintTimer) {
+        clearTimeout(unlockShopHintTimer);
+        unlockShopHintTimer = null;
+    }
+    if (unlockShopHintEl && unlockShopHintEl.parentNode) unlockShopHintEl.parentNode.removeChild(unlockShopHintEl);
+    unlockShopHintEl = null;
+}
+
+function showUnlockShopHintNearCursor(message = 'Unlock in the shop!', autoHideMs = 0) {
+    hideUnlockShopHint();
+    const hint = document.createElement('button');
+    hint.type = 'button';
+    hint.className = 'unlock-shop-hint';
+    hint.textContent = message;
+    const x = Number.isFinite(lastPointerX) ? lastPointerX : (window.innerWidth * 0.5);
+    const y = Number.isFinite(lastPointerY) ? lastPointerY : (window.innerHeight * 0.5);
+    hint.style.left = `${x + 12}px`;
+    hint.style.top = `${y + 12}px`;
+    hint.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        hideUnlockShopHint();
+        closeMusicMenu();
+        closeKeySoundMenu();
+        openSkills();
+    });
+    document.body.appendChild(hint);
+    const rect = hint.getBoundingClientRect();
+    const pad = 10;
+    let left = x + 12;
+    let top = y + 12;
+    if (left + rect.width > window.innerWidth - pad) left = Math.max(pad, window.innerWidth - rect.width - pad);
+    if (top + rect.height > window.innerHeight - pad) top = Math.max(pad, y - rect.height - 12);
+    hint.style.left = `${left}px`;
+    hint.style.top = `${top}px`;
+    unlockShopHintEl = hint;
+    if (autoHideMs > 0) unlockShopHintTimer = setTimeout(hideUnlockShopHint, autoHideMs);
+}
+
+function selectMusicTheme(theme, event = null) {
+    updateLastPointerPositionFromEvent(event);
+    if (theme === 'universe' && !isSkillUnlocked('soundscapes')) {
+        showUnlockShopHintNearCursor('Unlock in the shop!', 2600);
+        return;
+    }
+    hideUnlockShopHint();
     setActiveMusicTheme(theme);
     updateMusicMenuUI();
     closeMusicMenu();
@@ -10066,8 +11874,20 @@ function updateKeySoundPackMenuUI() {
         const isDefault = pack === KEY_SOUND_DEFAULT_PACK;
         btn.classList.toggle('active', pack === keySoundPackName);
         btn.classList.toggle('locked', !unlocked);
-        btn.disabled = !unlocked;
-        btn.title = unlocked ? '' : `Unlock ${pack} in the Shop (1 SP).`;
+        btn.title = '';
+        btn.onmouseenter = null;
+        btn.onmouseleave = null;
+        btn.onfocus = null;
+        btn.onblur = null;
+        if (!unlocked) {
+            btn.onmouseenter = (event) => {
+                updateLastPointerPositionFromEvent(event);
+                showUnlockShopHintNearCursor('Unlock in the shop!');
+            };
+            btn.onmouseleave = hideUnlockShopHint;
+            btn.onfocus = () => showUnlockShopHintNearCursor('Unlock in the shop!');
+            btn.onblur = hideUnlockShopHint;
+        }
         if (isDefault) btn.title = 'Default pack';
     });
 }
@@ -10127,11 +11947,13 @@ function toggleKeySoundMenu(event) {
     else openKeySoundMenu();
 }
 
-function selectKeySoundPack(packName) {
+function selectKeySoundPack(packName, event = null) {
+    updateLastPointerPositionFromEvent(event);
     if (!isKeySoundPackUnlocked(packName)) {
-        showUiMessage('Unlock this sound pack in the Shop first.', 'info', 2200, 'top-left');
+        showUnlockShopHintNearCursor('Unlock in the shop!', 2600);
         return;
     }
+    hideUnlockShopHint();
     setKeySoundPack(packName);
     keySoundsEnabled = true;
     setKeySoundToggleUI();
@@ -10425,6 +12247,8 @@ const SFX = {
     clearHistory: new Audio('Sound Effects/Clear History.wav'),
     changeMode:   new Audio('Sound Effects/Change Mode.wav'),
     below50:      new Audio('Sound Effects/Below 50 WPM.wav'),
+    purchase1:    new Audio('Sound Effects/Purchase 1.mp3'),
+    laser:        new Audio('Sound Effects/laser.mp3'),
 };
 
 function playSound(audio) {
@@ -10512,9 +12336,9 @@ const SKILLS_KEY = 'sampire-skills';
 const REWARD_SETTINGS_KEY = 'sampire-reward-settings';
 const XP_PER_LEVEL = 500;
 const COMMUNITY_FLEET_LEVELS = [
-    { id: 'scout', name: 'The Scout', health: 25000 },
-    { id: 'fighter', name: 'The Fighter', health: 35000 },
-    { id: 'mothership', name: 'The Mothership', health: 50000 },
+    { id: 'scout', name: 'The Scout', health: 10000 },
+    { id: 'fighter', name: 'The Fighter', health: 20000 },
+    { id: 'mothership', name: 'The Mothership', health: 30000 },
 ];
 const COMMUNITY_FLEET_TOTAL_HEALTH = COMMUNITY_FLEET_LEVELS.reduce((sum, level) => sum + level.health, 0);
 let rivalTargetRefreshInFlight = false;
@@ -11201,6 +13025,47 @@ function isKeySoundPackUnlocked(packName) {
     return !!(state.keySoundPacks && state.keySoundPacks[safe]);
 }
 
+function triggerShopPurchaseFx(key) {
+    const safeKey = String(key || '').trim();
+    if (!safeKey) return;
+    shopPurchaseFxKey = safeKey;
+    shopPurchaseFxExpiresAt = Date.now() + 980;
+    playSound(SFX.purchase1);
+    setTimeout(() => {
+        if (shopPurchaseFxKey !== safeKey) return;
+        if (Date.now() < shopPurchaseFxExpiresAt) return;
+        shopPurchaseFxKey = '';
+        if (document.getElementById('skills-modal')?.classList.contains('show')) renderSkillsModal();
+    }, 1020);
+}
+
+function getShopPurchaseFxClass(key) {
+    const safeKey = String(key || '').trim();
+    if (!safeKey) return '';
+    if (shopPurchaseFxKey !== safeKey) return '';
+    if (Date.now() >= shopPurchaseFxExpiresAt) return '';
+    return ' purchase-fx';
+}
+
+function getShopPurchaseFxMarkup(key) {
+    const safeKey = String(key || '').trim();
+    if (!safeKey) return '';
+    if (shopPurchaseFxKey !== safeKey) return '';
+    if (Date.now() >= shopPurchaseFxExpiresAt) return '';
+    return `<span class="shop-purchase-burst" aria-hidden="true">
+        <span class="burst-flare"></span>
+        <span class="burst-ring"></span>
+        <span class="burst-unlocked">Unlocked</span>
+        <span class="burst-spark s1"></span>
+        <span class="burst-spark s2"></span>
+        <span class="burst-spark s3"></span>
+        <span class="burst-spark s4"></span>
+        <span class="burst-spark s5"></span>
+        <span class="burst-spark s6"></span>
+        <span class="burst-spark s7"></span>
+    </span>`;
+}
+
 function unlockShopKeySoundPack(packName) {
     const safe = String(packName || '').trim();
     const def = SHOP_KEY_SOUND_PACKS.find((pack) => pack.id === safe);
@@ -11209,7 +13074,7 @@ function unlockShopKeySoundPack(packName) {
     const points = getSkillPoints();
     if (points < def.cost) {
         playSound(SFX.below50);
-        showUiMessage('Not enough Skill Points.');
+        showUiMessage('Not enough Aether Crystals.');
         return;
     }
     const state = getSkillsState();
@@ -11217,6 +13082,7 @@ function unlockShopKeySoundPack(packName) {
     state.keySoundPacks[safe] = true;
     setSkillPoints(points - def.cost);
     saveSkillsState(state);
+    triggerShopPurchaseFx(`pack:${safe}`);
     updateSkillDisplay();
     renderSkillsModal();
     updateKeySoundPackMenuUI();
@@ -11276,13 +13142,13 @@ function setRewardActive(skillId, active) {
 function updateSkillDisplay() {
     const badge = document.getElementById('skill-point-badge');
     const points = getSkillPoints();
-    if (badge) badge.textContent = `Skill Points: ${points}`;
+    if (badge) badge.textContent = `Aether Crystals: ${points}`;
 }
 
 function spendSkillPoint(skillId) {
     const defs = {
-        aura: { label: 'Aura', levelReq: 1, cost: 1 },
-        soundscapes: { label: 'Soundscapes', levelReq: 3, cost: 1 },
+        aura: { label: 'Word Glow', levelReq: 1, cost: 1 },
+        soundscapes: { label: 'Your Own Personal Universe', levelReq: 3, cost: 1 },
         nebulaTrail: { label: 'Nebula Trail', levelReq: 1, cost: 1 },
     };
     const def = defs[skillId];
@@ -11297,7 +13163,7 @@ function spendSkillPoint(skillId) {
     const points = getSkillPoints();
     if (points < def.cost) {
         playSound(SFX.below50);
-        showUiMessage('Not enough Skill Points.');
+        showUiMessage('Not enough Aether Crystals.');
         return;
     }
     const state = getSkillsState();
@@ -11309,6 +13175,7 @@ function spendSkillPoint(skillId) {
     state[skillId] = true;
     setSkillPoints(points - def.cost);
     saveSkillsState(state);
+    triggerShopPurchaseFx(skillId);
     const rewardSettings = getRewardSettings();
     rewardSettings[skillId] = true;
     saveRewardSettings(rewardSettings);
@@ -11331,18 +13198,21 @@ function renderSkillsModal() {
     const state = getSkillsState();
     const soundscapesLockedByLevel = level < 3;
 
+    const crystal = '<span class="aether-crystal-icon" role="img" aria-label="Aether Crystal" title="Aether Crystal"></span>';
+
     content.innerHTML = `
         <div class="skills-modal-header-row">
             <span class="daily-xp-level">Lv ${level} <span class="daily-level-name">${getLevelName(level)}</span></span>
             <span class="shop-banner-title">Shop</span>
-            <span class="skill-point-badge">Skill Points: ${points}</span>
+            <span class="skill-point-badge">Aether Crystals: ${points}</span>
         </div>
         <div class="skills-modal-grid">
-            <div class="skill-card${state.aura ? ' purchased' : ''}">
-                <div class="skill-card-title">Aura Reward</div>
+            <div class="skill-card${state.aura ? ' purchased' : ''}${getShopPurchaseFxClass('aura')}">
+                ${getShopPurchaseFxMarkup('aura')}
+                <div class="skill-card-title">Word Glow</div>
                 <div class="skill-card-desc">A subtle glow around your current word that shifts color as your speed rises.</div>
                 <div class="skill-card-meta">
-                    <span class="skill-cost-row"><span class="skill-cost-label">Cost</span><span class="skill-cost-current">1 SP</span></span>
+                    <span class="skill-cost-row"><span class="skill-cost-label">Cost</span><span class="skill-cost-current">1 ${crystal}</span></span>
                 </div>
                 <div class="skill-status ${state.aura ? 'unlocked' : 'locked'}">${state.aura ? 'Owned' : 'Locked'}</div>
                 <button class="secondary shop-buy-btn" ${state.aura ? 'disabled' : ''} onclick="spendSkillPoint('aura')">
@@ -11357,11 +13227,12 @@ function renderSkillsModal() {
                         : `<button class="reward-preview-btn" onclick="toggleAuraPreview()">Preview</button>`}
                 </div>
             </div>
-            <div class="skill-card${state.soundscapes ? ' purchased' : ''}">
-                <div class="skill-card-title">Soundscapes Reward</div>
+            <div class="skill-card${state.soundscapes ? ' purchased' : ''}${getShopPurchaseFxClass('soundscapes')}">
+                ${getShopPurchaseFxMarkup('soundscapes')}
+                <div class="skill-card-title">Your Own Personal Universe</div>
                 <div class="skill-card-desc">Unlock the menu music theme "Your Own Personal Universe" at level 3.</div>
                 <div class="skill-card-meta">
-                    <span class="skill-cost-row"><span class="skill-cost-label">Cost</span><span class="skill-cost-current">1 SP</span><span class="skill-cost-label">· Requires Lv 3</span></span>
+                    <span class="skill-cost-row"><span class="skill-cost-label">Cost</span><span class="skill-cost-current">1 ${crystal}</span><span class="skill-cost-label">· Requires Lv 3</span></span>
                 </div>
                 <div class="skill-status ${state.soundscapes ? 'unlocked' : 'locked'}">${state.soundscapes ? 'Owned' : 'Locked'}</div>
                 <button class="secondary shop-buy-btn" ${(state.soundscapes || soundscapesLockedByLevel) ? 'disabled' : ''} onclick="spendSkillPoint('soundscapes')">
@@ -11376,14 +13247,15 @@ function renderSkillsModal() {
                     >${rewardSoundPreviewPlaying ? '❚❚' : '▶'}</button>
                 </div>
             </div>
-            <div class="skill-card${state.nebulaTrail ? ' purchased' : ''}">
-                <div class="skill-card-title">Nebula Trail Reward</div>
+            <div class="skill-card${state.nebulaTrail ? ' purchased' : ''}${getShopPurchaseFxClass('nebulaTrail')}">
+                ${getShopPurchaseFxMarkup('nebulaTrail')}
+                <div class="skill-card-title">Nebula Trail</div>
                 <div class="skill-card-desc">Your cursor leaves a colorful, swirling gas trail as you type across the screen.</div>
                 <div class="skill-card-meta">
                     <span class="skill-cost-row">
                         <span class="skill-cost-label">Cost</span>
-                        <span class="skill-cost-old">9999 SP</span>
-                        <span class="skill-cost-current">3 SP</span>
+                        <span class="skill-cost-old">9999 ${crystal}</span>
+                        <span class="skill-cost-current">3 ${crystal}</span>
                         <span class="flash-sale-badge">Flash Sale!</span>
                     </span>
                 </div>
@@ -11406,11 +13278,12 @@ function renderSkillsModal() {
         <div class="skills-modal-grid">
             ${SHOP_KEY_SOUND_PACKS.map((pack) => {
                 const owned = isKeySoundPackUnlocked(pack.id);
-                return `<div class="skill-card${owned ? ' purchased' : ''}">
+                return `<div class="skill-card${owned ? ' purchased' : ''}${getShopPurchaseFxClass(`pack:${pack.id}`)}">
+                    ${getShopPurchaseFxMarkup(`pack:${pack.id}`)}
                     <div class="skill-card-title">${escapeHtml(pack.label)}</div>
                     <div class="skill-card-desc">${escapeHtml(pack.desc)}</div>
                     <div class="skill-card-meta">
-                        <span class="skill-cost-row"><span class="skill-cost-label">Cost</span><span class="skill-cost-current">${pack.cost} SP</span></span>
+                        <span class="skill-cost-row"><span class="skill-cost-label">Cost</span><span class="skill-cost-current">${pack.cost} ${crystal}</span></span>
                     </div>
                     <div class="skill-status ${owned ? 'unlocked' : 'locked'}">${owned ? 'Owned' : 'Locked'}</div>
                     <button class="secondary shop-buy-btn" ${owned ? 'disabled' : ''} onclick="unlockShopKeySoundPack('${escapeHtml(pack.id)}')">
@@ -11443,33 +13316,140 @@ function toggleRewardFromInventory(skillId) {
     setRewardActive(skillId, next);
 }
 
+const inventorySectionsOpen = {
+    soundscapes: false,
+    cosmetics: false,
+    keypacks: false,
+};
+
+function isInventorySectionOpen(section) {
+    return !!inventorySectionsOpen[section];
+}
+
+function toggleInventorySection(section) {
+    if (!Object.prototype.hasOwnProperty.call(inventorySectionsOpen, section)) return;
+    inventorySectionsOpen[section] = !inventorySectionsOpen[section];
+    renderInventoryModal();
+}
+window.toggleInventorySection = toggleInventorySection;
+
+function equipKeySoundPackFromInventory(packName) {
+    const safe = String(packName || '').trim();
+    if (!safe || !isKeySoundPackUnlocked(safe)) return;
+    setKeySoundPack(safe);
+    keySoundsEnabled = true;
+    setKeySoundToggleUI();
+    updateKeySoundPackMenuUI();
+    try { localStorage.setItem('sampire-key-sounds-enabled', '1'); } catch (e) {}
+    renderInventoryModal();
+    showUiMessage(`${safe} equipped.`, 'success', 1400, 'top-left');
+}
+
 function renderInventoryModal() {
     const content = document.getElementById('inventory-content');
     if (!content) return;
     const owned = getSkillsState();
     const settings = getRewardSettings();
-    const defs = [
-        { id: 'aura', icon: '✨', name: 'Aura Reward', desc: 'Glow effect around your current word.' },
-        { id: 'soundscapes', icon: '🎵', name: 'Soundscapes Reward', desc: 'Unlocks and enables the universe menu soundtrack.' },
-        { id: 'nebulaTrail', icon: '🌌', name: 'Nebula Trail Reward', desc: 'Colorful trail effect while typing.' },
-    ];
-    const earned = defs.filter(d => !!owned[d.id]);
-    if (earned.length === 0) {
+    const soundscapesItems = [
+        { id: 'soundscapes', name: 'Your Own Personal Universe', desc: 'Unlocks and enables the universe menu soundtrack.' },
+    ].filter(item => !!owned[item.id]);
+    const cosmeticsItems = [
+        { id: 'aura', name: 'Word Glow', desc: 'Glow effect around your current word.' },
+        { id: 'nebulaTrail', name: 'Nebula Trail', desc: 'Colorful trail effect while typing.' },
+    ].filter(item => !!owned[item.id]);
+    const keyboardPackItems = SHOP_KEY_SOUND_PACKS
+        .filter((pack) => isKeySoundPackUnlocked(pack.id))
+        .map((pack) => ({
+            id: pack.id,
+            icon: pack.icon,
+            name: pack.label,
+            desc: pack.desc,
+            equipped: keySoundPackName === pack.id,
+        }));
+
+    const anyOwned = soundscapesItems.length > 0 || cosmeticsItems.length > 0 || keyboardPackItems.length > 0;
+    if (!anyOwned) {
         content.innerHTML = '<div class="inventory-empty">No rewards earned yet. Visit the Shop to unlock rewards.</div>';
         return;
     }
-    content.innerHTML = `<div class="inventory-grid">${
-        earned.map(item => {
-            const on = settings[item.id] !== false;
-            return `<div class="inventory-item">
+
+    const renderRewardCards = (items) => items.map((item) => {
+        const on = settings[item.id] !== false;
+        const previewHtml = item.id === 'aura'
+            ? `<div class="reward-preview-stage" onclick="previewAuraRewardAt('inventory-aura-preview-word')" title="Click to replay preview">
+                    <span class="reward-preview-word" id="inventory-aura-preview-word">cosmic</span>
+                    <span class="reward-preview-word">typing</span>
+               </div>`
+            : item.id === 'nebulaTrail'
+                ? `<div class="reward-preview-stage" id="inventory-nebula-preview-stage" onclick="previewNebulaTrailRewardAt('inventory-nebula-preview-stage')" title="Click to replay preview">
+                        <span class="reward-preview-word">type</span>
+                        <span class="reward-preview-word">faster</span>
+                        <span class="reward-preview-cursor" aria-hidden="true"></span>
+                   </div>`
+                : `<button type="button" class="soundscape-preview-icon-btn" onclick="toggleSoundscapesPreview()" aria-label="${rewardSoundPreviewPlaying ? 'Pause sound preview' : 'Play sound preview'}" title="${rewardSoundPreviewPlaying ? 'Pause preview' : 'Play preview'}">${rewardSoundPreviewPlaying ? '❚❚' : '▶'}</button>`;
+        return `<div class="inventory-item reward-item">
+            <div class="inventory-item-main">
                 <div class="inventory-item-top">
-                    <span class="inventory-item-name"><span aria-hidden="true">${item.icon}</span>${escapeHtml(item.name)}</span>
+                    <span class="inventory-item-name">${escapeHtml(item.name)}</span>
                     <button class="inventory-toggle ${on ? 'on' : ''}" onclick="toggleRewardFromInventory('${item.id}')">${on ? 'On' : 'Off'}</button>
                 </div>
+                <div class="inventory-preview-panel">${previewHtml}</div>
                 <div class="inventory-item-desc">${escapeHtml(item.desc)}</div>
-            </div>`;
-        }).join('')
-    }</div>`;
+            </div>
+        </div>`;
+    }).join('');
+
+    const renderPackCards = (items) => items.map((item) => `
+        <div class="inventory-item">
+            <div class="inventory-item-top">
+                <span class="inventory-item-name">${escapeHtml(item.name)}</span>
+                <button class="inventory-toggle ${item.equipped ? 'on' : ''}" onclick="equipKeySoundPackFromInventory('${escapeHtml(item.id)}')">${item.equipped ? 'Equipped' : 'Equip'}</button>
+            </div>
+            <div class="inventory-item-desc">${escapeHtml(item.desc)}</div>
+            <div class="inventory-pack-preview">
+                <span class="inventory-pack-preview-label">Try Now</span>
+                <input type="text" class="shop-preview-input" maxlength="42" placeholder="Type here to preview this pack" onkeydown="handleShopKeySoundPreviewKeydown(event, '${escapeHtml(item.id)}')">
+            </div>
+            <div class="inventory-item-meta">${item.equipped ? '<span class="equipped">Currently active key sound pack.</span>' : 'Click Equip to make this your active key sound pack.'}</div>
+        </div>
+    `).join('');
+
+    const renderInventorySection = (sectionId, title, itemCount, bodyHtml) => {
+        const open = isInventorySectionOpen(sectionId);
+        return `<div class="inventory-section">
+            <div class="inventory-section-header">
+                <span class="inventory-section-title">${title}</span>
+                <span class="inventory-section-controls">
+                    <span class="weekly-reset">${itemCount} unlocked</span>
+                    <button type="button" class="challenge-section-toggle" aria-label="${open ? `Collapse ${title}` : `Expand ${title}`}" aria-expanded="${open ? 'true' : 'false'}" onclick="toggleInventorySection('${sectionId}')"><span class="chevron">▾</span></button>
+                </span>
+            </div>
+            ${open ? bodyHtml : ''}
+        </div>`;
+    };
+
+    content.innerHTML = `
+        <div class="inventory-grid">
+            ${renderInventorySection(
+                'soundscapes',
+                'Soundscapes',
+                soundscapesItems.length,
+                (soundscapesItems.length > 0 ? renderRewardCards(soundscapesItems) : '<div class="inventory-section-empty">No Soundscapes rewards unlocked yet.</div>')
+            )}
+            ${renderInventorySection(
+                'cosmetics',
+                'Cosmetics',
+                cosmeticsItems.length,
+                (cosmeticsItems.length > 0 ? renderRewardCards(cosmeticsItems) : '<div class="inventory-section-empty">No cosmetic rewards unlocked yet.</div>')
+            )}
+            ${renderInventorySection(
+                'keypacks',
+                'Keyboard Sound Packs',
+                keyboardPackItems.length,
+                (keyboardPackItems.length > 0 ? renderPackCards(keyboardPackItems) : '<div class="inventory-section-empty">No keyboard sound packs unlocked yet.</div>')
+            )}
+        </div>
+    `;
 }
 
 function previewSoundscapesReward() {
@@ -11543,11 +13523,28 @@ function updateXPDisplay() {
     const badge = document.getElementById('level-badge');
     const fill  = document.getElementById('xp-bar-fill');
     const counter = document.getElementById('xp-counter');
+    const streakIndicator = document.getElementById('xp-streak-indicator');
+    const streakTooltip = document.getElementById('xp-streak-tooltip');
     const lvl = getLevel(xp);
     const xpInLevel = Math.round(getLevelProgress(xp) * XP_PER_LEVEL);
+    const streakCount = Math.max(0, Number(getStreakData().streak || 0) || 0);
+    const streakMultiplier = getXPMultiplier(streakCount);
     if (badge) { badge.textContent = `Lv ${lvl}`; badge.title = getLevelName(lvl); }
     if (counter) counter.textContent = `${xpInLevel} / ${XP_PER_LEVEL} XP`;
     if (fill)  fill.style.width  = (getLevelProgress(xp) * 100).toFixed(1) + '%';
+    if (streakIndicator && streakTooltip) {
+        if (streakMultiplier > 1) {
+            const currentLabel = streakMultiplier.toFixed(1).replace('.0', '');
+            const tomorrowStreak = streakCount + 1;
+            const tomorrowMultiplier = getXPMultiplier(tomorrowStreak);
+            const tomorrowLabel = tomorrowMultiplier.toFixed(1).replace('.0', '');
+            streakTooltip.textContent = `${streakCount}-day streak active (${currentLabel}x XP)! Login tomorrow to reach ${tomorrowStreak} days (${tomorrowLabel}x XP)!`;
+            streakIndicator.classList.add('show');
+        } else {
+            streakTooltip.textContent = '';
+            streakIndicator.classList.remove('show');
+        }
+    }
     updateSkillDisplay();
     updateProfileToggleHoverInfo();
     const skillsModal = document.getElementById('skills-modal');
@@ -11562,6 +13559,8 @@ function jumpToChallengeFromProgress(challengeId) {
         openCommunityHub();
         return;
     }
+    if (CHALLENGES.some(c => c.id === id)) challengeSectionsOpen.daily = true;
+    if (WEEKLY_CHALLENGES.some(c => c.id === id)) challengeSectionsOpen.weekly = true;
     closeResults();
     setMode('daily');
     requestAnimationFrame(() => {
@@ -11576,6 +13575,22 @@ function jumpToChallengeFromProgress(challengeId) {
         }, 60);
     });
 }
+
+const challengeSectionsOpen = {
+    daily: false,
+    weekly: false,
+};
+
+function isChallengeSectionOpen(section) {
+    return !!challengeSectionsOpen[section];
+}
+
+function toggleChallengeSection(section) {
+    if (!Object.prototype.hasOwnProperty.call(challengeSectionsOpen, section)) return;
+    challengeSectionsOpen[section] = !challengeSectionsOpen[section];
+    renderDailyChallenges();
+}
+window.toggleChallengeSection = toggleChallengeSection;
 
 function renderDailyChallenges() {
     const panel = document.getElementById('challenge-panel');
@@ -11598,73 +13613,26 @@ function renderDailyChallenges() {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
     const weekRangeLabel = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    const dailyOpen = isChallengeSectionOpen('daily');
+    const weeklyOpen = isChallengeSectionOpen('weekly');
 
     refreshWeeklyRivalTarget();
-
     panel.innerHTML = `
         <div class="daily-header category-header daily">
-            <span class="daily-title-wrap"><span class="daily-title-icon" aria-hidden="true">⚡</span><span class="daily-title">Daily Challenges</span></span>
-            <span class="daily-reset">${dailyCompletions.length}/${CHALLENGES.length} completed today &nbsp;·&nbsp; resets at midnight</span>
-        </div>
-        <div class="challenge-cards">
-            ${CHALLENGES.map(c => {
-                const done = dailyCompletions.includes(c.id);
-                const isPassive = !!c.passive;
-                const progress = isPassive ? getDailyPassiveProgress(c.id) : null;
-                const progressText = isPassive
-                    ? `${Math.min(progress.count, progress.target)} / ${progress.target} completed today`
-                    : '';
-                return `<div id="challenge-card-${escapeHtml(c.id)}" data-challenge-id="${escapeHtml(c.id)}" class="challenge-card${done ? ' completed' : ''}">
-                    <div class="challenge-card-left">
-                        <div class="challenge-name">${escapeHtml(c.name)}
-                            <span class="challenge-difficulty ${c.diffClass}">${c.difficulty}</span>
-                            <span class="challenge-xp">+${c.xp} XP</span>
-                        </div>
-                        <div class="challenge-desc">${escapeHtml(c.desc)}</div>
-                        ${isPassive ? `<div class="weekly-progress">${escapeHtml(progressText)}</div>` : ''}
-                    </div>
-                    <div class="challenge-card-right">
-                        ${done
-                            ? `<span class="challenge-done-badge">&#10003; Done</span>`
-                            : isPassive
-                                ? `<span class="challenge-locked-badge">In Progress</span>`
-                                : `<button class="challenge-start-btn" onclick="startChallenge('${c.id}')">Start</button>`}
-                    </div>
-                </div>`;
-            }).join('')}
-        </div>
-        <div class="daily-xp-row">
-            <span class="daily-xp-level">Lv ${level} <span class="daily-level-name">${getLevelName(level)}</span></span>
-            <div class="daily-xp-bar-wrap">
-                <div class="daily-xp-bar-fill" style="width:${(getLevelProgress(xp)*100).toFixed(1)}%"></div>
-            </div>
-            <span class="daily-xp-label">${xpInLevel} / ${XP_PER_LEVEL} XP</span>
-        </div>
-        ${streakCount >= 1 ? `<div class="daily-streak-row">
-            <span class="daily-streak-badge">${streakCount >= 3 ? '🔥' : '⚡'} ${streakCount}-day streak</span>
-            ${streakMultiplier > 1 ? `<span class="daily-multiplier">${streakMultiplier.toFixed(1).replace('.0', '')}x XP active${streakMultiplier >= 2 ? ' (max)' : ''}</span>` : ''}
-            <span class="skill-info-wrap" tabindex="0" aria-label="How streak XP works">
-                <span class="skill-info-icon" aria-hidden="true">i</span>
-                <span class="skill-info-tooltip">Gain a 0.5x increase in your XP gain with each consecutive day you log on! This stacks to a maximum of 2x XP.</span>
+            <span class="daily-title-wrap"><span class="daily-title-icon" aria-hidden="true">⚡</span><span class="daily-title">Daily Challenges</span><button type="button" class="challenge-section-toggle challenge-title-toggle" aria-label="${dailyOpen ? 'Collapse daily challenges' : 'Expand daily challenges'}" aria-expanded="${dailyOpen ? 'true' : 'false'}" onclick="toggleChallengeSection('daily')"><span class="chevron">▾</span></button></span>
+            <span class="challenge-section-controls">
+                <span class="daily-reset">${dailyCompletions.length}/${CHALLENGES.length} completed today &nbsp;·&nbsp; resets at midnight</span>
             </span>
-        </div>` : ''}
-
-        <div class="weekly-section">
-            <div class="daily-header category-header weekly">
-                <span class="daily-title-wrap"><span class="daily-title-icon" aria-hidden="true">📅</span><span class="daily-title">Weekly Challenges</span></span>
-                <span class="weekly-reset">${weeklyCompletions.length}/${WEEKLY_CHALLENGES.length} completed &nbsp;·&nbsp; ${escapeHtml(weekRangeLabel)}</span>
-            </div>
+        </div>
+        ${dailyOpen ? `
             <div class="challenge-cards">
-                ${WEEKLY_CHALLENGES.map(c => {
-                    const done = weeklyCompletions.includes(c.id);
-                    const progressText = c.id === 'marathon'
-                        ? `${Math.min(weeklyWords, 10000)} / 10,000 words this week`
-                        : c.id === 'consistent_climber'
-                            ? `${Math.min(weeklyStreak, 10)} / 10 consecutive tests near PB`
-                            : c.id === 'above_average'
-                                ? `${Math.min(weeklyAboveAvgCount, 5)} / 5 tests above ${Math.round(avgBaseline * 1.05 || 0)} WPM`
-                            : (rivalTarget ? `Target to beat: ${Math.round(rivalTarget)} WPM` : 'Target loading...');
-                    const canStart = c.id !== 'rival_week' || !!rivalTarget;
+                ${CHALLENGES.map(c => {
+                    const done = dailyCompletions.includes(c.id);
+                    const isPassive = !!c.passive;
+                    const progress = isPassive ? getDailyPassiveProgress(c.id) : null;
+                    const progressText = isPassive
+                        ? `${Math.min(progress.count, progress.target)} / ${progress.target} completed today`
+                        : '';
                     return `<div id="challenge-card-${escapeHtml(c.id)}" data-challenge-id="${escapeHtml(c.id)}" class="challenge-card${done ? ' completed' : ''}">
                         <div class="challenge-card-left">
                             <div class="challenge-name">${escapeHtml(c.name)}
@@ -11672,17 +13640,81 @@ function renderDailyChallenges() {
                                 <span class="challenge-xp">+${c.xp} XP</span>
                             </div>
                             <div class="challenge-desc">${escapeHtml(c.desc)}</div>
-                            <div class="weekly-progress">${escapeHtml(progressText)}</div>
+                            ${isPassive ? `<div class="weekly-progress">${escapeHtml(progressText)}</div>` : ''}
                         </div>
                         <div class="challenge-card-right">
                             ${done
                                 ? `<span class="challenge-done-badge">&#10003; Done</span>`
-                                : (c.id === 'marathon' || c.id === 'consistent_climber' || c.id === 'above_average')
-                                    ? `<span class="challenge-locked-badge">Locked</span>`
-                                    : `<button class="challenge-start-btn" ${canStart ? '' : 'disabled'} onclick="startChallenge('${c.id}')">${canStart ? 'Start' : 'Loading'}</button>`}
+                                : isPassive
+                                    ? `<span class="challenge-locked-badge">In Progress</span>`
+                                    : `<button class="challenge-start-btn" onclick="startChallenge('${c.id}')">Start</button>`}
                         </div>
                     </div>`;
                 }).join('')}
+            </div>
+            <div class="daily-xp-row">
+                <span class="daily-xp-level">Lv ${level} <span class="daily-level-name">${getLevelName(level)}</span></span>
+                <div class="daily-xp-bar-wrap">
+                    <div class="daily-xp-bar-fill" style="width:${(getLevelProgress(xp)*100).toFixed(1)}%"></div>
+                </div>
+                <span class="daily-xp-label">${xpInLevel} / ${XP_PER_LEVEL} XP</span>
+            </div>
+            ${streakCount >= 1 ? `<div class="daily-streak-row">
+                <span class="daily-streak-badge">${streakCount >= 3 ? '🔥' : '⚡'} ${streakCount}-day streak</span>
+                ${streakMultiplier > 1 ? `<span class="daily-multiplier">${streakMultiplier.toFixed(1).replace('.0', '')}x XP active${streakMultiplier >= 2 ? ' (max)' : ''}</span>` : ''}
+                <span class="skill-info-wrap" tabindex="0" aria-label="How streak XP works">
+                    <span class="skill-info-icon" aria-hidden="true">i</span>
+                    <span class="skill-info-tooltip">Gain a 0.5x increase in your XP gain with each consecutive day you log on! This stacks to a maximum of 2x XP.</span>
+                </span>
+            </div>` : ''}
+        ` : ''}
+
+        <div class="weekly-section">
+            <div class="daily-header category-header weekly">
+                <span class="daily-title-wrap"><span class="daily-title-icon" aria-hidden="true">📅</span><span class="daily-title">Weekly Challenges</span><button type="button" class="challenge-section-toggle challenge-title-toggle" aria-label="${weeklyOpen ? 'Collapse weekly challenges' : 'Expand weekly challenges'}" aria-expanded="${weeklyOpen ? 'true' : 'false'}" onclick="toggleChallengeSection('weekly')"><span class="chevron">▾</span></button></span>
+                <span class="challenge-section-controls">
+                    <span class="weekly-reset">${weeklyCompletions.length}/${WEEKLY_CHALLENGES.length} completed &nbsp;·&nbsp; ${escapeHtml(weekRangeLabel)}</span>
+                </span>
+            </div>
+            ${weeklyOpen ? `
+                <div class="challenge-cards">
+                    ${WEEKLY_CHALLENGES.map(c => {
+                        const done = weeklyCompletions.includes(c.id);
+                        const progressText = c.id === 'marathon'
+                            ? `${Math.min(weeklyWords, 10000)} / 10,000 words this week`
+                            : c.id === 'consistent_climber'
+                                ? `${Math.min(weeklyStreak, 10)} / 10 consecutive tests near PB`
+                                : c.id === 'above_average'
+                                    ? `${Math.min(weeklyAboveAvgCount, 5)} / 5 tests above ${Math.round(avgBaseline * 1.05 || 0)} WPM`
+                                : (rivalTarget ? `Target to beat: ${Math.round(rivalTarget)} WPM` : 'Target loading...');
+                        const canStart = c.id !== 'rival_week' || !!rivalTarget;
+                        return `<div id="challenge-card-${escapeHtml(c.id)}" data-challenge-id="${escapeHtml(c.id)}" class="challenge-card${done ? ' completed' : ''}">
+                            <div class="challenge-card-left">
+                                <div class="challenge-name">${escapeHtml(c.name)}
+                                    <span class="challenge-difficulty ${c.diffClass}">${c.difficulty}</span>
+                                    <span class="challenge-xp">+${c.xp} XP</span>
+                                </div>
+                                <div class="challenge-desc">${escapeHtml(c.desc)}</div>
+                                <div class="weekly-progress">${escapeHtml(progressText)}</div>
+                            </div>
+                            <div class="challenge-card-right">
+                                ${done
+                                    ? `<span class="challenge-done-badge">&#10003; Done</span>`
+                                    : (c.id === 'marathon' || c.id === 'consistent_climber' || c.id === 'above_average')
+                                        ? `<span class="challenge-locked-badge">Locked</span>`
+                                        : `<button class="challenge-start-btn" ${canStart ? '' : 'disabled'} onclick="startChallenge('${c.id}')">${canStart ? 'Start' : 'Loading'}</button>`}
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            ` : ''}
+            <div class="community-goal-section" id="community-goal-section">
+                <div class="daily-header category-header community">
+                    <span class="daily-title-wrap"><span class="daily-title-icon" aria-hidden="true">🛸</span><span class="daily-title">Community Goal</span><button type="button" class="challenge-section-toggle challenge-title-toggle challenge-title-openhub" aria-label="Open community hub" onclick="openCommunityHub()"><span>Open Hub</span></button></span>
+                    <span class="challenge-section-controls">
+                        <span class="weekly-reset">Work together as a community to defend humanity!</span>
+                    </span>
+                </div>
             </div>
         </div>`;
     updateProfileToggleHoverInfo();
@@ -11786,7 +13818,11 @@ bindAuthInputEvents();
 setupLeaderboardHoverHandlers();
 setupPwaInstallPrompt();
 loadGhostCursorPreference();
+loadMiningVisualsPreference();
+loadMiningLaserSoundPreference();
 updateGhostToggleButton();
+updateMiningFxToggleButton();
+updateSectorMapButtonVisibility();
 renderHistory();
 newTest();
 sfxReady = true; // enable sounds after initial load
