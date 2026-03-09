@@ -1,12 +1,25 @@
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+export const ACCESS_SESSION_TTL_MS = 1000 * 60 * 15;
+export const REFRESH_SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
+const SESSION_COOKIE_NAME = 'sampire_session';
+const REFRESH_COOKIE_NAME = 'sampire_refresh';
 
-export function json(data, status = 200) {
+export function json(data, status = 200, extraHeaders = null) {
+  const headers = new Headers({
+    'content-type': 'application/json; charset=utf-8',
+    'cache-control': 'no-store',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'DENY',
+    'referrer-policy': 'no-referrer',
+    'permissions-policy': 'geolocation=(), microphone=(), camera=()',
+    'cross-origin-resource-policy': 'same-origin',
+  });
+  if (extraHeaders) {
+    const incoming = extraHeaders instanceof Headers ? extraHeaders : new Headers(extraHeaders);
+    for (const [key, value] of incoming.entries()) headers.append(key, value);
+  }
   return new Response(JSON.stringify(data), {
     status,
-    headers: {
-      'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-store',
-    },
+    headers,
   });
 }
 
@@ -170,10 +183,14 @@ export function publicUser(user) {
 }
 
 export async function getAuthUser(request, env) {
-  const auth = request.headers.get('authorization') || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  const payload = await verifyToken(token, getSecret(env));
+  const payload = await verifyAccessTokenFromRequest(request, env);
   if (!payload || !payload.uid) return null;
+  if (payload.sid && hasStorage(env)) {
+    const session = await getJson(env, authSessionKey(payload.sid), null);
+    if (!session || session.revoked) return null;
+    if (String(session.uid || '') !== String(payload.uid || '')) return null;
+    if (Number(session.refreshExp) > 0 && Date.now() > Number(session.refreshExp)) return null;
+  }
   const user = await getJson(env, `user:${payload.uid}`);
   return user || null;
 }
@@ -235,12 +252,236 @@ export function communityContributionKey(weekKey) {
   return `community-contrib:v1:${String(weekKey || getWeekKeyUtc())}`;
 }
 
+export function createAccessSessionPayload(userId, sessionId) {
+  return {
+    uid: String(userId || ''),
+    sid: String(sessionId || ''),
+    typ: 'access',
+    exp: Date.now() + ACCESS_SESSION_TTL_MS,
+  };
+}
+
+export function createRefreshSessionPayload(userId, sessionId, refreshJti) {
+  return {
+    uid: String(userId || ''),
+    sid: String(sessionId || ''),
+    jti: String(refreshJti || ''),
+    typ: 'refresh',
+    exp: Date.now() + REFRESH_SESSION_TTL_MS,
+  };
+}
+
 export function createSessionPayload(userId) {
-  return { uid: userId, exp: Date.now() + SESSION_TTL_MS };
+  // Legacy compatibility for older callsites.
+  return createAccessSessionPayload(userId, '');
+}
+
+function parseCookieHeader(rawCookie) {
+  const out = {};
+  const parts = String(rawCookie || '').split(';');
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const idx = trimmed.indexOf('=');
+    if (idx <= 0) continue;
+    const key = trimmed.slice(0, idx).trim();
+    const value = trimmed.slice(idx + 1).trim();
+    if (!key) continue;
+    out[key] = value;
+  }
+  return out;
+}
+
+export function getAuthTokenFromRequest(request) {
+  const rawCookie = request && request.headers ? request.headers.get('cookie') : '';
+  const cookies = parseCookieHeader(rawCookie);
+  const cookieToken = String(cookies[SESSION_COOKIE_NAME] || '').trim();
+  if (cookieToken) return cookieToken;
+  const auth = request && request.headers ? (request.headers.get('authorization') || '') : '';
+  return auth.startsWith('Bearer ') ? auth.slice(7) : '';
+}
+
+export function getRefreshTokenFromRequest(request) {
+  const rawCookie = request && request.headers ? request.headers.get('cookie') : '';
+  const cookies = parseCookieHeader(rawCookie);
+  return String(cookies[REFRESH_COOKIE_NAME] || '').trim();
+}
+
+export async function verifyAccessTokenFromRequest(request, env) {
+  const token = getAuthTokenFromRequest(request);
+  if (!token) return null;
+  const payload = await verifyToken(token, getSecret(env));
+  if (!payload || !payload.uid) return null;
+  if (payload.typ && payload.typ !== 'access') return null;
+  return payload;
+}
+
+export async function verifyRefreshTokenFromRequest(request, env) {
+  const token = getRefreshTokenFromRequest(request);
+  if (!token) return null;
+  const payload = await verifyToken(token, getSecret(env));
+  if (!payload || !payload.uid || !payload.sid || !payload.jti) return null;
+  if (payload.typ !== 'refresh') return null;
+  return payload;
+}
+
+function shouldUseSecureCookie(request) {
+  try {
+    const url = new URL(request.url);
+    return url.protocol === 'https:';
+  } catch {
+    return true;
+  }
+}
+
+export function buildSessionCookie(request, token) {
+  return buildAccessSessionCookie(request, token);
+}
+
+export function buildAccessSessionCookie(request, token) {
+  const safeToken = String(token || '').trim();
+  if (!safeToken) return clearAccessSessionCookie(request);
+  const parts = [
+    `${SESSION_COOKIE_NAME}=${safeToken}`,
+    'Path=/',
+    `Max-Age=${Math.floor(ACCESS_SESSION_TTL_MS / 1000)}`,
+    'HttpOnly',
+    'SameSite=Strict',
+  ];
+  if (shouldUseSecureCookie(request)) parts.push('Secure');
+  return parts.join('; ');
+}
+
+export function clearSessionCookie(request) {
+  return clearAccessSessionCookie(request);
+}
+
+export function clearAccessSessionCookie(request) {
+  const parts = [
+    `${SESSION_COOKIE_NAME}=`,
+    'Path=/',
+    'Max-Age=0',
+    'HttpOnly',
+    'SameSite=Strict',
+  ];
+  if (shouldUseSecureCookie(request)) parts.push('Secure');
+  return parts.join('; ');
+}
+
+export function buildRefreshSessionCookie(request, token) {
+  const safeToken = String(token || '').trim();
+  if (!safeToken) return clearRefreshSessionCookie(request);
+  const parts = [
+    `${REFRESH_COOKIE_NAME}=${safeToken}`,
+    'Path=/',
+    `Max-Age=${Math.floor(REFRESH_SESSION_TTL_MS / 1000)}`,
+    'HttpOnly',
+    'SameSite=Strict',
+  ];
+  if (shouldUseSecureCookie(request)) parts.push('Secure');
+  return parts.join('; ');
+}
+
+export function clearRefreshSessionCookie(request) {
+  const parts = [
+    `${REFRESH_COOKIE_NAME}=`,
+    'Path=/',
+    'Max-Age=0',
+    'HttpOnly',
+    'SameSite=Strict',
+  ];
+  if (shouldUseSecureCookie(request)) parts.push('Secure');
+  return parts.join('; ');
+}
+
+export function authSessionKey(sessionId) {
+  return `auth-session:${String(sessionId || '')}`;
+}
+
+export async function createAuthSession(env, userId, nowMs = Date.now()) {
+  const now = Number(nowMs) || Date.now();
+  const sid = crypto.randomUUID();
+  const refreshJti = crypto.randomUUID();
+  const refreshExp = now + REFRESH_SESSION_TTL_MS;
+  const session = {
+    sid,
+    uid: String(userId || ''),
+    refreshJti,
+    refreshExp,
+    createdAt: now,
+    lastSeenAt: now,
+    lastRotatedAt: now,
+    revoked: false,
+  };
+  await saveAuthSession(env, session);
+  return session;
+}
+
+export async function saveAuthSession(env, session) {
+  if (!hasStorage(env) || !session || !session.sid) return;
+  const now = Date.now();
+  const ttlSec = Math.max(60, Math.ceil((Number(session.refreshExp) - now) / 1000));
+  await env.TYPING_APP.put(authSessionKey(session.sid), JSON.stringify(session), { expirationTtl: ttlSec });
+}
+
+export async function revokeAuthSession(env, sessionId) {
+  if (!hasStorage(env) || !sessionId) return;
+  const existing = await getJson(env, authSessionKey(sessionId), null);
+  if (!existing) return;
+  existing.revoked = true;
+  existing.revokedAt = Date.now();
+  await saveAuthSession(env, existing);
+}
+
+export async function mintSessionTokens(env, userId, secret) {
+  const session = await createAuthSession(env, userId, Date.now());
+  const accessToken = await createToken(createAccessSessionPayload(userId, session.sid), secret);
+  const refreshToken = await createToken(createRefreshSessionPayload(userId, session.sid, session.refreshJti), secret);
+  return { session, accessToken, refreshToken };
 }
 
 export function normalizeMode(mode) {
   const value = String(mode || 'quotes').trim().toLowerCase();
   if (value === 'words' || value === 'words30' || value === 'quotes') return value;
   return 'quotes';
+}
+
+export function getClientIp(request) {
+  const cfIp = String(request.headers.get('cf-connecting-ip') || '').trim();
+  if (cfIp) return cfIp;
+  const xff = String(request.headers.get('x-forwarded-for') || '').trim();
+  if (!xff) return 'unknown';
+  const first = xff.split(',')[0].trim();
+  return first || 'unknown';
+}
+
+export function safeRateKeyPart(value, fallback = 'unknown') {
+  const out = String(value || '').trim().toLowerCase();
+  if (!out) return fallback;
+  return out.replace(/[^a-z0-9._:-]/g, '_').slice(0, 120);
+}
+
+export async function incrementRateLimit(env, key, windowSec, nowMs = Date.now()) {
+  if (!hasStorage(env)) return { count: 1, retryAfterSec: windowSec, resetAt: nowMs + (windowSec * 1000) };
+  const now = Number(nowMs) || Date.now();
+  const safeWindowSec = Math.max(1, Math.floor(Number(windowSec) || 1));
+  const raw = await env.TYPING_APP.get(key);
+  let count = 0;
+  let resetAt = now + (safeWindowSec * 1000);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      const parsedResetAt = Number(parsed && parsed.resetAt) || 0;
+      if (parsedResetAt > now) {
+        count = Math.max(0, Math.floor(Number(parsed && parsed.count) || 0));
+        resetAt = parsedResetAt;
+      }
+    } catch {
+      // Ignore parse errors and reset the window below.
+    }
+  }
+  count += 1;
+  const ttl = Math.max(1, Math.ceil((resetAt - now) / 1000));
+  await env.TYPING_APP.put(key, JSON.stringify({ count, resetAt }), { expirationTtl: ttl });
+  return { count, retryAfterSec: ttl, resetAt };
 }

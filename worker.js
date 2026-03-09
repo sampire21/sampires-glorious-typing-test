@@ -1,5 +1,7 @@
 import { onRequestPost as handleSignup } from './functions/api/signup.js';
 import { onRequestPost as handleLogin } from './functions/api/login.js';
+import { onRequestPost as handleRefresh } from './functions/api/refresh.js';
+import { onRequestPost as handleLogout } from './functions/api/logout.js';
 import { onRequestGet as handleMe } from './functions/api/me.js';
 import { onRequestPost as handleScores } from './functions/api/scores/index.js';
 import { onRequestGet as handleScoresMe } from './functions/api/scores/me.js';
@@ -14,6 +16,8 @@ import { onRequestGet as handleAdminUserGet, onRequestPatch as handleAdminUserPa
 const routes = [
   { method: 'POST', path: '/api/signup', handler: handleSignup },
   { method: 'POST', path: '/api/login', handler: handleLogin },
+  { method: 'POST', path: '/api/refresh', handler: handleRefresh },
+  { method: 'POST', path: '/api/logout', handler: handleLogout },
   { method: 'GET', path: '/api/me', handler: handleMe },
   { method: 'POST', path: '/api/scores', handler: handleScores },
   { method: 'GET', path: '/api/scores/me', handler: handleScoresMe },
@@ -57,7 +61,13 @@ export default {
             requestId,
           }), {
             status: 500,
-            headers: { 'content-type': 'application/json' },
+            headers: {
+              'content-type': 'application/json; charset=utf-8',
+              'cache-control': 'no-store',
+              'x-content-type-options': 'nosniff',
+              'x-frame-options': 'DENY',
+              'referrer-policy': 'no-referrer',
+            },
           });
         }
       }
@@ -81,7 +91,13 @@ export default {
           requestId,
         }), {
           status: 500,
-          headers: { 'content-type': 'application/json' },
+          headers: {
+            'content-type': 'application/json; charset=utf-8',
+            'cache-control': 'no-store',
+            'x-content-type-options': 'nosniff',
+            'x-frame-options': 'DENY',
+            'referrer-policy': 'no-referrer',
+          },
         });
       }
     }
@@ -89,7 +105,13 @@ export default {
     if (url.pathname.startsWith('/api/')) {
       return new Response(JSON.stringify({ error: 'Not found' }), {
         status: 404,
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json; charset=utf-8',
+          'cache-control': 'no-store',
+          'x-content-type-options': 'nosniff',
+          'x-frame-options': 'DENY',
+          'referrer-policy': 'no-referrer',
+        },
       });
     }
 

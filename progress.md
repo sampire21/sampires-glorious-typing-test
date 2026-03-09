@@ -527,3 +527,132 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - `output/shop-style-preview.png`
 - Ran `develop-web-game` client loop and inspected screenshots in:
   - `output/web-game-shop-style/`
+
+## Update 23: Profile improvement tracking graph (WPM progress)
+- Enhanced profile progress tracking to make improvement visible over time.
+- Data pipeline update:
+  - `loadProfileData()` now merges local run history with fetched score rows (`mergeProfileScores(...)`) so profile progression charts are based on sequential runs, not just sparse cloud snapshots.
+  - If cloud fetch fails, profile now still renders from local history instead of showing a blocking error.
+- Chart/UX update:
+  - Renamed chart section to `WPM Progress (raw + rolling avg)`.
+  - `drawProfileTrendChart(...)` now renders:
+    - raw WPM trend line
+    - rolling average overlay line (adaptive window)
+    - legend labels for raw vs rolling average
+- Result: players can clearly see whether they are improving over recent tests rather than only seeing isolated point values.
+
+### Validation
+- `index.html` parse smoke test passed.
+- Targeted Playwright validation produced a profile screenshot showing:
+  - WPM Progress chart
+  - rolling average line + legend
+  - expected rendering without JS exceptions
+  - artifact: `output/profile-trend-preview.png`
+- Ran `develop-web-game` client loop and inspected screenshots in `output/web-game-profile-progress/`.
+
+## Update 24: Auth hardening phase 1 (rate limiting + response headers)
+- Added baseline API security headers to JSON responses in `functions/api/_lib.js`:
+  - `x-content-type-options: nosniff`
+  - `x-frame-options: DENY`
+  - `referrer-policy: no-referrer`
+  - `permissions-policy: geolocation=(), microphone=(), camera=()`
+  - `cross-origin-resource-policy: same-origin`
+- Added reusable request hardening helpers in `_lib.js`:
+  - `getClientIp(request)` for Cloudflare/forwarded IP extraction
+  - `safeRateKeyPart(...)` for sanitized rate-limit key segments
+  - `incrementRateLimit(env, key, windowSec, nowMs?)` for KV-window counters with TTL-based expiry
+
+### Login/signup rate limiting
+- `functions/api/login.js`
+  - Per-IP limiter: `30` attempts per `10` minutes
+  - Per-username limiter: `12` attempts per `10` minutes
+  - Returns HTTP `429` with `{ code: 'RATE_LIMITED', retryAfter }` on exceed
+- `functions/api/signup.js`
+  - Per-IP limiter: `12` attempts per `1` hour
+  - Per-username limiter: `6` attempts per `1` hour
+  - Returns HTTP `429` with `{ code: 'RATE_LIMITED', retryAfter }` on exceed
+
+### Worker API error/404 response hardening
+- `worker.js` now includes no-store + basic defensive headers on API error/404 JSON responses for consistent safe defaults.
+
+### Validation notes
+- Direct `node --check` syntax validation is limited by the repo’s Worker module setup (`.js` ESM files parsed as CJS by Node in this environment).
+- Changes were verified by direct diff inspection and constrained to additive hardening paths.
+
+## Update 25: Auth hardening phase 2 (HttpOnly cookie sessions)
+- Migrated cloud auth flow from client-stored bearer token to server-managed session cookie.
+- Added cookie helpers in `functions/api/_lib.js`:
+  - `buildSessionCookie(request, token)`
+  - `clearSessionCookie(request)`
+  - `getAuthTokenFromRequest(request)` (cookie-first, auth header fallback)
+- Extended `json(...)` helper to accept extra headers, enabling secure `Set-Cookie` responses while keeping default API security headers.
+
+### API changes
+- `POST /api/login` now sets `sampire_session` HttpOnly cookie and returns `{ user }` (no cloud token in response body).
+- `POST /api/signup` now sets `sampire_session` HttpOnly cookie and returns `{ user }`.
+- Added `POST /api/logout` to clear session cookie.
+- Updated worker routing to include `/api/logout`.
+
+### Frontend session changes
+- Cloud auth now relies on browser cookie session restore (`/api/me`) instead of localStorage token persistence.
+- `fetchWithTimeout(...)` now uses `credentials: 'same-origin'` so auth cookies are sent on API calls.
+- Added `LOCAL_AUTH_TOKEN_KEY` for local-browser fallback mode only (`local-token:*`).
+- Legacy cloud token key (`sampire-auth-token`) is now cleanup-only and removed during restore/logout.
+- Updated auth checks so cloud-synced flows gate on `currentUser` rather than `authToken`.
+- Added local fallback `/api/logout` handler in browser-local API shim for parity.
+
+### Validation
+- `index.html` script parse smoke check passed (`new Function` parse).
+- ESM bundle/syntax validation passed via `esbuild` for modified API/worker files.
+- Ran `develop-web-game` Playwright client loop (copied client script into repo path so local `playwright` dependency resolves).
+  - Artifacts: `output/web-game-phase2/shot-0.png`, `output/web-game-phase2/errors-0.json`
+  - Observed a static-server 404 resource console error in this loop; no new auth-flow runtime JS exceptions surfaced in this pass.
+
+### Notes
+- Local browser fallback mode still uses a local bearer token by design; cloud mode no longer stores auth tokens in localStorage.
+
+## Update 26: Auth hardening phase 3 (rotating refresh + session revocation)
+- Implemented split-token session model:
+  - short-lived access token cookie (`sampire_session`, 15 minutes)
+  - rotating refresh token cookie (`sampire_refresh`, 30 days)
+- Both cookies are issued as `HttpOnly`, `SameSite=Strict`, and `Secure` on HTTPS.
+
+### Backend session model
+- Added auth session records in KV (`auth-session:<sid>`) with:
+  - `uid`, `refreshJti`, `refreshExp`, `revoked`, `createdAt`, `lastSeenAt`, `lastRotatedAt`
+- Added helper APIs in `functions/api/_lib.js` for:
+  - token payload creation by type (`access` / `refresh`)
+  - cookie build/clear for access + refresh cookies
+  - session record create/save/revoke
+  - token extraction and verification from request cookies
+- `getAuthUser(...)` now validates:
+  - signed access token
+  - token type (`access`)
+  - session record exists (when `sid` present), not revoked, uid matches, refresh window still active
+
+### Endpoint changes
+- `POST /api/login` and `POST /api/signup`:
+  - now mint session record + access/refresh cookies
+  - still return `{ user }` JSON body
+- Added `POST /api/refresh` (`functions/api/refresh.js`):
+  - validates refresh token + session record
+  - rotates refresh `jti` on each call
+  - issues fresh access + refresh cookies
+  - on refresh token replay/mismatch, revokes session and clears cookies
+- `POST /api/logout` now:
+  - attempts to resolve session from access/refresh token
+  - revokes matched session in KV
+  - clears both cookies
+
+### Frontend behavior
+- Added automatic one-shot refresh retry on cloud `401` responses for API calls (excluding login/signup/refresh/logout):
+  - client calls `/api/refresh`
+  - on success, retries original request
+  - on unauthorized refresh, clears in-memory cloud user state
+- Kept local fallback mode working with `local-token:*` auth.
+- Added local shim support for `POST /api/refresh` in `localApiFetch(...)`.
+
+### Validation
+- `index.html` script parse smoke check passed.
+- ESM bundle/syntax validation passed with `esbuild` for all modified API/worker files.
+- Ran Playwright loop artifacts (`output/web-game-phase3/`): no new auth-flow runtime JS exceptions surfaced; one static-server file 404 console error persisted in this environment.

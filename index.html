@@ -5971,6 +5971,7 @@ function showUiMessage(message, type = 'error', ms = 2600, position = 'bottom') 
 const HISTORY_KEY = 'sampire-typing-history';
 const MAX_HISTORY = 50;
 const AUTH_TOKEN_KEY = 'sampire-auth-token';
+const LOCAL_AUTH_TOKEN_KEY = 'sampire-local-auth-token';
 const LOCAL_AUTH_USERS_KEY = 'sampire-local-auth-users';
 const LOCAL_AUTH_SCORES_KEY = 'sampire-local-auth-scores';
 const LOCAL_GUEST_SCORES_KEY = 'sampire-local-guest-scores';
@@ -6012,7 +6013,7 @@ const SYNC_PROGRESS_KEYS = [
     BIBLE_MODE_KEY,
 ];
 const CRITICAL_STORAGE_KEYS = [
-    AUTH_TOKEN_KEY,
+    LOCAL_AUTH_TOKEN_KEY,
     LOCAL_AUTH_USERS_KEY,
     LOCAL_AUTH_SCORES_KEY,
     LOCAL_GUEST_SCORES_KEY,
@@ -6048,6 +6049,7 @@ let progressSyncTimer = null;
 let progressSyncInFlight = false;
 let suppressProgressSync = false;
 let progressCloudUpdatedAt = 0;
+let cloudRefreshPromise = null;
 let ghostCursorEnabled = true;
 let bibleModeEnabled = false;
 let bibleModeMissingWarned = false;
@@ -6207,7 +6209,7 @@ function applyProgressSnapshotToLocal(progress) {
 }
 
 async function pushCloudProgressSnapshot() {
-    if (!currentUser || !authToken || progressSyncInFlight || suppressProgressSync) return;
+    if (!currentUser || progressSyncInFlight || suppressProgressSync) return;
     progressSyncInFlight = true;
     try {
         const out = await apiFetch('/api/progress', {
@@ -6235,7 +6237,7 @@ async function pushCloudProgressSnapshot() {
 }
 
 function scheduleProgressSync(delayMs = 800) {
-    if (!currentUser || !authToken || suppressProgressSync) return;
+    if (!currentUser || suppressProgressSync) return;
     if (progressSyncTimer) clearTimeout(progressSyncTimer);
     progressSyncTimer = setTimeout(() => {
         progressSyncTimer = null;
@@ -6244,7 +6246,7 @@ function scheduleProgressSync(delayMs = 800) {
 }
 
 function flushProgressSyncNow() {
-    if (!currentUser || !authToken || suppressProgressSync) return;
+    if (!currentUser || suppressProgressSync) return;
     if (progressSyncTimer) {
         clearTimeout(progressSyncTimer);
         progressSyncTimer = null;
@@ -6253,7 +6255,7 @@ function flushProgressSyncNow() {
 }
 
 async function hydrateProgressForCurrentUser() {
-    if (!currentUser || !authToken) return;
+    if (!currentUser) return;
     const uid = String(currentUser.id || '');
     if (!uid) return;
     const owner = getProgressOwner();
@@ -6447,6 +6449,16 @@ async function localApiFetch(url, options = {}, headers = {}) {
         const user = getLocalUserFromAuth(headers);
         if (!user) localApiError(401, 'Unauthorized');
         return { user };
+    }
+
+    if (method === 'POST' && pathname === '/api/logout') {
+        return { ok: true };
+    }
+
+    if (method === 'POST' && pathname === '/api/refresh') {
+        const user = getLocalUserFromAuth(headers);
+        if (!user) localApiError(401, 'Unauthorized');
+        return { ok: true, user };
     }
 
     if (pathname === '/api/progress' && method === 'GET') {
@@ -6946,15 +6958,51 @@ async function localApiFetch(url, options = {}, headers = {}) {
 
 function buildAuthHeaders(options = {}) {
     const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
-    if (authToken) headers.Authorization = `Bearer ${authToken}`;
+    if (isLocalAuthToken(authToken)) headers.Authorization = `Bearer ${authToken}`;
     return headers;
+}
+
+function shouldAttemptCloudSessionRefresh(url) {
+    const path = String(url || '').split('?')[0];
+    if (!path.startsWith('/api/')) return false;
+    if (path === '/api/login' || path === '/api/signup' || path === '/api/refresh' || path === '/api/logout') return false;
+    return true;
+}
+
+async function tryRefreshCloudSession() {
+    if (cloudRefreshPromise) return cloudRefreshPromise;
+    cloudRefreshPromise = (async () => {
+        try {
+            const res = await fetchWithTimeout('/api/refresh', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            let data = {};
+            try { data = await res.json(); } catch (e) {}
+            if (!res.ok) {
+                if (res.status === 401) {
+                    currentUser = null;
+                    updateAuthUi();
+                }
+                return false;
+            }
+            if (data && data.user) currentUser = data.user;
+            updateAuthUi();
+            return true;
+        } catch (e) {
+            return false;
+        } finally {
+            cloudRefreshPromise = null;
+        }
+    })();
+    return cloudRefreshPromise;
 }
 
 async function fetchWithTimeout(url, opts, timeoutMs = 8000) {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
-        return await fetch(url, { ...opts, signal: ctrl.signal });
+        return await fetch(url, { credentials: 'same-origin', ...opts, signal: ctrl.signal });
     } finally {
         clearTimeout(tid);
     }
@@ -6969,7 +7017,7 @@ async function apiFetch(url, options = {}) {
     }
 
     try {
-        const res = await fetchWithTimeout(url, { ...options, headers });
+        let res = await fetchWithTimeout(url, { ...options, headers });
         let data = {};
         try { data = await res.json(); } catch (e) {}
         const isApiRoute = typeof url === 'string' && url.startsWith('/api/');
@@ -6977,6 +7025,14 @@ async function apiFetch(url, options = {}) {
             localApiFallbackActive = true;
             setAuthNote('Cloud API routes not found. Using local browser storage mode.', false);
             return localApiFetch(url, options, headers);
+        }
+        if (isApiRoute && res.status === 401 && !isLocalAuthToken(authToken) && shouldAttemptCloudSessionRefresh(url)) {
+            const refreshed = await tryRefreshCloudSession();
+            if (refreshed) {
+                res = await fetchWithTimeout(url, { ...options, headers });
+                data = {};
+                try { data = await res.json(); } catch (e) {}
+            }
         }
         if (!res.ok) {
             const msg = data && data.error ? data.error : `Request failed (${res.status})`;
@@ -6996,9 +7052,17 @@ async function apiFetchCloudFirst(url, options = {}) {
     if (!isWebContext) return null;
     const headers = buildAuthHeaders(options);
     try {
-        const res = await fetchWithTimeout(url, { ...options, headers });
+        let res = await fetchWithTimeout(url, { ...options, headers });
         let data = {};
         try { data = await res.json(); } catch (e) {}
+        if (res.status === 401 && !isLocalAuthToken(authToken) && shouldAttemptCloudSessionRefresh(url)) {
+            const refreshed = await tryRefreshCloudSession();
+            if (refreshed) {
+                res = await fetchWithTimeout(url, { ...options, headers });
+                data = {};
+                try { data = await res.json(); } catch (e) {}
+            }
+        }
         if (!res.ok) {
             const msg = data && data.error ? data.error : `Request failed (${res.status})`;
             const err = new Error(msg);
@@ -7260,9 +7324,11 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
             method: 'POST',
             body: JSON.stringify({ username, password }),
         }, 'Cloud API routes not found. Using local browser storage mode.', shouldAllowAuthLocalFallback);
-        authToken = out.token;
+        authToken = isLocalAuthToken(out && out.token) ? out.token : null;
         currentUser = out.user;
-        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        if (authToken) localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, authToken);
+        else localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
         await hydrateProgressForCurrentUser();
         ensureFounderBadgeForBeta();
         updateAuthUi();
@@ -7313,10 +7379,12 @@ async function loginUser() {
             method: 'POST',
             body: JSON.stringify({ username, password }),
         }, 'Cloud API routes not found. Using local browser storage mode.', shouldAllowAuthLocalFallback);
-        if (!out || !out.token) throw new Error('Login failed: no token returned');
-        authToken = out.token;
+        if (!out || !out.user) throw new Error('Login failed');
+        authToken = isLocalAuthToken(out && out.token) ? out.token : null;
         currentUser = out.user;
-        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        if (authToken) localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, authToken);
+        else localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
         await hydrateProgressForCurrentUser();
         ensureFounderBadgeForBeta();
         updateAuthUi();
@@ -7334,47 +7402,73 @@ async function loginUser() {
     }
 }
 
-function logoutUser() {
+async function logoutUser() {
     // Try to flush pending progress before token/session teardown.
     flushProgressSyncNow();
+    try {
+        if (isLocalAuthToken(authToken)) {
+            await localApiFetch('/api/logout', { method: 'POST' }, buildAuthHeaders({}));
+        } else {
+            await apiFetchCloudFirst('/api/logout', { method: 'POST' });
+        }
+    } catch (e) {}
     authToken = null;
     currentUser = null;
     localApiFallbackActive = false;
     localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY);
     updateAuthUi();
     setAuthNote('Logged out.');
 }
 
 async function restoreSession() {
-    authToken = localStorage.getItem(AUTH_TOKEN_KEY) || null;
-    if (!authToken) {
-        updateAuthUi();
-        return;
+    // Legacy cleanup: cloud sessions now use HttpOnly cookies, not localStorage token.
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    authToken = localStorage.getItem(LOCAL_AUTH_TOKEN_KEY) || null;
+    currentUser = null;
+
+    if (isLocalAuthToken(authToken)) {
+        try {
+            localApiFallbackActive = true;
+            const out = await localApiFetch('/api/me', {}, buildAuthHeaders({}));
+            currentUser = out.user;
+        } catch (e) {
+            authToken = null;
+            localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY);
+            localApiFallbackActive = false;
+        }
     }
-    try {
-        const out = isLocalAuthToken(authToken)
-            ? await apiFetch('/api/me')
-            : await apiFetchCloudFirst('/api/me');
-        currentUser = out.user;
-        await hydrateProgressForCurrentUser();
-        ensureFounderBadgeForBeta();
-        updateAuthUi();
-        setAuthNote('');
-    } catch (e) {
-        if (!isLocalAuthToken(authToken) && shouldAllowLocalFallback(e)) {
+
+    if (!currentUser) {
+        try {
+            const out = await apiFetchCloudFirst('/api/me');
+            currentUser = out.user;
+            authToken = null;
+            localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY);
+            localApiFallbackActive = false;
+        } catch (e) {
+            if (shouldAllowLocalFallback(e) && isLocalAuthToken(authToken)) {
+                updateAuthUi();
+                setAuthNote('Cloud session check failed. Local browser mode remains available.', true);
+                return;
+            }
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY);
+            localApiFallbackActive = false;
             updateAuthUi();
-            setAuthNote('Cloud session check failed. Keeping session token and retrying on next request.', true);
             return;
         }
-        authToken = null;
-        currentUser = null;
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-        updateAuthUi();
     }
+
+    await hydrateProgressForCurrentUser();
+    ensureFounderBadgeForBeta();
+    updateAuthUi();
+    setAuthNote('');
 }
 
 async function saveScoreToCloud(score) {
-    if (!authToken || !currentUser) return { ok: false, error: 'Not logged in' };
+    if (!currentUser) return { ok: false, error: 'Not logged in' };
     try {
         if (isLocalAuthToken(authToken)) {
             await apiFetch('/api/scores', {
@@ -7466,7 +7560,7 @@ function saveGuestScoreToLeaderboard(score, isSessionPB) {
 }
 
 async function refreshCloudProgress() {
-    if (!authToken || !currentUser) return;
+    if (!currentUser) return;
     try {
         const out = isLocalAuthToken(authToken)
             ? await apiFetch('/api/scores/me?limit=50')
@@ -8667,10 +8761,27 @@ async function loadProfileData() {
     }
     try {
         const out = await apiFetch('/api/scores/me?limit=200');
-        renderProfile(Array.isArray(out.scores) ? out.scores : []);
+        const cloudScores = Array.isArray(out.scores) ? out.scores : [];
+        const localScores = loadHistory();
+        const mergedScores = mergeProfileScores(localScores, cloudScores);
+        renderProfile(mergedScores);
     } catch (e) {
-        content.innerHTML = `<div class="profile-loading">Failed to load profile: ${escapeHtml(e.message)}</div>`;
+        renderProfile(loadHistory());
     }
+}
+
+function mergeProfileScores(localScores = [], cloudScores = []) {
+    const all = [];
+    const seen = new Set();
+    for (const row of [...(Array.isArray(cloudScores) ? cloudScores : []), ...(Array.isArray(localScores) ? localScores : [])]) {
+        if (!row || typeof row !== 'object') continue;
+        const key = `${Number(row.date) || 0}|${String(row.mode || '')}|${Number(row.wpm) || 0}|${Number(row.accuracy) || 0}|${Number(row.time) || 0}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        all.push(row);
+    }
+    all.sort((a, b) => (a.date || 0) - (b.date || 0));
+    return all;
 }
 
 function renderProfile(scores) {
@@ -8777,7 +8888,7 @@ function renderProfile(scores) {
         </div>
 
         ${totalTests >= 2 ? `
-        <div class="profile-section-title">WPM over time <span class="profile-section-sub">(last ${Math.min(totalTests, 50)} tests)</span></div>
+        <div class="profile-section-title">WPM Progress <span class="profile-section-sub">(raw + rolling avg, last ${Math.min(totalTests, 50)} tests)</span></div>
         <canvas id="profile-trend-chart" class="profile-chart-canvas" aria-hidden="true"></canvas>
         ` : ''}
 
@@ -8953,16 +9064,24 @@ function drawProfileTrendChart(canvas, allScores) {
     const maxWpm = Math.max(...scores.map(s => s.wpm || 0), 10);
     const yMax   = Math.ceil(maxWpm / 10) * 10;
     const n      = scores.length;
+    const rollingWindow = Math.max(4, Math.min(10, Math.round(n / 6)));
+    const rollingWpm = scores.map((_, idx) => {
+        const from = Math.max(0, idx - rollingWindow + 1);
+        const slice = scores.slice(from, idx + 1);
+        const avg = slice.reduce((sum, row) => sum + (Number(row.wpm) || 0), 0) / Math.max(1, slice.length);
+        return avg;
+    });
 
     const toX = i   => PAD.left + (i / (n - 1)) * W;
     const toY = wpm => PAD.top  + (1 - wpm / yMax) * H;
 
     const gridColor  = '#2a2a45';
     const labelColor = '#4b5568';
-    const lineColor  = '#7c6ff7';
+    const lineColor  = '#6aa8ff';
+    const avgLineColor = '#f59e0b';
     const fillTop    = 'rgba(124,111,247,0.3)';
     const fillBot    = 'rgba(124,111,247,0)';
-    const dotColor   = '#a78bfa';
+    const dotColor   = '#9ec5ff';
 
     ctx.strokeStyle = gridColor;
     ctx.fillStyle   = labelColor;
@@ -8993,8 +9112,8 @@ function drawProfileTrendChart(canvas, allScores) {
     ctx.lineTo(toX(n-1), toY(0)); ctx.lineTo(toX(0), toY(0)); ctx.closePath();
     ctx.fillStyle = grad; ctx.fill();
 
-    // Line
-    ctx.strokeStyle = lineColor; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+    // Raw line
+    ctx.strokeStyle = lineColor; ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
     ctx.beginPath(); ctx.moveTo(toX(0), toY(scores[0].wpm || 0));
     for (let i = 1; i < n; i++) {
         const p0 = scores[Math.max(i-2,0)], p1 = scores[i-1], p2 = scores[i], p3 = scores[Math.min(i+1,n-1)];
@@ -9006,11 +9125,29 @@ function drawProfileTrendChart(canvas, allScores) {
     }
     ctx.stroke();
 
+    // Rolling average line
+    ctx.strokeStyle = avgLineColor;
+    ctx.lineWidth = 2.6;
+    ctx.beginPath();
+    ctx.moveTo(toX(0), toY(rollingWpm[0] || 0));
+    for (let i = 1; i < n; i++) {
+        ctx.lineTo(toX(i), toY(rollingWpm[i] || 0));
+    }
+    ctx.stroke();
+
     // Dots
     ctx.fillStyle = dotColor;
     for (let i = 0; i < n; i++) {
         ctx.beginPath(); ctx.arc(toX(i), toY(scores[i].wpm || 0), n > 30 ? 1.5 : 3, 0, Math.PI * 2); ctx.fill();
     }
+
+    // Legend
+    ctx.textAlign = 'left';
+    ctx.font = '10px system-ui,sans-serif';
+    ctx.fillStyle = '#93c5fd';
+    ctx.fillText('Raw', PAD.left + 6, PAD.top + 12);
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillText(`Rolling Avg (${rollingWindow})`, PAD.left + 42, PAD.top + 12);
 }
 
 function drawProfileHistogram(canvas, allScores) {
@@ -10949,7 +11086,7 @@ function awardBadge(id) {
 
 function ensureFounderBadgeForBeta() {
     if (!BETA_FOUNDER_ACHIEVEMENT_ENABLED) return;
-    if (!currentUser || !authToken) return;
+    if (!currentUser) return;
     awardBadge('founder');
 }
 
