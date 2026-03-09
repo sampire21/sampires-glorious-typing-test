@@ -229,3 +229,60 @@ Original prompt: Please look through my game and ensure that it is solid from to
 - `manifest.webmanifest` JSON parse: pass.
 - `sw.js` syntax check: pass.
 - Chromium localhost check: service worker registered successfully with scope `http://127.0.0.1:3000/`.
+
+## Update 16: Inventory persistence + top-right music theme selector
+- Fixed unlock persistence loss on login by hardening cloud hydration merge:
+  - Added `mergeProgressSnapshotsForSameOwner(remote, local)` and use it during `hydrateProgressForCurrentUser()` when owner matches.
+  - Merge behavior now preserves same-user unlock state if remote snapshot is stale/partial:
+    - skill unlocks (`sampire-skills`) use boolean OR semantics
+    - badge list (`sampire-badges`) is unioned by id
+    - key unlock-related fields are preserved from local when missing remotely
+  - If merge changed state, it now pushes merged progress back to cloud immediately.
+- Added immediate progress flushes for inventory/reward changes:
+  - `saveSkillsState`, `saveRewardSettings`, `setRewardActive`, and `spendSkillPoint` now flush.
+- Added top-right Music menu (click the Music button to open):
+  - Theme options:
+    - `Dark Main Theme`
+    - `Your Own Personal Universe`
+  - `Toggle On / Off` mute option in the menu
+  - Active theme highlighting
+  - Universe theme is disabled/locked unless `soundscapes` reward is unlocked
+  - Escape/outside-click closes the music menu
+
+### Validation
+- JS parse smoke test passed.
+- Playwright localhost checks:
+  - Music menu opens and options render with active-state classes.
+  - Local storage values for skills/reward settings persist across reload.
+  - Merge helper test confirms remote/local union keeps unlocks and badges when remote is stale.
+
+## Update 17: Music cutoff/restart mitigation for long tracks
+- Addressed intermittent issue where `Your Own Personal Universe` could restart mid-song.
+- Changes:
+  - `playThemeSoundtrack()` is now idempotent: if active track is already playing, it does not call `play()` again.
+  - `retryThemeMusicAfterGesture()` now exits early (and clears gesture-needed flag) if the active track is already playing.
+  - Removed manual `ended` restart handlers for theme tracks and rely on `audio.loop = true` only.
+- Goal: prevent redundant play/restart calls from focus/gesture events that can interrupt long playback on some browsers.
+- JS parse smoke test passed.
+
+## Update 18: Quotes Bible Mode framework
+- Added Bible Mode toggle UI beside WPM in typing stats (`Quotes` mode only).
+- Added persistent preference key: `sampire-bible-mode` and included it in progress sync keys.
+- Added quote routing helpers:
+  - uses `window.BIBLE_VERSES` when Bible Mode is enabled and dataset is present
+  - falls back to default `QUOTES` with a one-time info toast if no verses are loaded
+- Updated New Test label behavior:
+  - quotes mode + bible off: `New Quote`
+  - quotes mode + bible on: `New Verse`
+  - word modes: `New Words`
+- Added placeholder data file:
+  - `bible-verses.js` (empty `window.BIBLE_VERSES` array with expected object shape comments)
+  - included in HTML before main app script
+
+### Validation
+- Inline script parse check passed.
+- Local Playwright smoke check passed:
+  - words mode hides Bible toggle
+  - quotes mode shows Bible toggle
+  - toggling Bible mode updates button label to `New Verse`
+  - no startup JS errors.

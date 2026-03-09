@@ -113,6 +113,59 @@
             color: #e2e8f0;
             font-variant-numeric: tabular-nums;
         }
+        .stat.bible-mode-stat {
+            min-width: 140px;
+            padding: 0.55rem 0.9rem;
+            display: none;
+            gap: 0.45rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .bible-mode-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            display: inline-block;
+        }
+        .bible-mode-switch input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .bible-mode-slider {
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: #27314f;
+            border: 1px solid #2e3a61;
+            transition: background 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .bible-mode-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 2px;
+            top: 2px;
+            border-radius: 50%;
+            background: #f4f6ff;
+            transition: transform 0.2s ease;
+        }
+        .bible-mode-switch input:checked + .bible-mode-slider {
+            background: #7c6ff7;
+            border-color: #a78bfa;
+        }
+        .bible-mode-switch input:checked + .bible-mode-slider::before {
+            transform: translateX(20px);
+        }
+        .bible-mode-hint {
+            font-size: 0.64rem;
+            color: #9ca3af;
+            line-height: 1.2;
+        }
 
         /* ── Progress bar ── */
         .progress-bar {
@@ -1059,6 +1112,63 @@
             border: 1px solid #2a2a45;
             box-shadow: none;
             transition: background 0.2s, color 0.2s;
+        }
+        .music-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .music-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 228px;
+            padding: 0.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(124, 111, 247, 0.44);
+            background: rgba(16, 12, 39, 0.96);
+            box-shadow: 0 14px 26px rgba(3, 0, 18, 0.42);
+            z-index: 260;
+            display: none;
+        }
+        .music-menu.show {
+            display: block;
+        }
+        .music-menu-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #b3a9ff;
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+        }
+        .music-option {
+            width: 100%;
+            text-align: left;
+            padding: 0.46rem 0.52rem;
+            border-radius: 8px;
+            border: 1px solid rgba(95, 88, 167, 0.44);
+            background: rgba(24, 18, 55, 0.84);
+            color: #e9e4ff;
+            font-size: 0.76rem;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 0.34rem;
+        }
+        .music-option:hover,
+        .music-option:focus-visible {
+            border-color: rgba(185, 173, 255, 0.78);
+            background: rgba(36, 28, 77, 0.95);
+            outline: none;
+        }
+        .music-option.active {
+            border-color: rgba(167, 139, 250, 0.86);
+            box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.22);
+            color: #f6f3ff;
+        }
+        .music-option.locked {
+            opacity: 0.48;
+            cursor: not-allowed;
         }
 
         .keysound-toggle {
@@ -3828,6 +3938,44 @@
             letter-spacing: 0.05em;
             margin-top: 0.1rem;
         }
+        .install-app-btn {
+            position: fixed;
+            left: 50%;
+            bottom: 0.95rem;
+            transform: translateX(-50%);
+            z-index: 320;
+            display: none;
+            min-width: 180px;
+            background: rgba(27, 20, 64, 0.92);
+            border: 1px solid rgba(124, 111, 247, 0.45);
+            color: #e8e9ff;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            border-radius: 999px;
+            padding: 0.58rem 1rem;
+            box-shadow: 0 10px 26px rgba(8, 4, 26, 0.45);
+            backdrop-filter: blur(5px);
+        }
+        .install-app-btn:hover {
+            background: rgba(38, 30, 84, 0.95);
+            border-color: rgba(167, 139, 250, 0.65);
+        }
+        .install-app-btn.show {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (max-width: 768px) {
+            .install-app-btn {
+                bottom: 0.65rem;
+                width: calc(100% - 1.5rem);
+                max-width: 360px;
+            }
+            .stat.bible-mode-stat {
+                min-width: 124px;
+            }
+        }
 
     </style>
 </head>
@@ -3860,6 +4008,7 @@
 <div id="scroll-header" aria-hidden="true"></div>
 <div id="ui-toast" class="ui-toast" role="status" aria-live="polite"></div>
 <div id="lb-user-tooltip" class="lb-user-tooltip" aria-hidden="true"></div>
+<button id="install-app-btn" class="install-app-btn" type="button" aria-label="Install this app">Install App</button>
 <div class="top-left-actions">
     <button class="share-toggle" id="share-toggle" onclick="shareSite()">
         <span>Share</span>
@@ -3909,10 +4058,18 @@
         </div>
     </div>
 
-    <button class="music-toggle" id="music-toggle" onclick="toggleMusic()">
-        <span>Music</span>
-        <span id="music-state" class="toggle-indicator on">✓</span>
-    </button>
+    <div class="music-wrap" id="music-wrap">
+        <button class="music-toggle" id="music-toggle" onclick="toggleMusicMenu(event)">
+            <span>Music</span>
+            <span id="music-state" class="toggle-indicator on">✓</span>
+        </button>
+        <div class="music-menu" id="music-menu" aria-hidden="true">
+            <div class="music-menu-title">Main Menu Theme</div>
+            <button type="button" class="music-option" data-theme="dark" onclick="selectMusicTheme('dark')">Dark Main Theme</button>
+            <button type="button" class="music-option" data-theme="universe" onclick="selectMusicTheme('universe')">Your Own Personal Universe</button>
+            <button type="button" class="music-option" onclick="toggleMusicMuteFromMenu()">Toggle On / Off</button>
+        </div>
+    </div>
 </div>
 
 <div class="pb-celebration" id="pb-celebration" aria-hidden="true">
@@ -3935,6 +4092,14 @@
         <div class="stat">
             <div class="stat-label">WPM</div>
             <div class="stat-value" id="wpm">0</div>
+        </div>
+        <div class="stat bible-mode-stat" id="bible-mode-stat">
+            <div class="stat-label">Bible Mode</div>
+            <label class="bible-mode-switch" for="bible-mode-toggle" title="Use Bible verses in Quotes mode">
+                <input id="bible-mode-toggle" type="checkbox" onchange="toggleBibleMode()">
+                <span class="bible-mode-slider" aria-hidden="true"></span>
+            </label>
+            <div class="bible-mode-hint" id="bible-mode-hint">Quotes</div>
         </div>
         <div class="stat">
             <div class="stat-label">Accuracy</div>
@@ -4278,6 +4443,7 @@
     </div>
 </div>
 
+<script src="bible-verses.js"></script>
 <script>
 const APP_STORAGE_SCHEMA_KEY = 'sampire-storage-schema-version';
 const APP_STORAGE_SCHEMA_VERSION = '2026-03-08.1';
@@ -4532,16 +4698,76 @@ function getModeLabel(mode = currentMode) {
     return 'words 30s';
 }
 
+function getPrimaryNewTestLabel(mode = currentMode) {
+    if (mode !== 'quotes') return 'New Words';
+    return bibleModeEnabled ? 'New Verse' : 'New Quote';
+}
+
+function updatePrimaryNewTestButtons() {
+    const label = getPrimaryNewTestLabel(currentMode);
+    document.querySelectorAll('.new-test-btn').forEach((btn) => {
+        btn.innerHTML = escapeHtml(label) + '<span class="btn-hint">(Spacebar)</span>';
+    });
+}
+
+function normalizeQuoteEntries(entries) {
+    if (!Array.isArray(entries)) return [];
+    return entries
+        .map((entry) => {
+            const text = String(entry && entry.text || '').trim();
+            if (!text) return null;
+            const source = String(entry && entry.source || 'Bible').trim() || 'Bible';
+            return { text, source };
+        })
+        .filter(Boolean);
+}
+
+function getBibleQuotePool() {
+    return normalizeQuoteEntries(window.BIBLE_VERSES);
+}
+
+function getQuotePool() {
+    if (!bibleModeEnabled) return QUOTES;
+    const biblePool = getBibleQuotePool();
+    if (biblePool.length > 0) return biblePool;
+    if (!bibleModeMissingWarned) {
+        bibleModeMissingWarned = true;
+        showUiMessage('Bible mode is enabled but no verses are loaded yet. Using default quotes.', 'info', 3200, 'top-left');
+    }
+    return QUOTES;
+}
+
+function updateBibleModeUi() {
+    const stat = document.getElementById('bible-mode-stat');
+    const toggle = document.getElementById('bible-mode-toggle');
+    const hint = document.getElementById('bible-mode-hint');
+    if (stat) stat.style.display = currentMode === 'quotes' ? 'flex' : 'none';
+    if (toggle) toggle.checked = !!bibleModeEnabled;
+    if (hint) {
+        const poolSize = getBibleQuotePool().length;
+        hint.textContent = bibleModeEnabled
+            ? (poolSize > 0 ? `${poolSize} verses` : 'No verses loaded')
+            : 'Quotes';
+    }
+    updatePrimaryNewTestButtons();
+}
+
+function toggleBibleMode() {
+    bibleModeEnabled = !bibleModeEnabled;
+    bibleModeMissingWarned = false;
+    try { localStorage.setItem(BIBLE_MODE_KEY, bibleModeEnabled ? '1' : '0'); } catch (e) {}
+    updateBibleModeUi();
+    if (currentMode === 'quotes') newTest(true);
+}
+window.toggleBibleMode = toggleBibleMode;
+
 function setMode(mode) {
     const previousMode = currentMode;
     activeChallengeId = null;
     currentMode = mode;
     document.querySelectorAll('.mode-tab').forEach(btn =>
         btn.classList.toggle('active', btn.dataset.mode === mode));
-    const label = mode === 'quotes' ? 'New Quote' : 'New Words';
-    document.querySelectorAll('.new-test-btn').forEach(btn => {
-        btn.innerHTML = escapeHtml(label) + '<span class="btn-hint">(Spacebar)</span>';
-    });
+    updateBibleModeUi();
     const panel = document.getElementById('challenge-panel');
     const area  = document.getElementById('typing-area');
     if (mode === 'daily') {
@@ -4586,7 +4812,8 @@ function newTest(fromModeSwitch = false) {
         const q = pool[Math.floor(Math.random() * pool.length)];
         init(q.text, `Challenge: The Perfectionist \u2022 ${q.source}`);
     } else if (currentMode === 'quotes') {
-        const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+        const pool = getQuotePool();
+        const q = pool[Math.floor(Math.random() * pool.length)];
         try {
             const gk = 'sampire-ghost-quotes-' + btoa(encodeURIComponent(q.text)).slice(0, 40);
             const stored = localStorage.getItem(gk);
@@ -5289,6 +5516,7 @@ const LOCAL_AUTH_SCORES_KEY = 'sampire-local-auth-scores';
 const LOCAL_GUEST_SCORES_KEY = 'sampire-local-guest-scores';
 const GUEST_SESSION_ID_KEY = 'sampire-guest-session-id';
 const GHOST_CURSOR_ENABLED_KEY = 'sampire-ghost-cursor-enabled';
+const BIBLE_MODE_KEY = 'sampire-bible-mode';
 const STORAGE_SAFETY_SNAPSHOT_KEY = 'sampire-storage-snapshot-v1';
 const PROGRESS_OWNER_KEY = 'sampire-progress-owner';
 const SYNC_PROGRESS_KEYS = [
@@ -5309,6 +5537,7 @@ const SYNC_PROGRESS_KEYS = [
     'sampire-active-soundscape',
     'sampire-music-muted',
     'sampire-key-sounds-enabled',
+    BIBLE_MODE_KEY,
 ];
 const CRITICAL_STORAGE_KEYS = [
     AUTH_TOKEN_KEY,
@@ -5328,6 +5557,7 @@ const CRITICAL_STORAGE_KEYS = [
     'sampire-community-weekly-contrib',
     'sampire-skill-points',
     'sampire-skills',
+    BIBLE_MODE_KEY,
 ];
 let authToken = null;
 let currentUser = null;
@@ -5342,6 +5572,9 @@ let progressSyncInFlight = false;
 let suppressProgressSync = false;
 let progressCloudUpdatedAt = 0;
 let ghostCursorEnabled = true;
+let bibleModeEnabled = false;
+let bibleModeMissingWarned = false;
+let skillStateCache = null;
 
 function loadLocalJson(key, fallback) {
     try {
@@ -5388,6 +5621,80 @@ function getProgressSnapshotFromLocal() {
         }
     } catch (e) {}
     return progress;
+}
+
+function parseProgressJsonSafe(raw, fallback) {
+    try {
+        const parsed = JSON.parse(raw || '');
+        return parsed == null ? fallback : parsed;
+    } catch (e) {
+        return fallback;
+    }
+}
+
+function normalizeBadgeIdList(raw) {
+    const rows = Array.isArray(raw) ? raw : [];
+    return rows
+        .map((entry) => {
+            if (typeof entry === 'string') return { id: entry, earnedAt: null };
+            const id = String(entry && entry.id || '');
+            if (!id) return null;
+            const earnedAt = Number(entry && entry.earnedAt);
+            return { id, earnedAt: Number.isFinite(earnedAt) ? earnedAt : null };
+        })
+        .filter(Boolean);
+}
+
+function mergeProgressSnapshotsForSameOwner(remoteProgress = {}, localProgress = {}) {
+    const merged = { ...(remoteProgress || {}) };
+    let changed = false;
+
+    const preserveIfMissing = [
+        'sampire-skills',
+        'sampire-reward-settings',
+        'sampire-badges',
+        'sampire-active-soundscape',
+        'sampire-music-muted',
+    ];
+    for (const key of preserveIfMissing) {
+        if (merged[key] == null && localProgress[key] != null) {
+            merged[key] = localProgress[key];
+            changed = true;
+        }
+    }
+
+    const remoteSkills = parseProgressJsonSafe(merged['sampire-skills'] || '{}', {});
+    const localSkills = parseProgressJsonSafe(localProgress['sampire-skills'] || '{}', {});
+    const skillKeys = ['aura', 'soundscapes', 'nebulaTrail'];
+    const mergedSkills = {};
+    for (const key of skillKeys) mergedSkills[key] = !!remoteSkills[key] || !!localSkills[key];
+    const mergedSkillsRaw = JSON.stringify(mergedSkills);
+    if (String(merged['sampire-skills'] || '') !== mergedSkillsRaw) {
+        merged['sampire-skills'] = mergedSkillsRaw;
+        changed = true;
+    }
+
+    const remoteBadges = normalizeBadgeIdList(parseProgressJsonSafe(merged['sampire-badges'] || '[]', []));
+    const localBadges = normalizeBadgeIdList(parseProgressJsonSafe(localProgress['sampire-badges'] || '[]', []));
+    const badgeById = new Map();
+    for (const b of [...remoteBadges, ...localBadges]) {
+        const prev = badgeById.get(b.id);
+        if (!prev) {
+            badgeById.set(b.id, b);
+            continue;
+        }
+        const prevTs = Number(prev.earnedAt) || 0;
+        const nextTs = Number(b.earnedAt) || 0;
+        if (nextTs > prevTs) badgeById.set(b.id, b);
+    }
+    const mergedBadges = [...badgeById.values()];
+    const mergedBadgesRaw = JSON.stringify(mergedBadges);
+    if (String(merged['sampire-badges'] || '') !== mergedBadgesRaw) {
+        merged['sampire-badges'] = mergedBadgesRaw;
+        changed = true;
+    }
+
+    return { progress: merged, changed };
 }
 
 function applyProgressSnapshotToLocal(progress) {
@@ -5466,9 +5773,17 @@ async function hydrateProgressForCurrentUser() {
     const hasRemoteRecord = hasRemoteProgress || remoteUpdatedAt > 0;
 
     if (hasRemoteRecord) {
-        applyProgressSnapshotToLocal(remoteProgress || {});
+        const localProgressBefore = owner === uid ? getProgressSnapshotFromLocal() : {};
+        const merged = owner === uid
+            ? mergeProgressSnapshotsForSameOwner(remoteProgress || {}, localProgressBefore || {})
+            : { progress: remoteProgress || {}, changed: false };
+        applyProgressSnapshotToLocal(merged.progress || {});
         setProgressOwner(uid);
         progressCloudUpdatedAt = remoteUpdatedAt;
+        if (merged.changed) {
+            // Push merged state so cloud snapshot catches up with local unlocks/preferences.
+            await pushCloudProgressSnapshot();
+        }
     } else {
         if (owner && owner !== uid) {
             clearSyncedLocalProgress();
@@ -6692,6 +7007,7 @@ let leaderboardHoverBound = false;
 let lbTooltipHideTimer = null;
 let lbTooltipActiveUsername = '';
 let lbTooltipRequestToken = 0;
+let deferredInstallPrompt = null;
 
 function normalizeSummaryUsername(value) {
     return String(value || '').trim().toLowerCase();
@@ -6862,6 +7178,49 @@ function setupLeaderboardHoverHandlers() {
     });
     window.addEventListener('scroll', () => hideLeaderboardUserTooltip(true), true);
     leaderboardHoverBound = true;
+}
+
+function updateInstallAppButtonVisibility() {
+    const btn = document.getElementById('install-app-btn');
+    if (!btn) return;
+    const show = !!deferredInstallPrompt;
+    btn.classList.toggle('show', show);
+}
+
+async function handleInstallAppClick() {
+    if (!deferredInstallPrompt) return;
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    updateInstallAppButtonVisibility();
+    try {
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+            showUiMessage('App installed successfully!', 'success', 2200, 'top-left');
+        }
+    } catch (e) {
+        // Ignore: install prompt is browser-controlled and may be canceled.
+    } finally {
+        updateInstallAppButtonVisibility();
+    }
+}
+
+function setupPwaInstallPrompt() {
+    const btn = document.getElementById('install-app-btn');
+    if (btn) btn.addEventListener('click', handleInstallAppClick);
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        updateInstallAppButtonVisibility();
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        updateInstallAppButtonVisibility();
+    });
+
+    updateInstallAppButtonVisibility();
 }
 
 function getWeekStart() {
@@ -8614,13 +8973,16 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeAdminPanel();
     if (e.key === 'Escape') closeCommunityHub();
     if (e.key === 'Escape') closeKeySoundMenu();
+    if (e.key === 'Escape') closeMusicMenu();
 });
 
 document.addEventListener('pointerdown', (e) => {
-    const wrap = document.getElementById('keysound-wrap');
-    if (!wrap) return;
-    if (wrap.contains(e.target)) return;
+    const keyWrap = document.getElementById('keysound-wrap');
+    const musicWrap = document.getElementById('music-wrap');
+    if (keyWrap && keyWrap.contains(e.target)) return;
+    if (musicWrap && musicWrap.contains(e.target)) return;
     closeKeySoundMenu();
+    closeMusicMenu();
 });
 
 // ── Theme Soundtracks ────────────────────────────────────────────────────────
@@ -8663,6 +9025,10 @@ let pbFxTimeout = null;
 function playThemeSoundtrack() {
     if (musicMuted) return;
     const track = themeMusic[activeMusicTheme] || themeMusic.dark;
+    if (!track.paused && !track.ended) {
+        musicNeedsUserGesture = false;
+        return;
+    }
     track.play()
         .then(() => { musicNeedsUserGesture = false; })
         .catch(() => { musicNeedsUserGesture = true; });
@@ -8672,6 +9038,69 @@ function stopThemeSoundtracks() {
     Object.values(themeMusic).forEach((track) => {
         track.pause();
     });
+}
+
+function updateMusicToggleUi() {
+    const state = document.getElementById('music-state');
+    if (!state) return;
+    state.textContent = musicMuted ? '✗' : '✓';
+    state.classList.toggle('on', !musicMuted);
+    state.classList.toggle('off', musicMuted);
+}
+
+function updateMusicMenuUI() {
+    document.querySelectorAll('#music-menu .music-option[data-theme]').forEach((btn) => {
+        const theme = String(btn.dataset.theme || '');
+        const isActive = theme === activeMusicTheme;
+        btn.classList.toggle('active', isActive);
+        if (theme === 'universe') {
+            const locked = !isSkillUnlocked('soundscapes');
+            btn.classList.toggle('locked', locked);
+            btn.disabled = locked;
+            btn.title = locked ? 'Unlock Soundscapes reward to use this theme.' : '';
+        } else {
+            btn.classList.remove('locked');
+            btn.disabled = false;
+            btn.title = '';
+        }
+    });
+}
+
+function openMusicMenu() {
+    const menu = document.getElementById('music-menu');
+    if (!menu) return;
+    menu.classList.add('show');
+    menu.setAttribute('aria-hidden', 'false');
+    updateMusicMenuUI();
+}
+
+function closeMusicMenu() {
+    const menu = document.getElementById('music-menu');
+    if (!menu) return;
+    menu.classList.remove('show');
+    menu.setAttribute('aria-hidden', 'true');
+}
+
+function toggleMusicMenu(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    const menu = document.getElementById('music-menu');
+    if (!menu) return;
+    if (menu.classList.contains('show')) closeMusicMenu();
+    else openMusicMenu();
+}
+
+function selectMusicTheme(theme) {
+    setActiveMusicTheme(theme);
+    updateMusicMenuUI();
+    closeMusicMenu();
+}
+
+function toggleMusicMuteFromMenu() {
+    toggleMusic();
+    updateMusicMenuUI();
 }
 
 function setActiveMusicTheme(theme) {
@@ -8686,28 +9115,20 @@ function setActiveMusicTheme(theme) {
         stopThemeSoundtracks();
         playThemeSoundtrack();
     }
+    updateMusicMenuUI();
 }
 
 function toggleMusic() {
     musicMuted = !musicMuted;
-    const state = document.getElementById('music-state');
     if (musicMuted) {
         musicNeedsUserGesture = false;
-        if (state) {
-            state.textContent = '✗';
-            state.classList.add('off');
-            state.classList.remove('on');
-        }
         stopThemeSoundtracks();
     } else {
-        if (state) {
-            state.textContent = '✓';
-            state.classList.add('on');
-            state.classList.remove('off');
-        }
         playThemeSoundtrack();
     }
+    updateMusicToggleUi();
     try { localStorage.setItem('sampire-music-muted', musicMuted ? '1' : '0'); } catch(e) {}
+    flushProgressSyncNow();
 }
 
 async function shareSite() {
@@ -8957,6 +9378,11 @@ function playKeypressSound(key, event = null) {
 
 function retryThemeMusicAfterGesture() {
     if (musicMuted || !musicNeedsUserGesture) return;
+    const track = themeMusic[activeMusicTheme] || themeMusic.dark;
+    if (track && !track.paused && !track.ended) {
+        musicNeedsUserGesture = false;
+        return;
+    }
     playThemeSoundtrack();
 }
 
@@ -9010,19 +9436,18 @@ const storedMusicMuted = localStorage.getItem('sampire-music-muted');
 musicMuted = storedMusicMuted === null ? false : storedMusicMuted === '1';
 const storedActiveSoundscape = localStorage.getItem('sampire-active-soundscape');
 activeMusicTheme = (storedActiveSoundscape === 'universe' && isRewardActive('soundscapes')) ? 'universe' : 'dark';
-const musicState = document.getElementById('music-state');
-if (musicState) {
-    musicState.textContent = musicMuted ? '✗' : '✓';
-    musicState.classList.toggle('on', !musicMuted);
-    musicState.classList.toggle('off', musicMuted);
-}
+updateMusicToggleUi();
+updateMusicMenuUI();
 const storedKeySoundsEnabled = localStorage.getItem('sampire-key-sounds-enabled');
 keySoundsEnabled = storedKeySoundsEnabled === null ? true : storedKeySoundsEnabled === '1';
+const storedBibleMode = localStorage.getItem(BIBLE_MODE_KEY);
+bibleModeEnabled = storedBibleMode === '1';
 const storedKeySoundPack = localStorage.getItem(KEY_SOUND_PACK_KEY);
 keySoundPackName = storedKeySoundPack ? String(storedKeySoundPack) : KEY_SOUND_DEFAULT_PACK;
 loadKeySoundPackConfig();
 setKeySoundToggleUI();
 updateKeySoundPackMenuUI();
+updateBibleModeUi();
 if (!musicMuted) playThemeSoundtrack();
 
 document.addEventListener('pointerdown', retryThemeMusicAfterGesture, { passive: true });
@@ -9057,7 +9482,6 @@ const COMMUNITY_FLEET_LEVELS = [
     { id: 'mothership', name: 'The Mothership', health: 50000 },
 ];
 const COMMUNITY_FLEET_TOTAL_HEALTH = COMMUNITY_FLEET_LEVELS.reduce((sum, level) => sum + level.health, 0);
-let skillStateCache = null;
 let rivalTargetRefreshInFlight = false;
 
 const CHALLENGES = [
@@ -9693,6 +10117,7 @@ function saveSkillsState(nextState) {
         nebulaTrail: !!(nextState && nextState.nebulaTrail),
     };
     try { localStorage.setItem(SKILLS_KEY, JSON.stringify(skillStateCache)); } catch (e) {}
+    flushProgressSyncNow();
 }
 
 function isSkillUnlocked(skillId) {
@@ -9721,6 +10146,7 @@ function saveRewardSettings(next) {
         nebulaTrail: !!(next && next.nebulaTrail),
     };
     try { localStorage.setItem(REWARD_SETTINGS_KEY, JSON.stringify(safe)); } catch (e) {}
+    flushProgressSyncNow();
 }
 
 function isRewardActive(skillId) {
@@ -9742,8 +10168,10 @@ function setRewardActive(skillId, active) {
         setActiveMusicTheme('universe');
     }
     applyAuraStyles();
+    updateMusicMenuUI();
     if (document.getElementById('skills-modal')?.classList.contains('show')) renderSkillsModal();
     if (document.getElementById('inventory-modal')?.classList.contains('show')) renderInventoryModal();
+    flushProgressSyncNow();
 }
 
 function updateSkillDisplay() {
@@ -9789,9 +10217,11 @@ function spendSkillPoint(skillId) {
     if (skillId === 'soundscapes') {
         setActiveMusicTheme('universe');
     }
+    updateMusicMenuUI();
     updateSkillDisplay();
     renderSkillsModal();
     applyAuraStyles();
+    flushProgressSyncNow();
 }
 
 function renderSkillsModal() {
@@ -9972,17 +10402,8 @@ function updateScrollHeaderState() {
     document.body.classList.toggle('scrolled', (window.scrollY || 0) > 16);
 }
 
-themeMusic.dark.addEventListener('ended', () => {
-    if (activeMusicTheme !== 'dark' || musicMuted || rewardSoundPreviewPlaying) return;
-    themeMusic.dark.currentTime = 0;
-    themeMusic.dark.play().catch(() => {});
-});
-
-themeMusic.universe.addEventListener('ended', () => {
-    if (activeMusicTheme !== 'universe' || musicMuted || rewardSoundPreviewPlaying) return;
-    themeMusic.universe.currentTime = 0;
-    themeMusic.universe.play().catch(() => {});
-});
+// Looping is handled by `audio.loop = true`; avoid manual ended restarts to
+// reduce unintended mid-track restarts in some browsers.
 
 function addXP(amount) {
     const prev = getTotalXP();
@@ -10243,6 +10664,7 @@ function bindAuthInputEvents() {
 
 bindAuthInputEvents();
 setupLeaderboardHoverHandlers();
+setupPwaInstallPrompt();
 loadGhostCursorPreference();
 updateGhostToggleButton();
 renderHistory();
