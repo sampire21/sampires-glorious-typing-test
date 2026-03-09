@@ -81,6 +81,58 @@
         }
 
         .mode-tab.active:hover { background: #6357e0; }
+        .community-mode-popup {
+            display: none;
+            align-items: center;
+            gap: 0.8rem;
+            margin: -0.5rem auto 1rem;
+            max-width: 780px;
+            border: 1px solid rgba(125, 211, 252, 0.44);
+            border-radius: 12px;
+            background: linear-gradient(160deg, rgba(14, 20, 48, 0.92), rgba(24, 24, 78, 0.86));
+            padding: 0.66rem 0.8rem;
+            box-shadow: 0 0 24px rgba(14, 165, 233, 0.2);
+        }
+        .community-mode-popup.show { display: flex; }
+        .community-mode-popup-main {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            min-width: 0;
+            flex: 1;
+        }
+        .community-mode-popup-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: #bae6fd;
+        }
+        .community-mode-popup-desc {
+            font-size: 0.7rem;
+            color: #cbd5e1;
+            line-height: 1.34;
+        }
+        .community-mode-popup-status {
+            font-size: 0.68rem;
+            color: #86efac;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .community-mode-popup-exit {
+            border: 1px solid rgba(248, 113, 113, 0.52);
+            background: rgba(127, 29, 29, 0.3);
+            color: #fecaca;
+            border-radius: 999px;
+            font-size: 0.66rem;
+            letter-spacing: 0.05em;
+            padding: 0.36rem 0.72rem;
+            font-weight: 700;
+        }
+        .community-mode-popup-exit:hover {
+            background: rgba(153, 27, 27, 0.44);
+            border-color: rgba(252, 165, 165, 0.7);
+        }
 
         /* ── Stats bar ── */
         .stats {
@@ -280,13 +332,25 @@
             left: var(--x, 0px);
             top: var(--y, 0px);
             transform: translate(-50%, -50%);
-            color: #7dd3fc;
-            text-shadow: 0 0 10px rgba(125, 211, 252, 0.78);
-            font-size: 0.78rem;
+            color: #fef08a;
+            text-shadow: 0 0 18px rgba(253, 224, 71, 0.9), 0 0 28px rgba(56, 189, 248, 0.85);
+            font-size: 1.08rem;
             line-height: 1;
             pointer-events: none;
             z-index: 9;
-            animation: xzLaserRise var(--dur, 0.58s) ease-out forwards;
+            animation: xzLaserRise var(--dur, 0.62s) cubic-bezier(0.12, 0.7, 0.18, 1) forwards;
+        }
+        .xz-laser-icon::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 3px;
+            height: 62px;
+            border-radius: 999px;
+            transform: translate(-50%, -100%);
+            background: linear-gradient(180deg, rgba(250, 204, 21, 0.96) 0%, rgba(56, 189, 248, 0.52) 55%, rgba(2, 6, 23, 0) 100%);
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.75);
         }
 
         @keyframes nebulaTrailDrift {
@@ -295,8 +359,9 @@
             100% { opacity: 0;    transform: translate(calc(-50% + var(--dx, 22px)), calc(-50% + var(--dy, -14px))) scale(0.45) rotate(260deg); }
         }
         @keyframes xzLaserRise {
-            0%   { opacity: 0.95; transform: translate(-50%, -40%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -180%) scale(1.16); }
+            0%   { opacity: 0; transform: translate(-50%, 18%) scale(0.72); }
+            14%  { opacity: 1; transform: translate(-50%, -28%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -340%) scale(1.45); }
         }
 
         @keyframes blink {
@@ -1186,6 +1251,29 @@
             opacity: 0.48;
             cursor: not-allowed;
         }
+        .menu-volume-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin: 0.42rem 0 0.34rem;
+        }
+        .menu-volume-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .menu-volume-value {
+            font-size: 0.67rem;
+            font-weight: 700;
+            color: #d7cdfd;
+        }
+        .menu-volume-slider {
+            width: 100%;
+            margin: 0 0 0.25rem;
+            accent-color: #8f72ff;
+            cursor: pointer;
+        }
 
         .keysound-toggle {
             display: flex;
@@ -1254,6 +1342,15 @@
             border-color: rgba(96, 165, 250, 0.82);
             box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.22);
             color: #eef6ff;
+        }
+        #keysound-menu .menu-volume-label {
+            color: #9dc1ff;
+        }
+        #keysound-menu .menu-volume-value {
+            color: #cbe2ff;
+        }
+        #keysound-menu .menu-volume-slider {
+            accent-color: #60a5fa;
         }
 
         .leaderboard-toggle {
@@ -4056,6 +4153,15 @@
                 max-width: 360px;
             }
             .bible-mode-inline { width: 100%; justify-content: center; }
+            .community-mode-popup {
+                flex-wrap: wrap;
+                justify-content: center;
+                text-align: center;
+            }
+            .community-mode-popup-status {
+                width: 100%;
+                text-align: center;
+            }
         }
 
     </style>
@@ -4133,6 +4239,11 @@
         </button>
         <div class="keysound-menu" id="keysound-menu" aria-hidden="true">
             <div class="keysound-menu-title">Sound Pack</div>
+            <div class="menu-volume-row">
+                <span class="menu-volume-label">Volume</span>
+                <span class="menu-volume-value" id="keysound-volume-value">100%</span>
+            </div>
+            <input type="range" class="menu-volume-slider" id="keysound-volume-slider" min="0" max="100" step="1" value="100" oninput="handleKeySoundVolumeInput(event)" aria-label="Keyboard sound volume">
             <button type="button" class="keysound-option" data-pack="nk-cream" onclick="selectKeySoundPack('nk-cream')">NK Creams</button>
             <button type="button" class="keysound-option" data-pack="cherrymx-blue-abs" onclick="selectKeySoundPack('cherrymx-blue-abs')">Cherry MX Blues</button>
             <button type="button" class="keysound-option" data-pack="Buckling Springs" onclick="selectKeySoundPack('Buckling Springs')">Buckling Springs</button>
@@ -4150,6 +4261,11 @@
         </button>
         <div class="music-menu" id="music-menu" aria-hidden="true">
             <div class="music-menu-title">Main Menu Theme</div>
+            <div class="menu-volume-row">
+                <span class="menu-volume-label">Volume</span>
+                <span class="menu-volume-value" id="music-volume-value">35%</span>
+            </div>
+            <input type="range" class="menu-volume-slider" id="music-volume-slider" min="0" max="100" step="1" value="35" oninput="handleMusicVolumeInput(event)" aria-label="Music volume">
             <button type="button" class="music-option" data-theme="dark" onclick="selectMusicTheme('dark')">Dark Main Theme</button>
             <button type="button" class="music-option" data-theme="universe" onclick="selectMusicTheme('universe')">Your Own Personal Universe</button>
             <button type="button" class="music-option" onclick="toggleMusicMuteFromMenu()">Toggle On / Off</button>
@@ -4168,6 +4284,14 @@
     <button class="mode-tab active" data-mode="words" onclick="setMode('words')">Random Words</button>
     <button class="mode-tab" data-mode="words30" onclick="setMode('words30')">Words 30s</button>
     <button class="mode-tab" data-mode="daily" onclick="setMode('daily')">Challenges</button>
+</div>
+<div class="community-mode-popup" id="community-mode-popup" aria-live="polite">
+    <div class="community-mode-popup-main">
+        <div class="community-mode-popup-title" id="community-mode-popup-title">Community Mode</div>
+        <div class="community-mode-popup-desc" id="community-mode-popup-desc"></div>
+    </div>
+    <div class="community-mode-popup-status" id="community-mode-popup-status"></div>
+    <button type="button" class="community-mode-popup-exit" onclick="exitCommunityBoostMode()">Exit Mode</button>
 </div>
 
 <div class="container">
@@ -4302,6 +4426,7 @@
             <div class="profile-modal-title" id="profile-modal-title">Profile</div>
             <div class="profile-modal-header-actions">
                 <button type="button" class="profile-admin-btn" id="profile-admin-btn" onclick="openAdminPanel()" style="display:none;" aria-label="Open admin panel">Admin</button>
+                <button type="button" class="secondary" onclick="openLifetimeStatsModal()">Lifetime Stats</button>
                 <button type="button" class="secondary" id="logout-btn" onclick="logoutUser()" style="display:none;">Logout</button>
                 <button type="button" class="profile-account-cog" id="profile-account-cog" onclick="openAccountManagement()" aria-label="Manage your Account">
                     <span class="account-manage-icon" aria-hidden="true">⚙</span>
@@ -4311,6 +4436,16 @@
             </div>
         </div>
         <div id="profile-content"><div class="profile-loading">Loading...</div></div>
+    </div>
+</div>
+
+<div class="profile-modal" id="lifetime-stats-modal" aria-hidden="true" onclick="handleLifetimeStatsBackdrop(event)">
+    <div class="profile-modal-card" role="dialog" aria-modal="true" aria-labelledby="lifetime-stats-modal-title">
+        <div class="profile-modal-header">
+            <div class="profile-modal-title" id="lifetime-stats-modal-title">Lifetime Stats</div>
+            <button type="button" class="leaderboard-modal-close secondary" onclick="closeLifetimeStatsModal()" aria-label="Close lifetime stats">X</button>
+        </div>
+        <div id="lifetime-stats-content"><div class="profile-loading">Loading...</div></div>
     </div>
 </div>
 
@@ -4781,8 +4916,14 @@ const COMMUNITY_BOOST_MODES = {
     },
 };
 
+function getActiveTypingMode(mode = currentMode) {
+    if (mode !== 'community') return mode;
+    const def = getCommunityBoostDefinition();
+    return def ? def.mode : 'words';
+}
+
 function isTimedMode(mode = currentMode) {
-    return mode === 'words30';
+    return getActiveTypingMode(mode) === 'words30';
 }
 
 function getModeLabel(mode = currentMode) {
@@ -4793,12 +4934,17 @@ function getModeLabel(mode = currentMode) {
     if (activeChallengeId === 'consistent_climber') return 'challenge: consistent climber';
     if (activeChallengeId === 'rival_week') return 'challenge: rival week';
     if (activeChallengeId === 'above_average') return 'challenge: above average';
+    if (mode === 'community') {
+        const def = getCommunityBoostDefinition();
+        return def ? `community: ${def.name.toLowerCase()}` : 'community mode';
+    }
     if (mode === 'quotes') return 'quotes';
     if (mode === 'words')  return 'words';
     return 'words 30s';
 }
 
 function getPrimaryNewTestLabel(mode = currentMode) {
+    if (mode === 'community') return 'New Mission';
     if (mode !== 'quotes') return 'New Words';
     return bibleModeEnabled ? 'New Verse' : 'New Quote';
 }
@@ -4843,6 +4989,7 @@ function updateBibleModeUi() {
     if (stat) stat.style.display = currentMode === 'quotes' ? 'flex' : 'none';
     if (toggle) toggle.checked = !!bibleModeEnabled;
     updatePrimaryNewTestButtons();
+    updateCommunityModePopup();
 }
 
 function toggleBibleMode() {
@@ -4857,6 +5004,10 @@ window.toggleBibleMode = toggleBibleMode;
 function setMode(mode) {
     const previousMode = currentMode;
     activeChallengeId = null;
+    if (mode !== 'community' && currentMode === 'community') {
+        activeCommunityBoostMode = null;
+        communityModeRuntime = null;
+    }
     currentMode = mode;
     document.querySelectorAll('.mode-tab').forEach(btn =>
         btn.classList.toggle('active', btn.dataset.mode === mode));
@@ -4900,7 +5051,7 @@ function getCommunityBoostDefinition(modeId = activeCommunityBoostMode) {
 
 function isCommunityBoostActiveForCurrentMode(mode = currentMode) {
     const def = getCommunityBoostDefinition();
-    return !!(def && def.mode === mode);
+    return !!(def && mode === 'community');
 }
 
 function buildCommunityModeRuntime() {
@@ -4928,7 +5079,7 @@ function startCommunityBoostMode(modeId) {
     activeCommunityBoostMode = modeId;
     communityModeRuntime = null;
     closeCommunityHub();
-    setMode(def.mode);
+    setMode('community');
     showUiMessage(`${def.name} engaged. Fleet damage boost active.`, 'success', 2600, 'top-left');
 }
 window.startCommunityBoostMode = startCommunityBoostMode;
@@ -4937,10 +5088,43 @@ function clearCommunityBoostMode() {
     if (!activeCommunityBoostMode) return;
     activeCommunityBoostMode = null;
     communityModeRuntime = null;
+    if (currentMode === 'community') setMode('words');
     renderCommunityHub();
     showUiMessage('Community boost mode disabled.', 'info', 2200, 'top-left');
 }
 window.clearCommunityBoostMode = clearCommunityBoostMode;
+
+function exitCommunityBoostMode() {
+    clearCommunityBoostMode();
+}
+window.exitCommunityBoostMode = exitCommunityBoostMode;
+
+function updateCommunityModePopup() {
+    const popup = document.getElementById('community-mode-popup');
+    const title = document.getElementById('community-mode-popup-title');
+    const desc = document.getElementById('community-mode-popup-desc');
+    const status = document.getElementById('community-mode-popup-status');
+    if (!popup || !title || !desc || !status) return;
+    const def = getCommunityBoostDefinition();
+    const show = currentMode === 'community' && !!def;
+    popup.classList.toggle('show', show);
+    if (!show) return;
+    title.textContent = `Community Mode: ${def.name}`;
+    desc.textContent = def.desc;
+    if (def.id === 'kinetic_shielding') {
+        const runtime = communityModeRuntime || {};
+        const dodges = Math.max(0, Math.min(5, Number(runtime.dodges) || 0));
+        const baseline = Math.round(Number(runtime.baselineWpm) || 0);
+        status.textContent = `Dodges: ${dodges}/5 · Hold above ${baseline} WPM`;
+        return;
+    }
+    if (def.id === 'targeted_weakness') {
+        const bonus = Number(communityModeRuntime && communityModeRuntime.xzBonusWords) || 0;
+        status.textContent = `X/Z bonus words hit: ${bonus}`;
+        return;
+    }
+    status.textContent = '';
+}
 
 function normalizeDamageToken(token) {
     return String(token || '')
@@ -4951,7 +5135,7 @@ function normalizeDamageToken(token) {
 function computeCommunityDamage(typedWords, typedAttempt, quoteText) {
     let damage = Math.max(0, Math.floor(Number(typedWords) || 0));
     const modeDef = getCommunityBoostDefinition();
-    if (!modeDef || modeDef.mode !== currentMode) return damage;
+    if (!modeDef || currentMode !== 'community') return damage;
     if (modeDef.id === 'targeted_weakness') {
         const typedTokens = String(typedAttempt || '').split(/\s+/).filter(Boolean).map(normalizeDamageToken);
         const quoteTokens = String(quoteText || '').split(/\s+/).filter(Boolean).map(normalizeDamageToken);
@@ -4998,6 +5182,18 @@ function newTest(fromModeSwitch = false) {
         const pool = short.length > 0 ? short : QUOTES;
         const q = pool[Math.floor(Math.random() * pool.length)];
         init(q.text, `Challenge: The Perfectionist \u2022 ${q.source}`);
+    } else if (currentMode === 'community') {
+        const def = getCommunityBoostDefinition();
+        if (!def) {
+            init(generateWordTest(), '');
+        } else if (def.id === 'targeted_weakness') {
+            init(generateTargetedWeaknessPassage(65), 'Community Mode \u2022 Targeted Weakness');
+        } else if (def.id === 'kinetic_shielding') {
+            const baseline = Number(communityModeRuntime && communityModeRuntime.baselineWpm) || 35;
+            init(generateWordTest(120), `Community Mode \u2022 Kinetic Shielding \u2022 Hold above ${baseline} WPM`);
+        } else {
+            init(generateWordTest(), '');
+        }
     } else if (currentMode === 'quotes') {
         const useTargetedPassage = activeCommunityBoostMode === 'targeted_weakness';
         const pool = getQuotePool();
@@ -5022,6 +5218,7 @@ function newTest(fromModeSwitch = false) {
     } else {
         init(generateWordTest(), '');
     }
+    updateCommunityModePopup();
 }
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -5032,6 +5229,7 @@ let currentIndex  = 0;
 let startTime     = null;
 let timerHandle   = null;
 let isComplete    = false;
+let resultsPendingOpen = false;
 let wpmSamples    = [];   // [{t: seconds, wpm: number}, ...]
 let lastSampleSec = -1;
 let keyStrokes    = 0;
@@ -5141,6 +5339,7 @@ function init(quote, source = '') {
     currentIndex = 0;
     startTime    = null;
     isComplete   = false;
+    resultsPendingOpen = false;
     ghostChars   = Array.isArray(pendingGhostChars) ? pendingGhostChars.slice() : [];
     ghostTimeline = Array.isArray(pendingGhostTimeline) ? pendingGhostTimeline.slice() : [];
     ghostReplayIndex = (ghostCursorEnabled && ghostTimeline.length > 0) ? ghostTimeline[0].index : -1;
@@ -5387,7 +5586,7 @@ function emitNebulaTrailAtCursor(force = false) {
 }
 
 function emitXzLaserAtCursor(keyChar) {
-    if (activeCommunityBoostMode !== 'targeted_weakness' || currentMode !== 'quotes') return;
+    if (activeCommunityBoostMode !== 'targeted_weakness' || currentMode !== 'community') return;
     if (!quoteDisplay || !charSpans.length) return;
     const lower = String(keyChar || '').toLowerCase();
     if (lower !== 'x' && lower !== 'z') return;
@@ -5647,7 +5846,7 @@ function startTimer() {
             timerEl.textContent = Math.round(elapsed) + 's';
         }
         updateStats();
-        if (activeCommunityBoostMode === 'kinetic_shielding' && currentMode === 'words30' && communityModeRuntime && !communityModeRuntime.shieldBroken) {
+        if (activeCommunityBoostMode === 'kinetic_shielding' && currentMode === 'community' && communityModeRuntime && !communityModeRuntime.shieldBroken) {
             const runtime = communityModeRuntime;
             const wpmNow = getWPM(elapsed);
             if (elapsed >= runtime.graceSeconds && wpmNow < runtime.baselineWpm) {
@@ -5656,6 +5855,7 @@ function startTimer() {
                 const dodges = Math.min(runtime.maxDodges, Math.floor((elapsed / RANDOM_WORDS_DURATION) * runtime.maxDodges));
                 runtime.dodges = Math.max(runtime.dodges, dodges);
             }
+            updateCommunityModePopup();
         }
         sampleWpm();
         updateLiveChart();
@@ -5675,6 +5875,7 @@ function startTimer() {
 
         if (isTimedMode() && elapsed >= RANDOM_WORDS_DURATION) {
             isComplete = true;
+            resultsPendingOpen = true;
             clearInterval(timerHandle);
             timerHandle = null;
             timerEl.textContent = '0s';
@@ -5745,12 +5946,22 @@ const LOCAL_GUEST_SCORES_KEY = 'sampire-local-guest-scores';
 const GUEST_SESSION_ID_KEY = 'sampire-guest-session-id';
 const GHOST_CURSOR_ENABLED_KEY = 'sampire-ghost-cursor-enabled';
 const BIBLE_MODE_KEY = 'sampire-bible-mode';
+const LIFETIME_TESTS_KEY = 'sampire-lifetime-tests-completed';
+const LIFETIME_WORDS_TYPED_KEY = 'sampire-lifetime-words-typed';
+const LIFETIME_TIME_SECONDS_KEY = 'sampire-lifetime-time-seconds';
+const LIFETIME_BEST_WPM_KEY = 'sampire-lifetime-best-wpm';
+const LIFETIME_BIBLE_TESTS_KEY = 'sampire-lifetime-bible-tests-completed';
 const STORAGE_SAFETY_SNAPSHOT_KEY = 'sampire-storage-snapshot-v1';
 const PROGRESS_OWNER_KEY = 'sampire-progress-owner';
 const SYNC_PROGRESS_KEYS = [
     HISTORY_KEY,
     'sampire-xp',
     'sampire-lifetime-challenges-completed',
+    LIFETIME_TESTS_KEY,
+    LIFETIME_WORDS_TYPED_KEY,
+    LIFETIME_TIME_SECONDS_KEY,
+    LIFETIME_BEST_WPM_KEY,
+    LIFETIME_BIBLE_TESTS_KEY,
     'sampire-streak',
     'sampire-badges',
     'sampire-daily',
@@ -5764,7 +5975,9 @@ const SYNC_PROGRESS_KEYS = [
     'sampire-reward-settings',
     'sampire-active-soundscape',
     'sampire-music-muted',
+    'sampire-music-volume',
     'sampire-key-sounds-enabled',
+    'sampire-key-sound-volume',
     BIBLE_MODE_KEY,
 ];
 const CRITICAL_STORAGE_KEYS = [
@@ -5775,6 +5988,11 @@ const CRITICAL_STORAGE_KEYS = [
     HISTORY_KEY,
     'sampire-xp',
     'sampire-lifetime-challenges-completed',
+    LIFETIME_TESTS_KEY,
+    LIFETIME_WORDS_TYPED_KEY,
+    LIFETIME_TIME_SECONDS_KEY,
+    LIFETIME_BEST_WPM_KEY,
+    LIFETIME_BIBLE_TESTS_KEY,
     'sampire-streak',
     'sampire-badges',
     'sampire-daily',
@@ -5883,6 +6101,13 @@ function mergeProgressSnapshotsForSameOwner(remoteProgress = {}, localProgress =
         'sampire-badges',
         'sampire-active-soundscape',
         'sampire-music-muted',
+        'sampire-music-volume',
+        'sampire-key-sound-volume',
+        LIFETIME_TESTS_KEY,
+        LIFETIME_WORDS_TYPED_KEY,
+        LIFETIME_TIME_SECONDS_KEY,
+        LIFETIME_BEST_WPM_KEY,
+        LIFETIME_BIBLE_TESTS_KEY,
     ];
     for (const key of preserveIfMissing) {
         if (merged[key] == null && localProgress[key] != null) {
@@ -6554,7 +6779,7 @@ async function localApiFetch(url, options = {}, headers = {}) {
         if (method === 'PATCH') {
             const DAILY_IDS = ['nobackspace', 'sprint', 'perfectionist', 'daily_quotes_5', 'daily_words_5', 'daily_words30_5'];
             const WEEKLY_IDS = ['marathon', 'consistent_climber', 'rival_week', 'above_average'];
-            const ACHIEVEMENT_IDS = ['sonic_boom', 'speed_demon', 'flawless', 'midnight_oil', 'streak_master', 'triple_crown'];
+            const ACHIEVEMENT_IDS = ['sonic_boom', 'speed_demon', 'flawless', 'midnight_oil', 'streak_master', 'triple_crown', 'founder', 'human_lectionary'];
             const clampInt = (value, min, max = Infinity) => {
                 const n = Math.floor(Number(value));
                 if (!Number.isFinite(n)) return null;
@@ -6998,6 +7223,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
         currentUser = out.user;
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         await hydrateProgressForCurrentUser();
+        ensureFounderBadgeForBeta();
         updateAuthUi();
         closeLoginModal();
         setAuthNote('Account created and logged in.');
@@ -7051,6 +7277,7 @@ async function loginUser() {
         currentUser = out.user;
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         await hydrateProgressForCurrentUser();
+        ensureFounderBadgeForBeta();
         updateAuthUi();
         closeLoginModal();
         setAuthNote('Logged in successfully.');
@@ -7089,6 +7316,7 @@ async function restoreSession() {
             : await apiFetchCloudFirst('/api/me');
         currentUser = out.user;
         await hydrateProgressForCurrentUser();
+        ensureFounderBadgeForBeta();
         updateAuthUi();
         setAuthNote('');
     } catch (e) {
@@ -7881,6 +8109,81 @@ function closeProfile() {
 
 function handleProfileBackdrop(event) {
     if (event && event.target === document.getElementById('profile-modal')) closeProfile();
+}
+
+function renderLifetimeStatsModal() {
+    const content = document.getElementById('lifetime-stats-content');
+    if (!content) return;
+    const lifetime = getLifetimeStatsSummary();
+    const streakCount = Math.max(0, Number(getStreakData().streak || 0) || 0);
+    const xp = getTotalXP();
+    const level = getLevel(xp);
+    const achievements = getEarnedBadges().length;
+    const lifetimeChallenges = getLifetimeChallengesCompleted();
+    const avgWordsPerTest = lifetime.tests > 0 ? Math.round(lifetime.words / lifetime.tests) : 0;
+    content.innerHTML = `
+        <div class="profile-section-title">Your All-Time Totals</div>
+        <div class="profile-stats-grid">
+            <div class="profile-stat">
+                <div class="profile-stat-label">Tests</div>
+                <div class="profile-stat-value">${lifetime.tests.toLocaleString()}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Words Typed</div>
+                <div class="profile-stat-value">${lifetime.words.toLocaleString()}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Time Typed</div>
+                <div class="profile-stat-value profile-stat-value--sm">${escapeHtml(formatLifetimeDuration(lifetime.seconds))}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Best WPM</div>
+                <div class="profile-stat-value">${lifetime.bestWpm.toLocaleString()}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Bible Tests</div>
+                <div class="profile-stat-value">${lifetime.bibleTests.toLocaleString()}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Level</div>
+                <div class="profile-stat-value">${level}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Current Streak</div>
+                <div class="profile-stat-value">${streakCount.toLocaleString()}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Challenges</div>
+                <div class="profile-stat-value">${lifetimeChallenges.toLocaleString()}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Achievements</div>
+                <div class="profile-stat-value">${achievements.toLocaleString()}</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-label">Avg Words/Test</div>
+                <div class="profile-stat-value">${avgWordsPerTest.toLocaleString()}</div>
+            </div>
+        </div>
+    `;
+}
+
+function openLifetimeStatsModal() {
+    if (!currentUser) return;
+    const modal = document.getElementById('lifetime-stats-modal');
+    if (!modal) return;
+    renderLifetimeStatsModal();
+    openModal(modal);
+}
+
+function closeLifetimeStatsModal() {
+    const modal = document.getElementById('lifetime-stats-modal');
+    if (!modal) return;
+    closeModal(modal);
+}
+
+function handleLifetimeStatsBackdrop(event) {
+    if (event && event.target === document.getElementById('lifetime-stats-modal')) closeLifetimeStatsModal();
 }
 
 function setAdminNote(message, isError = false) {
@@ -8740,6 +9043,80 @@ function loadHistory() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { return []; }
 }
 
+function getStoredInt(key, fallback = 0) {
+    const n = parseInt(localStorage.getItem(key) || '', 10);
+    return Number.isFinite(n) ? Math.max(0, n) : Math.max(0, Number(fallback) || 0);
+}
+
+function getHistoryDerivedLifetimeStats() {
+    const history = loadHistory();
+    const bibleLookup = getBibleModeLookupSet();
+    let words = 0;
+    let seconds = 0;
+    let bestWpm = 0;
+    let bibleTests = 0;
+    for (const entry of history) {
+        if (!entry || typeof entry !== 'object') continue;
+        words += Math.max(0, Math.floor(Number(entry.typedWords) || 0));
+        seconds += Math.max(0, Math.floor(Number(entry.time) || 0));
+        bestWpm = Math.max(bestWpm, Math.floor(Number(entry.wpm) || 0));
+        if (entry.bibleMode === true) {
+            bibleTests += 1;
+            continue;
+        }
+        if (entry.mode === 'quotes') {
+            const text = String(entry.text || '').trim();
+            if (text && bibleLookup.has(text)) bibleTests += 1;
+        }
+    }
+    return {
+        tests: history.length,
+        words,
+        seconds,
+        bestWpm,
+        bibleTests,
+    };
+}
+
+function getLifetimeStatsSummary() {
+    const fromHistory = getHistoryDerivedLifetimeStats();
+    const tests = Math.max(getStoredInt(LIFETIME_TESTS_KEY), fromHistory.tests);
+    const words = Math.max(getStoredInt(LIFETIME_WORDS_TYPED_KEY), fromHistory.words);
+    const seconds = Math.max(getStoredInt(LIFETIME_TIME_SECONDS_KEY), fromHistory.seconds);
+    const bestWpm = Math.max(getStoredInt(LIFETIME_BEST_WPM_KEY), fromHistory.bestWpm);
+    const bibleTests = Math.max(getStoredInt(LIFETIME_BIBLE_TESTS_KEY), fromHistory.bibleTests);
+    return { tests, words, seconds, bestWpm, bibleTests };
+}
+
+function recordLifetimeRunStats({ wpm = 0, typedWords = 0, timeSeconds = 0, bibleMode = false } = {}) {
+    const current = getLifetimeStatsSummary();
+    const nextTests = current.tests + 1;
+    const nextWords = current.words + Math.max(0, Math.floor(Number(typedWords) || 0));
+    const nextSeconds = current.seconds + Math.max(0, Math.floor(Number(timeSeconds) || 0));
+    const nextBest = Math.max(current.bestWpm, Math.floor(Number(wpm) || 0));
+    const nextBibleTests = current.bibleTests + (bibleMode ? 1 : 0);
+    try {
+        localStorage.setItem(LIFETIME_TESTS_KEY, String(nextTests));
+        localStorage.setItem(LIFETIME_WORDS_TYPED_KEY, String(nextWords));
+        localStorage.setItem(LIFETIME_TIME_SECONDS_KEY, String(nextSeconds));
+        localStorage.setItem(LIFETIME_BEST_WPM_KEY, String(nextBest));
+        localStorage.setItem(LIFETIME_BIBLE_TESTS_KEY, String(nextBibleTests));
+    } catch (e) {}
+    scheduleProgressSync(300);
+}
+
+function formatLifetimeDuration(totalSeconds) {
+    const seconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const parts = [];
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0 || parts.length) parts.push(`${hours}h`);
+    parts.push(`${minutes}m`);
+    return parts.join(' ');
+}
+
 function clearHistory() {
     if (!confirm('Clear all history?')) return;
     playSound(SFX.clearHistory);
@@ -8793,6 +9170,7 @@ function renderHistory() {
 
 // ── Completion ─────────────────────────────────────────────────────────────
 function showResults(capturedElapsed) {
+    resultsPendingOpen = false;
     clearInterval(timerHandle);
 
     const elapsedRaw = capturedElapsed != null ? capturedElapsed : getElapsed();
@@ -8878,7 +9256,24 @@ function showResults(capturedElapsed) {
     const typedWordTokens = typedAttempt ? (typedAttempt.match(/\S+/g) || []) : [];
     const typedWords = typedWordTokens.length;
     const communityDamage = computeCommunityDamage(typedWords, typedAttempt, currentQuote);
-    const scoreEntry = { wpm, rawWpm, consistency, accuracy, time, mode: currentMode, text: currentQuote, date: Date.now(), typedWords };
+    const scoreEntry = {
+        wpm,
+        rawWpm,
+        consistency,
+        accuracy,
+        time,
+        mode: currentMode,
+        bibleMode: currentMode === 'quotes' && bibleModeEnabled,
+        text: currentQuote,
+        date: Date.now(),
+        typedWords
+    };
+    recordLifetimeRunStats({
+        wpm,
+        typedWords,
+        timeSeconds: time,
+        bibleMode: scoreEntry.bibleMode === true,
+    });
     saveToHistory(scoreEntry);
     addCommunityWeeklyWords(communityDamage);
     submitCommunityContribution(communityDamage);
@@ -9159,6 +9554,7 @@ function handleTypingKeydown(e) {
 
     if (!isTimedMode() && currentIndex === currentQuote.length) {
         isComplete = true;
+        resultsPendingOpen = true;
         const _capturedElapsed = getElapsed();
         setTimeout(() => showResults(_capturedElapsed), 400);
     }
@@ -9198,6 +9594,11 @@ document.addEventListener('keydown', (e) => {
     // Do not hijack keyboard input while user is typing in UI form fields.
     if (isUserTextEntryTarget(activeEl)) return;
 
+    if (resultsPendingOpen && e.key === ' ') {
+        e.preventDefault();
+        return;
+    }
+
     // Spacebar = new test when idle, complete, or results showing
     if (e.key === ' ' && (isComplete || resultsOpen || !startTime)) {
         e.preventDefault();
@@ -9235,6 +9636,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeLoginModal();
     if (e.key === 'Escape') closeAdminPanel();
     if (e.key === 'Escape') closeCommunityHub();
+    if (e.key === 'Escape') closeLifetimeStatsModal();
     if (e.key === 'Escape') closeKeySoundMenu();
     if (e.key === 'Escape') closeMusicMenu();
 });
@@ -9254,20 +9656,26 @@ const themeMusic = {
     universe: new Audio('Sound Effects/Your Own Personal Universe.mp3'),
 };
 const soundscapePreviewAudio = new Audio('Sound Effects/Your Own Personal Universe.mp3');
+const MUSIC_VOLUME_KEY = 'sampire-music-volume';
+const KEY_SOUND_VOLUME_KEY = 'sampire-key-sound-volume';
+const DEFAULT_MUSIC_VOLUME = 0.35;
+const DEFAULT_KEY_SOUND_VOLUME = 1;
 
 themeMusic.dark.loop = true;
-themeMusic.dark.volume = 0.35;
+themeMusic.dark.volume = DEFAULT_MUSIC_VOLUME;
 themeMusic.universe.loop = true;
-themeMusic.universe.volume = 0.35;
+themeMusic.universe.volume = DEFAULT_MUSIC_VOLUME;
 themeMusic.dark.preload = 'auto';
 themeMusic.universe.preload = 'auto';
 soundscapePreviewAudio.loop = false;
 soundscapePreviewAudio.preload = 'auto';
-soundscapePreviewAudio.volume = themeMusic.universe.volume;
+soundscapePreviewAudio.volume = DEFAULT_MUSIC_VOLUME;
 
 let musicMuted = false;
 let musicNeedsUserGesture = false;
 let keySoundsEnabled = false;
+let musicVolume = DEFAULT_MUSIC_VOLUME;
+let keySoundVolume = DEFAULT_KEY_SOUND_VOLUME;
 let activeMusicTheme = 'dark';
 let rewardPreviewTimer = null;
 let rewardSoundPreviewPlaying = false;
@@ -9303,6 +9711,44 @@ function stopThemeSoundtracks() {
     });
 }
 
+function clampAudioVolume(value, fallback = 1) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return Math.max(0, Math.min(1, Number(fallback) || 0));
+    return Math.max(0, Math.min(1, n));
+}
+
+function getVolumePercent(volume) {
+    return `${Math.round(clampAudioVolume(volume, 0) * 100)}%`;
+}
+
+function updateMusicVolumeUI() {
+    const slider = document.getElementById('music-volume-slider');
+    const valueEl = document.getElementById('music-volume-value');
+    const pct = Math.round(musicVolume * 100);
+    if (slider) slider.value = String(pct);
+    if (valueEl) valueEl.textContent = `${pct}%`;
+}
+
+function applyMusicVolume() {
+    Object.values(themeMusic).forEach((track) => {
+        track.volume = musicVolume;
+    });
+    soundscapePreviewAudio.volume = musicVolume;
+    updateMusicVolumeUI();
+}
+
+function setMusicVolume(value) {
+    musicVolume = clampAudioVolume(value, DEFAULT_MUSIC_VOLUME);
+    applyMusicVolume();
+    try { localStorage.setItem(MUSIC_VOLUME_KEY, String(musicVolume)); } catch (e) {}
+    flushProgressSyncNow();
+}
+
+function handleMusicVolumeInput(event) {
+    const raw = Number(event && event.target && event.target.value);
+    setMusicVolume(raw / 100);
+}
+
 function updateMusicToggleUi() {
     const state = document.getElementById('music-state');
     if (!state) return;
@@ -9335,6 +9781,7 @@ function openMusicMenu() {
     menu.classList.add('show');
     menu.setAttribute('aria-hidden', 'false');
     updateMusicMenuUI();
+    updateMusicVolumeUI();
 }
 
 function closeMusicMenu() {
@@ -9433,12 +9880,41 @@ function updateKeySoundPackMenuUI() {
     });
 }
 
+function updateKeySoundVolumeUI() {
+    const slider = document.getElementById('keysound-volume-slider');
+    const valueEl = document.getElementById('keysound-volume-value');
+    const pct = Math.round(keySoundVolume * 100);
+    if (slider) slider.value = String(pct);
+    if (valueEl) valueEl.textContent = `${pct}%`;
+}
+
+function applyKeySoundVolume() {
+    keySoundPools.forEach((entry) => {
+        if (!entry || !Array.isArray(entry.pool)) return;
+        entry.pool.forEach((audio) => { audio.volume = keySoundVolume; });
+    });
+    updateKeySoundVolumeUI();
+}
+
+function setKeySoundVolume(value) {
+    keySoundVolume = clampAudioVolume(value, DEFAULT_KEY_SOUND_VOLUME);
+    applyKeySoundVolume();
+    try { localStorage.setItem(KEY_SOUND_VOLUME_KEY, String(keySoundVolume)); } catch (e) {}
+    flushProgressSyncNow();
+}
+
+function handleKeySoundVolumeInput(event) {
+    const raw = Number(event && event.target && event.target.value);
+    setKeySoundVolume(raw / 100);
+}
+
 function openKeySoundMenu() {
     const menu = document.getElementById('keysound-menu');
     if (!menu) return;
     menu.classList.add('show');
     menu.setAttribute('aria-hidden', 'false');
     updateKeySoundPackMenuUI();
+    updateKeySoundVolumeUI();
 }
 
 function closeKeySoundMenu() {
@@ -9535,6 +10011,7 @@ function getOrCreateKeySoundPool(path) {
             pool: Array.from({length: KEY_SOUND_POOL_SIZE}, () => {
                 const a = new Audio(path);
                 a.preload = 'auto';
+                a.volume = keySoundVolume;
                 return a;
             }),
             i: 0
@@ -9547,6 +10024,7 @@ function playAudioSpriteSegment(path, startMs, durationMs) {
     const entry = getOrCreateKeySoundPool(path);
     const audio = entry.pool[entry.i];
     entry.i = (entry.i + 1) % KEY_SOUND_POOL_SIZE;
+    audio.volume = keySoundVolume;
     if (audio.__spriteStopTimer) clearTimeout(audio.__spriteStopTimer);
     try {
         audio.currentTime = Math.max(0, Number(startMs || 0) / 1000);
@@ -9634,6 +10112,7 @@ function playKeypressSound(key, event = null) {
     const entry = getOrCreateKeySoundPool(path);
     const audio = entry.pool[entry.i];
     entry.i = (entry.i + 1) % KEY_SOUND_POOL_SIZE;
+    audio.volume = keySoundVolume;
     audio.currentTime = 0;
     audio.play().catch(() => {});
 }
@@ -9697,12 +10176,14 @@ function runPersonalBestCelebration() {
 snapshotCriticalStorageOnce();
 const storedMusicMuted = localStorage.getItem('sampire-music-muted');
 musicMuted = storedMusicMuted === null ? false : storedMusicMuted === '1';
+setMusicVolume(localStorage.getItem(MUSIC_VOLUME_KEY));
 const storedActiveSoundscape = localStorage.getItem('sampire-active-soundscape');
 activeMusicTheme = (storedActiveSoundscape === 'universe' && isRewardActive('soundscapes')) ? 'universe' : 'dark';
 updateMusicToggleUi();
 updateMusicMenuUI();
 const storedKeySoundsEnabled = localStorage.getItem('sampire-key-sounds-enabled');
 keySoundsEnabled = storedKeySoundsEnabled === null ? true : storedKeySoundsEnabled === '1';
+setKeySoundVolume(localStorage.getItem(KEY_SOUND_VOLUME_KEY));
 const storedBibleMode = localStorage.getItem(BIBLE_MODE_KEY);
 bibleModeEnabled = storedBibleMode === '1';
 const storedKeySoundPack = localStorage.getItem(KEY_SOUND_PACK_KEY);
@@ -10254,6 +10735,7 @@ async function refreshWeeklyRivalTarget() {
 
 const STREAK_KEY = 'sampire-streak';
 const BADGES_KEY = 'sampire-badges';
+const BETA_FOUNDER_ACHIEVEMENT_ENABLED = true;
 
 const BADGE_DEFS = [
     { id: 'sonic_boom',    name: 'Sonic Boom',       desc: 'Hit 100+ WPM for the first time',           icon: '⚡' },
@@ -10262,6 +10744,8 @@ const BADGE_DEFS = [
     { id: 'midnight_oil',  name: 'The Midnight Oil', desc: 'Complete a challenge between 2–3 AM',        icon: '🌙' },
     { id: 'streak_master', name: 'Streak Master',    desc: 'Maintain a 7-day streak',                   icon: '🔗' },
     { id: 'triple_crown',  name: 'Triple Crown',     desc: 'Complete all 3 daily challenges in one day', icon: '👑' },
+    { id: 'founder',       name: 'Founder',          desc: 'Created an account during the beta period',  icon: '🏛️' },
+    { id: 'human_lectionary', name: 'The Human Lectionary', desc: 'Complete 100 Bible Mode typing tests', icon: '📖' },
 ];
 
 function getStreakData() {
@@ -10309,6 +10793,25 @@ function awardBadge(id) {
     return true;
 }
 
+function ensureFounderBadgeForBeta() {
+    if (!BETA_FOUNDER_ACHIEVEMENT_ENABLED) return;
+    if (!currentUser || !authToken) return;
+    awardBadge('founder');
+}
+
+function getBibleModeLookupSet() {
+    const pool = getBibleQuotePool();
+    const out = new Set();
+    for (const item of pool) {
+        out.add(String(item && item.text || '').trim());
+    }
+    return out;
+}
+
+function getBibleModeTestCount() {
+    return getLifetimeStatsSummary().bibleTests;
+}
+
 function checkBadges(wpm, passed, challengeId) {
     const newBadges = [];
     if (wpm >= 100 && awardBadge('sonic_boom'))  newBadges.push('sonic_boom');
@@ -10320,6 +10823,7 @@ function checkBadges(wpm, passed, challengeId) {
     }
     if ((getStreakData().streak || 0) >= 7 && awardBadge('streak_master')) newBadges.push('streak_master');
     if (getDailyCompletions().length >= CHALLENGES.length && awardBadge('triple_crown')) newBadges.push('triple_crown');
+    if (getBibleModeTestCount() >= 100 && awardBadge('human_lectionary')) newBadges.push('human_lectionary');
     return newBadges;
 }
 

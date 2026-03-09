@@ -319,3 +319,146 @@ Original prompt: Please look through my game and ensure that it is solid from to
 ### Remaining TODOs
 - Consider adding an explicit in-run HUD indicator for shield dodge progress (e.g., `Dodges: 2/5`) while kinetic mode is active.
 - If desired, expose a small post-result line showing exact boosted damage submitted each run.
+
+## Update 16: Music + keyboard volume sliders
+- Added volume slider controls inside both top-bar menus:
+  - `Music` dropdown now has a `Volume` slider (`#music-volume-slider`) with live percentage label.
+  - `Key Sounds` dropdown now has a `Volume` slider (`#keysound-volume-slider`) with live percentage label.
+- Implemented persisted volume settings:
+  - `sampire-music-volume` (default `0.35`)
+  - `sampire-key-sound-volume` (default `1`)
+- Wired music volume to all relevant tracks:
+  - main theme tracks (`dark`, `universe`)
+  - reward preview track (`soundscapePreviewAudio`)
+- Wired key sound volume to keypress audio playback:
+  - pool creation and runtime playback now respect `keySoundVolume`
+  - sprite-segment playback also applies configured key volume
+- Added UI sync helpers so slider values and percentage labels stay current when menus open and when values change.
+- Added both new volume keys to progress-sync handling so preferences can travel with synced profile data.
+
+### Validation
+- `index.html` script parse smoke check passed (`new Function` parse).
+- Ran Playwright UI verification against local server:
+  - setting music slider to `12` updated label to `12%` and persisted `sampire-music-volume=0.12`
+  - setting key sound slider to `67` updated label to `67%` and persisted `sampire-key-sound-volume=0.67`
+  - after reload, both labels restored to persisted values
+  - no page/console errors during the interaction run
+- Ran `develop-web-game` client loop and captured screenshots in `output/web-game-volume/` (`shot-0.png`..`shot-2.png`).
+
+## Update 17: Beta achievement `Founder` (auto-unlock for all accounts)
+- Added new achievement definition:
+  - id: `founder`
+  - name: `Founder`
+  - desc: `Created an account during the beta period`
+- Added beta gate flag:
+  - `const BETA_FOUNDER_ACHIEVEMENT_ENABLED = true;`
+  - flip this to `false` later to stop automatic Founder grants.
+- Added `ensureFounderBadgeForBeta()` helper and wired it into auth lifecycle:
+  - after `hydrateProgressForCurrentUser()` in `signupUser`
+  - after `hydrateProgressForCurrentUser()` in `loginUser`
+  - after `hydrateProgressForCurrentUser()` in `restoreSession`
+- Result: while beta flag is `true`, any authenticated account automatically gets `Founder` once.
+- Updated achievement ID lists used by admin set-achievements flows:
+  - local fallback admin patch route inside `index.html`
+  - cloud route `functions/api/admin/users/[id].js`
+
+### Validation
+- `index.html` script parse smoke test passed (`new Function` parse).
+- Playwright signup flow check against local server:
+  - new account signup succeeded
+  - `founder` stored in `sampire-badges`
+  - `Founder` appears in profile content
+  - `BADGE_DEFS` includes `founder`
+- Ran `develop-web-game` client loop and inspected screenshots in `output/web-game-founder/`.
+
+## Update 18: New achievement `The Human Lectionary`
+- Added new achievement definition:
+  - id: `human_lectionary`
+  - name: `The Human Lectionary`
+  - desc: `Complete 100 Bible Mode typing tests`
+- Added Bible-mode history counting helper:
+  - `getBibleModeTestCount()`
+  - Counts both:
+    - new entries with explicit `bibleMode: true`
+    - legacy quote entries whose text matches known Bible verse pool text
+- Added new badge unlock rule in `checkBadges(...)`:
+  - awards `human_lectionary` when `getBibleModeTestCount() >= 100`
+- Enhanced history persistence for future runs:
+  - `scoreEntry` now includes `bibleMode: currentMode === 'quotes' && bibleModeEnabled`
+- Updated admin achievement lists to include the new badge id:
+  - local fallback admin patch route in `index.html`
+  - cloud admin route in `functions/api/admin/users/[id].js`
+
+### Validation
+- `index.html` parse smoke check passed.
+- Playwright validation (local):
+  - legacy-style 100 Bible quote entries counted correctly (`countFromLegacy: 100`)
+  - new-format `bibleMode: true` entries counted correctly (`countFromFlagged: 100`)
+  - `checkBadges` returns `human_lectionary` and badge is stored in `sampire-badges`
+  - badge definition present in `BADGE_DEFS`
+  - no console/page errors in targeted run
+- Ran `develop-web-game` client loop and inspected screenshots in `output/web-game-lectionary/`.
+
+## Update 19: Fix result-race bug (spacebar after final word causing 0-score results)
+- Fixed a race condition between completion and global spacebar shortcut handling.
+- Root cause:
+  - After the final character, `isComplete` is set and `showResults(...)` is queued with a timeout.
+  - The same/next immediate spacebar key event reached the global keydown handler before results fully opened.
+  - Global handler interpreted it as "start new test", resetting state and resulting in 0-valued result stats.
+- Implemented guard state:
+  - Added `resultsPendingOpen` boolean in typing state.
+  - Set to `true` whenever completion queues `showResults` (timed and non-timed paths).
+  - Cleared in `showResults(...)` and in `init(...)`.
+  - In global keydown handler: if `resultsPendingOpen && e.key === ' '`, consume event and do nothing.
+- Behavior after fix:
+  - Space pressed during the completion -> results transition no longer starts a new test.
+  - Space still starts a new test normally when results overlay is already open.
+
+### Validation
+- `index.html` parse smoke check passed.
+- Playwright targeted repro:
+  - deterministic short test completed
+  - immediate post-completion `Space` no longer reset run
+  - results overlay opened with non-zero metrics from completed run
+- Playwright behavior check:
+  - pressing `Space` after results are open still starts a fresh test as intended.
+- Ran `develop-web-game` client loop and inspected screenshots in `output/web-game-space-fix/`.
+
+## Update 20: Profile `Lifetime Stats` button + dedicated stats modal
+- Added a new `Lifetime Stats` button to the profile modal header actions.
+- Added a new modal:
+  - `#lifetime-stats-modal`
+  - opens from profile via `openLifetimeStatsModal()`
+  - closes via close button, backdrop, and `Esc`
+- Added lifetime stats renderer:
+  - `renderLifetimeStatsModal()`
+  - shows all-time totals for Tests, Words Typed, Time Typed, Best WPM, Bible Tests, Level, Current Streak, Challenges, Achievements, Avg Words/Test.
+
+### Data model improvements for true lifetime tracking
+- Added persistent lifetime counters (localStorage + progress sync):
+  - `sampire-lifetime-tests-completed`
+  - `sampire-lifetime-words-typed`
+  - `sampire-lifetime-time-seconds`
+  - `sampire-lifetime-best-wpm`
+  - `sampire-lifetime-bible-tests-completed`
+- Added helpers:
+  - `getHistoryDerivedLifetimeStats()`
+  - `getLifetimeStatsSummary()`
+  - `recordLifetimeRunStats(...)`
+  - `formatLifetimeDuration(...)`
+- Wired run completion to update lifetime counters in `showResults()`.
+- Added the lifetime counter keys to sync and critical storage handling.
+- Added merge-preserve behavior for new lifetime keys in `mergeProgressSnapshotsForSameOwner()`.
+
+### Related correction
+- Updated `getBibleModeTestCount()` to use lifetime summary counters.
+  - This fixes long-run unlock viability for `The Human Lectionary` (100 Bible mode tests), which was previously constrained by capped local history.
+
+### Validation
+- `index.html` script parse smoke check passed.
+- Targeted Playwright checks:
+  - signup -> profile -> click `Lifetime Stats` opens modal successfully
+  - modal content renders populated totals
+  - `Esc` closes lifetime stats modal
+  - lifetime summary increments after completed test
+- Ran `develop-web-game` client loop and inspected screenshots in `output/web-game-lifetime-stats/`.

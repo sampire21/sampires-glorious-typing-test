@@ -15,7 +15,7 @@ import {
 const XP_PER_LEVEL = 500;
 const DAILY_IDS = ['nobackspace', 'sprint', 'perfectionist', 'daily_quotes_5', 'daily_words_5', 'daily_words30_5'];
 const WEEKLY_IDS = ['marathon', 'consistent_climber', 'rival_week', 'above_average'];
-const ACHIEVEMENT_IDS = ['sonic_boom', 'speed_demon', 'flawless', 'midnight_oil', 'streak_master', 'triple_crown'];
+const ACHIEVEMENT_IDS = ['sonic_boom', 'speed_demon', 'flawless', 'midnight_oil', 'streak_master', 'triple_crown', 'founder', 'human_lectionary'];
 
 function parseJsonSafe(raw, fallback) {
   try {
