@@ -462,3 +462,68 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - `Esc` closes lifetime stats modal
   - lifetime summary increments after completed test
 - Ran `develop-web-game` client loop and inspected screenshots in `output/web-game-lifetime-stats/`.
+
+## Update 21: Shop-gated keyboard sound packs + inline typing preview
+- Added keyboard sound packs (excluding NK Creams) to the shop at `1 SP` each:
+  - Cherry MX Blues (`cherrymx-blue-abs`)
+  - Buckling Springs (`Buckling Springs`)
+  - Cherry MX Blacks (`Cherry MX Blacks`)
+  - Cherry MX Browns (`Cherry MX Browns`)
+  - Cherry MX Reds (`Cherry MX Reds`)
+- Added a new shop section `Keyboard Sound Packs` in `renderSkillsModal()` with one card per pack.
+- Each pack card now includes a `Preview` typing field:
+  - users can type directly in the small input box and hear that pack without equipping it.
+  - wired via `handleShopKeySoundPreviewKeydown(event, packName)`.
+
+### Unlock / gating behavior
+- Added purchasable unlock flow `unlockShopKeySoundPack(packName)`:
+  - costs `1 SP`, deducts points, stores unlock in skills state, refreshes shop/menu UI.
+- Key sound menu now enforces locked state:
+  - locked packs are disabled and shown as locked until purchased.
+  - selecting a locked pack shows a message and does nothing.
+- NK Creams remains default and always unlocked.
+
+### Data model + sync updates
+- Extended `sampire-skills` state with `keySoundPacks` unlock map.
+- Updated `getSkillsState()`/`saveSkillsState()` to persist pack unlocks.
+- Updated progress merge logic so cloud/local sync preserves key-sound-pack unlocks (`mergeProgressSnapshotsForSameOwner`).
+
+### Audio preview plumbing
+- Added pack-specific preview playback path:
+  - `getKeySoundBaseForPack(packName)`
+  - `loadKeySoundPackConfigByName(packName)` with cache
+  - `resolveConfigBasedKeySoundSpecForPack(...)`
+  - `playKeypressSoundForPack(...)`
+- Preview playback supports both config modes (`multi` and `single`) and uses existing audio pool logic.
+
+### Bugfix discovered during validation
+- Fixed boot-time skill cache regression where `getSkillsState()` could cache fallback data before `SKILLS_KEY` const initialization path.
+- `getSkillsState()`/`saveSkillsState()` now use literal storage key `'sampire-skills'`, preventing transient false-lock states after reload.
+
+### Validation
+- `index.html` parse smoke test passed.
+- Targeted Playwright checks:
+  - packs are locked/disabled in key-sound menu before purchase
+  - buying a pack consumes exactly `1 SP`
+  - preview typing field triggers key sound pool activity (sound path exercised)
+  - unlocked pack remains unlocked after reload and can be selected from key-sound menu
+  - no JS runtime exceptions in targeted flow
+- Ran `develop-web-game` client loop and inspected screenshots in `output/web-game-shop-keypacks/`.
+
+## Update 22: Shop visual redesign (game-card style)
+- Restyled shop item cards to a bold arcade/mobile-game look inspired by provided reference:
+  - stronger panel framing and depth
+  - bright orange title plates
+  - high-contrast cost chips and accent pricing
+  - larger, punchier buy buttons
+  - stronger hover lift/shadow treatment
+- Updated supporting controls in cards:
+  - preview input fields and notes now match the new game-card visual language
+  - locked key-sound menu options keep clear visual lock state
+- Kept existing behavior/functionality intact while only changing visual treatment.
+
+### Visual validation
+- Captured dedicated shop preview screenshot:
+  - `output/shop-style-preview.png`
+- Ran `develop-web-game` client loop and inspected screenshots in:
+  - `output/web-game-shop-style/`

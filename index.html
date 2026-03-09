@@ -1343,6 +1343,10 @@
             box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.22);
             color: #eef6ff;
         }
+        .keysound-option.locked {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
         #keysound-menu .menu-volume-label {
             color: #9dc1ff;
         }
@@ -2867,42 +2871,43 @@
         }
         .skill-card {
             position: relative;
-            border: 1px solid rgba(109, 153, 255, 0.28);
-            background:
-                linear-gradient(180deg, rgba(30, 20, 62, 0.86) 0%, rgba(14, 16, 46, 0.86) 100%);
-            border-radius: 12px;
-            padding: 2.7rem 0.95rem 1rem;
+            border: 2px solid rgba(64, 103, 170, 0.92);
+            background: linear-gradient(180deg, rgba(25, 39, 74, 0.98) 0%, rgba(14, 24, 50, 0.96) 58%, rgba(12, 20, 42, 0.98) 100%);
+            border-radius: 16px;
+            padding: 3.05rem 1rem 1.04rem;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 12px 24px rgba(7, 10, 34, 0.42), inset 0 1px 0 rgba(255,255,255,0.08);
+            box-shadow: 0 16px 28px rgba(3, 8, 26, 0.56), inset 0 1px 0 rgba(199, 226, 255, 0.16), inset 0 -1px 0 rgba(0, 0, 0, 0.34);
             overflow: hidden;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+        }
+        .skill-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(109, 153, 255, 0.98);
+            box-shadow: 0 18px 30px rgba(3, 8, 26, 0.62), inset 0 1px 0 rgba(199, 226, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.38);
         }
         .skill-card::before {
             content: '';
             position: absolute;
             inset: 8px;
-            border-radius: 9px;
-            border: 1px solid rgba(125, 211, 252, 0.18);
+            border-radius: 11px;
+            border: 1px solid rgba(123, 173, 255, 0.2);
             pointer-events: none;
         }
         .skill-card::after {
             content: '';
             position: absolute;
             inset: 0;
-            background:
-                radial-gradient(circle at 0 0, rgba(125, 211, 252, 0.32) 0 8px, transparent 9px),
-                radial-gradient(circle at 100% 0, rgba(125, 211, 252, 0.32) 0 8px, transparent 9px),
-                radial-gradient(circle at 0 100%, rgba(125, 211, 252, 0.32) 0 8px, transparent 9px),
-                radial-gradient(circle at 100% 100%, rgba(125, 211, 252, 0.32) 0 8px, transparent 9px);
-            opacity: 0.4;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 8%, transparent 8% 100%);
+            opacity: 0.28;
             pointer-events: none;
         }
         .skill-card.purchased {
-            border-color: rgba(74, 222, 128, 0.58);
-            background: linear-gradient(150deg, rgba(18, 70, 43, 0.52), rgba(10, 42, 30, 0.62));
-            box-shadow: 0 0 18px rgba(74, 222, 128, 0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+            border-color: rgba(74, 222, 128, 0.82);
+            background: linear-gradient(160deg, rgba(16, 72, 49, 0.88), rgba(10, 47, 35, 0.94));
+            box-shadow: 0 16px 28px rgba(8, 26, 18, 0.54), inset 0 1px 0 rgba(195, 255, 226, 0.2);
         }
         .skill-card.purchased .skill-card-title,
         .skill-card.purchased .skill-card-desc,
@@ -2920,35 +2925,35 @@
         }
         .skill-card-title {
             position: absolute;
-            top: 0.2rem;
+            top: 0.34rem;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 1.45rem);
-            border-radius: 8px;
-            border: 1px solid rgba(125, 211, 252, 0.45);
-            background: linear-gradient(135deg, rgba(22, 60, 130, 0.96), rgba(37, 99, 187, 0.92));
-            padding: 0.3rem 0.45rem;
-            font-size: 0.79rem;
-            font-weight: 800;
-            color: #eef4ff;
-            letter-spacing: 0.06em;
+            width: calc(100% - 1.2rem);
+            border-radius: 10px;
+            border: 2px solid rgba(171, 69, 19, 0.72);
+            background: linear-gradient(180deg, #ffbf4d 0%, #f39c2b 55%, #dc7f1f 100%);
+            padding: 0.32rem 0.48rem;
+            font-size: 0.76rem;
+            font-weight: 900;
+            color: #3f1f06;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             margin-bottom: 0;
-            text-shadow: 0 0 10px rgba(124, 111, 247, 0.28);
-            box-shadow: 0 4px 10px rgba(12, 26, 66, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            text-shadow: 0 1px 0 rgba(255, 236, 203, 0.72);
+            box-shadow: 0 5px 10px rgba(12, 26, 66, 0.42), inset 0 1px 0 rgba(255, 245, 216, 0.58);
         }
         .skill-card-desc {
-            font-size: 0.78rem;
-            color: #9ba6cf;
+            font-size: 0.76rem;
+            color: #c6d6f7;
             line-height: 1.4;
-            margin-top: 0.52rem;
-            margin-bottom: 0.72rem;
+            margin-top: 0.55rem;
+            margin-bottom: 0.66rem;
             min-height: 3.3em;
         }
         .skill-card-meta {
             font-size: 0.72rem;
-            color: #8ec5ff;
-            margin-bottom: 0.55rem;
+            color: #9fc9ff;
+            margin-bottom: 0.48rem;
             min-height: 1.3em;
         }
         .skill-cost-row {
@@ -2957,23 +2962,28 @@
             justify-content: center;
             gap: 0.38rem;
             flex-wrap: wrap;
-            padding: 0.2rem 0.5rem;
+            padding: 0.26rem 0.52rem;
             border-radius: 999px;
-            border: 1px solid rgba(109, 153, 255, 0.34);
-            background: rgba(27, 45, 98, 0.28);
+            border: 1px solid rgba(95, 132, 201, 0.66);
+            background: linear-gradient(180deg, rgba(21, 36, 73, 0.82), rgba(13, 27, 58, 0.92));
         }
         .skill-cost-label {
-            color: #8ec5ff;
+            color: #89c5ff;
             font-weight: 700;
             letter-spacing: 0.03em;
             text-transform: uppercase;
             font-size: 0.64rem;
         }
         .skill-cost-current {
-            color: #dff4ff;
-            font-weight: 800;
-            font-size: 0.74rem;
+            color: #ffe6b6;
+            font-weight: 900;
+            font-size: 0.7rem;
             letter-spacing: 0.02em;
+            padding: 0.14rem 0.4rem;
+            border-radius: 999px;
+            border: 1px solid rgba(224, 133, 34, 0.72);
+            background: linear-gradient(180deg, rgba(255, 174, 63, 0.94), rgba(234, 128, 34, 0.9));
+            text-shadow: 0 1px 0 rgba(80, 33, 6, 0.48);
         }
         .skill-cost-old {
             color: #fca5a5;
@@ -3003,20 +3013,21 @@
             margin-top: 0.55rem;
         }
         .shop-buy-btn {
-            min-width: 126px;
-            border-radius: 999px;
-            border: 1px solid rgba(125, 211, 252, 0.6);
-            background: linear-gradient(135deg, rgba(28, 90, 190, 0.96), rgba(14, 165, 233, 0.9));
-            color: #f0fbff;
+            width: 100%;
+            min-height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(191, 95, 26, 0.76);
+            background: linear-gradient(180deg, rgba(255, 166, 60, 0.98), rgba(234, 121, 24, 0.94));
+            color: #3f1f06;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            box-shadow: 0 8px 16px rgba(10, 53, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.07em;
+            box-shadow: 0 8px 14px rgba(47, 22, 5, 0.4), inset 0 1px 0 rgba(255, 230, 183, 0.54);
         }
         .shop-buy-btn[disabled] {
-            background: linear-gradient(135deg, rgba(34, 53, 87, 0.72), rgba(30, 58, 138, 0.55));
-            border-color: rgba(109, 153, 255, 0.3);
-            color: #a8badf;
+            background: linear-gradient(180deg, rgba(53, 69, 98, 0.9), rgba(40, 57, 87, 0.95));
+            border-color: rgba(109, 153, 255, 0.36);
+            color: #9db2d8;
             box-shadow: none;
         }
         .skill-card-controls {
@@ -3048,6 +3059,26 @@
             color: #e6f4ff;
             box-shadow: none;
             transform: none;
+        }
+        .shop-preview-input {
+            width: 100%;
+            border: 1px solid rgba(95, 132, 201, 0.68);
+            background: linear-gradient(180deg, rgba(12, 24, 53, 0.9), rgba(8, 20, 45, 0.95));
+            color: #def0ff;
+            border-radius: 9px;
+            padding: 0.42rem 0.54rem;
+            font-size: 0.74rem;
+            outline: none;
+        }
+        .shop-preview-input:focus {
+            border-color: rgba(255, 183, 92, 0.82);
+            box-shadow: 0 0 0 2px rgba(255, 153, 58, 0.22);
+        }
+        .shop-preview-note {
+            font-size: 0.66rem;
+            color: #9fc3f7;
+            text-align: center;
+            line-height: 1.3;
         }
         .reward-preview-stage {
             position: relative;
@@ -6091,6 +6122,10 @@ function normalizeBadgeIdList(raw) {
         .filter(Boolean);
 }
 
+function getShopKeySoundPackIds() {
+    return ['cherrymx-blue-abs', 'Buckling Springs', 'Cherry MX Blacks', 'Cherry MX Browns', 'Cherry MX Reds'];
+}
+
 function mergeProgressSnapshotsForSameOwner(remoteProgress = {}, localProgress = {}) {
     const merged = { ...(remoteProgress || {}) };
     let changed = false;
@@ -6121,6 +6156,12 @@ function mergeProgressSnapshotsForSameOwner(remoteProgress = {}, localProgress =
     const skillKeys = ['aura', 'soundscapes', 'nebulaTrail'];
     const mergedSkills = {};
     for (const key of skillKeys) mergedSkills[key] = !!remoteSkills[key] || !!localSkills[key];
+    const mergedPackUnlocks = {};
+    for (const id of getShopKeySoundPackIds()) {
+        mergedPackUnlocks[id] = !!(remoteSkills.keySoundPacks && remoteSkills.keySoundPacks[id])
+            || !!(localSkills.keySoundPacks && localSkills.keySoundPacks[id]);
+    }
+    mergedSkills.keySoundPacks = mergedPackUnlocks;
     const mergedSkillsRaw = JSON.stringify(mergedSkills);
     if (String(merged['sampire-skills'] || '') !== mergedSkillsRaw) {
         merged['sampire-skills'] = mergedSkillsRaw;
@@ -9684,12 +9725,20 @@ let nebulaPreviewVisible = false;
 const KEY_SOUND_BASE_ROOT = 'Sound Effects';
 const KEY_SOUND_DEFAULT_PACK = 'nk-cream';
 const KEY_SOUND_PACK_KEY = 'sampire-key-sound-pack';
+const SHOP_KEY_SOUND_PACKS = [
+    { id: 'cherrymx-blue-abs', label: 'Cherry MX Blues', icon: '🔊', desc: 'Clicky and crisp keystrokes.', cost: 1 },
+    { id: 'Buckling Springs', label: 'Buckling Springs', icon: '🔔', desc: 'Classic spring-loaded keyboard snap.', cost: 1 },
+    { id: 'Cherry MX Blacks', label: 'Cherry MX Blacks', icon: '🎹', desc: 'Deep and solid keypress profile.', cost: 1 },
+    { id: 'Cherry MX Browns', label: 'Cherry MX Browns', icon: '⌨️', desc: 'Balanced tactile keyboard sound.', cost: 1 },
+    { id: 'Cherry MX Reds', label: 'Cherry MX Reds', icon: '🎧', desc: 'Smooth linear key sound profile.', cost: 1 },
+];
 const keySoundPools = new Map();
 const KEY_SOUND_POOL_SIZE = 4;
 let keySoundPackName = KEY_SOUND_DEFAULT_PACK;
 let keySoundPackConfig = null;
 let keySoundPackLoadPromise = null;
 let keySoundPackLoadAttempted = false;
+const keySoundPackConfigCache = new Map();
 let pbFxTimeout = null;
 
 
@@ -9876,7 +9925,13 @@ function setKeySoundToggleUI() {
 function updateKeySoundPackMenuUI() {
     document.querySelectorAll('#keysound-menu .keysound-option[data-pack]').forEach((btn) => {
         const pack = String(btn.dataset.pack || '');
+        const unlocked = isKeySoundPackUnlocked(pack);
+        const isDefault = pack === KEY_SOUND_DEFAULT_PACK;
         btn.classList.toggle('active', pack === keySoundPackName);
+        btn.classList.toggle('locked', !unlocked);
+        btn.disabled = !unlocked;
+        btn.title = unlocked ? '' : `Unlock ${pack} in the Shop (1 SP).`;
+        if (isDefault) btn.title = 'Default pack';
     });
 }
 
@@ -9936,6 +9991,10 @@ function toggleKeySoundMenu(event) {
 }
 
 function selectKeySoundPack(packName) {
+    if (!isKeySoundPackUnlocked(packName)) {
+        showUiMessage('Unlock this sound pack in the Shop first.', 'info', 2200, 'top-left');
+        return;
+    }
     setKeySoundPack(packName);
     keySoundsEnabled = true;
     setKeySoundToggleUI();
@@ -9966,6 +10025,10 @@ function resolveKeySoundFilename(key) {
 
 function getKeySoundBase() {
     return `${KEY_SOUND_BASE_ROOT}/${keySoundPackName}`;
+}
+
+function getKeySoundBaseForPack(packName) {
+    return `${KEY_SOUND_BASE_ROOT}/${String(packName || '').trim()}`;
 }
 
 function getKeyCodeForSoundPack(event, key) {
@@ -10060,9 +10123,32 @@ function resolveConfigBasedKeySoundSpec(key, event) {
     return null;
 }
 
+function resolveConfigBasedKeySoundSpecForPack(key, event, cfg, packName) {
+    if (!cfg || !cfg.defines || typeof cfg.defines !== 'object') return null;
+    const keyCode = getKeyCodeForSoundPack(event, key);
+    if (!keyCode) return null;
+    const define = cfg.defines[keyCode];
+    if (define == null) return null;
+    const base = getKeySoundBaseForPack(packName);
+    if (cfg.key_define_type === 'single') {
+        if (!Array.isArray(define) || define.length < 2) return null;
+        return {
+            type: 'single',
+            path: `${base}/${String(cfg.sound || 'sound.ogg')}`,
+            startMs: Math.max(0, Number(define[0]) || 0),
+            durationMs: Math.max(1, Number(define[1]) || 1),
+        };
+    }
+    if (typeof define === 'string' && define.trim()) {
+        return { type: 'multi', path: `${base}/${define.trim()}` };
+    }
+    return null;
+}
+
 function setKeySoundPack(packName) {
     const safe = String(packName || '').trim();
     if (!safe) return;
+    if (!isKeySoundPackUnlocked(safe)) return;
     keySoundPackName = safe;
     keySoundPackConfig = null;
     keySoundPackLoadPromise = null;
@@ -10096,6 +10182,70 @@ async function loadKeySoundPackConfig() {
         }
     })();
     return keySoundPackLoadPromise;
+}
+
+async function loadKeySoundPackConfigByName(packName) {
+    const safe = String(packName || '').trim();
+    if (!safe) return null;
+    if (keySoundPackConfigCache.has(safe)) return keySoundPackConfigCache.get(safe);
+    try {
+        const out = await fetch(`${getKeySoundBaseForPack(safe)}/config.json`, { cache: 'no-store' });
+        if (!out.ok) {
+            keySoundPackConfigCache.set(safe, null);
+            return null;
+        }
+        const cfg = await out.json();
+        const parsed = {
+            key_define_type: String(cfg && cfg.key_define_type || 'multi').toLowerCase(),
+            sound: String(cfg && cfg.sound || 'sound.ogg'),
+            defines: (cfg && cfg.defines && typeof cfg.defines === 'object' && !Array.isArray(cfg.defines)) ? cfg.defines : {},
+        };
+        keySoundPackConfigCache.set(safe, parsed);
+        return parsed;
+    } catch (e) {
+        keySoundPackConfigCache.set(safe, null);
+        return null;
+    }
+}
+
+function playKeypressSoundForPack(packName, key, event = null, cfgOverride = null) {
+    const safePack = String(packName || '').trim();
+    if (!safePack) return;
+    const cfg = cfgOverride || keySoundPackConfigCache.get(safePack) || null;
+    const spec = resolveConfigBasedKeySoundSpecForPack(key, event, cfg, safePack);
+    if (spec && spec.type === 'single') {
+        playAudioSpriteSegment(spec.path, spec.startMs, spec.durationMs);
+        return;
+    }
+    const path = spec && spec.type === 'multi'
+        ? spec.path
+        : `${getKeySoundBaseForPack(safePack)}/${resolveKeySoundFilename(key)}`;
+    const entry = getOrCreateKeySoundPool(path);
+    const audio = entry.pool[entry.i];
+    entry.i = (entry.i + 1) % KEY_SOUND_POOL_SIZE;
+    audio.volume = keySoundVolume;
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+}
+
+function handleShopKeySoundPreviewKeydown(event, packName) {
+    if (!event) return;
+    event.stopPropagation();
+    const key = String(event.key || '');
+    if (!key) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (key === 'Escape') return;
+    if (key === 'Tab') {
+        event.preventDefault();
+    }
+    if (key.length !== 1 && key !== 'Backspace' && key !== 'Enter' && key !== 'Tab' && key !== ' ') return;
+    playKeypressSoundForPack(packName, key, event);
+    if (!keySoundPackConfigCache.has(String(packName || '').trim())) {
+        loadKeySoundPackConfigByName(packName).then((cfg) => {
+            if (!cfg) return;
+            playKeypressSoundForPack(packName, key, event, cfg);
+        });
+    }
 }
 
 function playKeypressSound(key, event = null) {
@@ -10188,6 +10338,10 @@ const storedBibleMode = localStorage.getItem(BIBLE_MODE_KEY);
 bibleModeEnabled = storedBibleMode === '1';
 const storedKeySoundPack = localStorage.getItem(KEY_SOUND_PACK_KEY);
 keySoundPackName = storedKeySoundPack ? String(storedKeySoundPack) : KEY_SOUND_DEFAULT_PACK;
+if (!isKeySoundPackUnlocked(keySoundPackName)) {
+    keySoundPackName = KEY_SOUND_DEFAULT_PACK;
+    try { localStorage.setItem(KEY_SOUND_PACK_KEY, keySoundPackName); } catch (e) {}
+}
 loadKeySoundPackConfig();
 setKeySoundToggleUI();
 updateKeySoundPackMenuUI();
@@ -10861,14 +11015,19 @@ function setSkillPoints(points) {
 }
 
 function getSkillsState() {
-    const fallback = { aura: false, soundscapes: false, nebulaTrail: false };
+    const fallback = { aura: false, soundscapes: false, nebulaTrail: false, keySoundPacks: {} };
     if (skillStateCache) return skillStateCache;
     try {
-        const raw = JSON.parse(localStorage.getItem(SKILLS_KEY) || '{}');
+        const raw = JSON.parse(localStorage.getItem('sampire-skills') || '{}');
+        const unlockedPacks = {};
+        for (const packId of getShopKeySoundPackIds()) {
+            unlockedPacks[packId] = !!(raw.keySoundPacks && raw.keySoundPacks[packId]);
+        }
         skillStateCache = {
             aura: !!raw.aura,
             soundscapes: !!raw.soundscapes,
             nebulaTrail: !!raw.nebulaTrail,
+            keySoundPacks: unlockedPacks,
         };
         return skillStateCache;
     } catch (e) {
@@ -10878,18 +11037,54 @@ function getSkillsState() {
 }
 
 function saveSkillsState(nextState) {
+    const nextPacks = {};
+    for (const packId of getShopKeySoundPackIds()) {
+        nextPacks[packId] = !!(nextState && nextState.keySoundPacks && nextState.keySoundPacks[packId]);
+    }
     skillStateCache = {
         aura: !!(nextState && nextState.aura),
         soundscapes: !!(nextState && nextState.soundscapes),
         nebulaTrail: !!(nextState && nextState.nebulaTrail),
+        keySoundPacks: nextPacks,
     };
-    try { localStorage.setItem(SKILLS_KEY, JSON.stringify(skillStateCache)); } catch (e) {}
+    try { localStorage.setItem('sampire-skills', JSON.stringify(skillStateCache)); } catch (e) {}
     flushProgressSyncNow();
 }
 
 function isSkillUnlocked(skillId) {
     const state = getSkillsState();
     return !!state[skillId];
+}
+
+function isKeySoundPackUnlocked(packName) {
+    const safe = String(packName || '').trim();
+    if (!safe) return false;
+    if (safe === KEY_SOUND_DEFAULT_PACK) return true;
+    const state = getSkillsState();
+    return !!(state.keySoundPacks && state.keySoundPacks[safe]);
+}
+
+function unlockShopKeySoundPack(packName) {
+    const safe = String(packName || '').trim();
+    const def = SHOP_KEY_SOUND_PACKS.find((pack) => pack.id === safe);
+    if (!def) return;
+    if (isKeySoundPackUnlocked(safe)) return;
+    const points = getSkillPoints();
+    if (points < def.cost) {
+        playSound(SFX.below50);
+        showUiMessage('Not enough Skill Points.');
+        return;
+    }
+    const state = getSkillsState();
+    if (!state.keySoundPacks || typeof state.keySoundPacks !== 'object') state.keySoundPacks = {};
+    state.keySoundPacks[safe] = true;
+    setSkillPoints(points - def.cost);
+    saveSkillsState(state);
+    updateSkillDisplay();
+    renderSkillsModal();
+    updateKeySoundPackMenuUI();
+    showUiMessage(`${def.label} unlocked!`, 'success', 1800, 'top-left');
+    flushProgressSyncNow();
 }
 
 function getRewardSettings() {
@@ -11069,6 +11264,27 @@ function renderSkillsModal() {
                         : `<button class="reward-preview-btn" onclick="toggleNebulaPreview()">Preview</button>`}
                 </div>
             </div>
+        </div>
+        <div class="profile-section-title">Keyboard Sound Packs</div>
+        <div class="skills-modal-grid">
+            ${SHOP_KEY_SOUND_PACKS.map((pack) => {
+                const owned = isKeySoundPackUnlocked(pack.id);
+                return `<div class="skill-card${owned ? ' purchased' : ''}">
+                    <div class="skill-card-title">${escapeHtml(pack.label)}</div>
+                    <div class="skill-card-desc">${escapeHtml(pack.desc)}</div>
+                    <div class="skill-card-meta">
+                        <span class="skill-cost-row"><span class="skill-cost-label">Cost</span><span class="skill-cost-current">${pack.cost} SP</span></span>
+                    </div>
+                    <div class="skill-status ${owned ? 'unlocked' : 'locked'}">${owned ? 'Owned' : 'Locked'}</div>
+                    <button class="secondary shop-buy-btn" ${owned ? 'disabled' : ''} onclick="unlockShopKeySoundPack('${escapeHtml(pack.id)}')">
+                        ${owned ? 'Owned' : 'Unlock Pack'}
+                    </button>
+                    <div class="skill-card-controls">
+                        <input type="text" class="shop-preview-input" maxlength="42" placeholder="Type here to preview this pack" onkeydown="handleShopKeySoundPreviewKeydown(event, '${escapeHtml(pack.id)}')">
+                        <div class="shop-preview-note">Preview typing sounds without equipping.</div>
+                    </div>
+                </div>`;
+            }).join('')}
         </div>
     `;
 }
