@@ -13,3 +13,8 @@ data/app-data.json
 
 # Claude internal
 .claude/
+
+# Dependencies / build artifacts
+node_modules/
+output/
+tmp_web_game_playwright_client.mjs

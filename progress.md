@@ -293,3 +293,29 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - now renders as a plain inline toggle to the left of WPM
   - retains quote-mode-only visibility and existing behavior
 - JS parse smoke test passed after style/markup update.
+
+## Update 16: Community boost game modes (in progress)
+- Added community boost mode system scaffolding:
+  - `targeted_weakness` and `kinetic_shielding` definitions.
+  - runtime state helpers and damage computation helpers.
+- Added Community Hub mode cards with start/disable actions.
+- `Targeted Weakness` now generates X/Z-heavy passages and emits laser icon effect on X/Z keypress.
+- `Kinetic Shielding` runtime now tracks dodge progress while maintaining WPM above baseline.
+- Results now submit boosted community damage (`addCommunityWeeklyWords` + `submitCommunityContribution`) instead of raw typed word count when a boost mode is active.
+- JS parse smoke check passed.
+
+## Update 17: Community boost mode verification
+- Ran local parse smoke check for inline script: pass.
+- Ran develop-web-game Playwright client against `http://127.0.0.1:3000` with screenshots to `output/web-game-community/`.
+- Added targeted feature Playwright checks (`output/community_modes_check.cjs`) and validated:
+  - Community Hub shows both new boost cards.
+  - `Targeted Weakness` starts quote test with source label `Community Mode: Targeted Weakness`.
+  - X/Z keypress spawns `.xz-laser-icon` effect.
+  - Targeted helper damage sample (`3 words`, 2 X/Z matches) returns `7` damage.
+  - `Kinetic Shielding` starts words30 with baseline in source label.
+  - Shield runtime state initializes and dodge count increments over time while WPM stays above baseline.
+- Screenshot inspected: `output/community-hub-modes.png` confirms new mode UI in community modal.
+
+### Remaining TODOs
+- Consider adding an explicit in-run HUD indicator for shield dodge progress (e.g., `Dodges: 2/5`) while kinetic mode is active.
+- If desired, expose a small post-result line showing exact boosted damage submitted each run.

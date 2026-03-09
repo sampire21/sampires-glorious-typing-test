@@ -275,11 +275,28 @@
             z-index: 5;
             animation: nebulaTrailDrift var(--dur, 0.72s) cubic-bezier(0.2, 0.62, 0.24, 1) forwards;
         }
+        .xz-laser-icon {
+            position: absolute;
+            left: var(--x, 0px);
+            top: var(--y, 0px);
+            transform: translate(-50%, -50%);
+            color: #7dd3fc;
+            text-shadow: 0 0 10px rgba(125, 211, 252, 0.78);
+            font-size: 0.78rem;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 9;
+            animation: xzLaserRise var(--dur, 0.58s) ease-out forwards;
+        }
 
         @keyframes nebulaTrailDrift {
             0%   { opacity: 0.78; transform: translate(-50%, -50%) scale(0.76) rotate(0deg); }
             65%  { opacity: 0.45; transform: translate(calc(-50% + var(--dx, 16px)), calc(-50% + var(--dy, -10px))) scale(1.2) rotate(150deg); }
             100% { opacity: 0;    transform: translate(calc(-50% + var(--dx, 22px)), calc(-50% + var(--dy, -14px))) scale(0.45) rotate(260deg); }
+        }
+        @keyframes xzLaserRise {
+            0%   { opacity: 0.95; transform: translate(-50%, -40%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -180%) scale(1.16); }
         }
 
         @keyframes blink {
@@ -3768,6 +3785,73 @@
         .community-hub-rank { color: #fca5a5; font-weight: 800; }
         .community-hub-user { color: #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .community-hub-dmg { color: #86efac; font-weight: 800; }
+        .community-modes {
+            margin-top: 0.8rem;
+            margin-bottom: 1.15rem;
+            background: rgba(16, 20, 42, 0.72);
+            border: 1px solid rgba(125, 211, 252, 0.24);
+            border-radius: 12px;
+            padding: 0.7rem;
+        }
+        .community-modes-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #c7d2fe;
+            margin-bottom: 0.52rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .community-mode-card {
+            border: 1px solid rgba(99, 102, 241, 0.34);
+            border-radius: 10px;
+            padding: 0.62rem;
+            background: rgba(19, 24, 58, 0.82);
+            margin-top: 0.52rem;
+        }
+        .community-mode-card.active {
+            border-color: rgba(74, 222, 128, 0.62);
+            box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.22);
+        }
+        .community-mode-title {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.24rem;
+        }
+        .community-mode-desc {
+            font-size: 0.66rem;
+            color: #9ca3af;
+            line-height: 1.35;
+            margin-bottom: 0.42rem;
+        }
+        .community-mode-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.42rem;
+            flex-wrap: wrap;
+        }
+        .community-mode-btn {
+            border: 1px solid rgba(129, 140, 248, 0.52);
+            background: rgba(49, 46, 129, 0.44);
+            color: #e0e7ff;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            padding: 0.32rem 0.62rem;
+            cursor: pointer;
+        }
+        .community-mode-btn:hover {
+            border-color: rgba(147, 197, 253, 0.74);
+            background: rgba(56, 60, 150, 0.58);
+        }
+        .community-mode-badge {
+            font-size: 0.62rem;
+            color: #86efac;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
 
         /* ── Result overlay – new badge notification ── */
         .result-new-badges {
@@ -4051,6 +4135,10 @@
             <div class="keysound-menu-title">Sound Pack</div>
             <button type="button" class="keysound-option" data-pack="nk-cream" onclick="selectKeySoundPack('nk-cream')">NK Creams</button>
             <button type="button" class="keysound-option" data-pack="cherrymx-blue-abs" onclick="selectKeySoundPack('cherrymx-blue-abs')">Cherry MX Blues</button>
+            <button type="button" class="keysound-option" data-pack="Buckling Springs" onclick="selectKeySoundPack('Buckling Springs')">Buckling Springs</button>
+            <button type="button" class="keysound-option" data-pack="Cherry MX Blacks" onclick="selectKeySoundPack('Cherry MX Blacks')">Cherry MX Blacks</button>
+            <button type="button" class="keysound-option" data-pack="Cherry MX Browns" onclick="selectKeySoundPack('Cherry MX Browns')">Cherry MX Browns</button>
+            <button type="button" class="keysound-option" data-pack="Cherry MX Reds" onclick="selectKeySoundPack('Cherry MX Reds')">Cherry MX Reds</button>
             <button type="button" class="keysound-option" onclick="toggleKeySounds()">Toggle On / Off</button>
         </div>
     </div>
@@ -4086,16 +4174,16 @@
 
 <div id="typing-area">
     <div class="stats">
-        <div class="stat">
-            <div class="stat-label">WPM</div>
-            <div class="stat-value" id="wpm">0</div>
-        </div>
         <div class="bible-mode-inline" id="bible-mode-inline">
             <span>Bible Mode</span>
             <label class="bible-mode-switch" for="bible-mode-toggle" title="Use Bible verses in Quotes mode">
                 <input id="bible-mode-toggle" type="checkbox" onchange="toggleBibleMode()">
                 <span class="bible-mode-slider" aria-hidden="true"></span>
             </label>
+        </div>
+        <div class="stat">
+            <div class="stat-label">WPM</div>
+            <div class="stat-value" id="wpm">0</div>
         </div>
         <div class="stat">
             <div class="stat-label">Accuracy</div>
@@ -4676,6 +4764,22 @@ let currentMode = 'words';
 const RANDOM_WORDS_DURATION = 30;
 const RANDOM_WORDS_BUFFER_WORDS = 80;
 const NO_BACKSPACE_MIN_ACC = 80;
+let activeCommunityBoostMode = null;
+let communityModeRuntime = null;
+const COMMUNITY_BOOST_MODES = {
+    targeted_weakness: {
+        id: 'targeted_weakness',
+        name: 'Targeted Weakness',
+        desc: 'Words containing X or Z deal triple hull damage.',
+        mode: 'quotes',
+    },
+    kinetic_shielding: {
+        id: 'kinetic_shielding',
+        name: 'Kinetic Shielding',
+        desc: 'Maintain WPM above your personal average to dodge 5 glitch-bolts.',
+        mode: 'words30',
+    },
+};
 
 function isTimedMode(mode = currentMode) {
     return mode === 'words30';
@@ -4778,6 +4882,99 @@ function generateWordTest(count = 40) {
     return words.join(' ');
 }
 
+function generateTargetedWeaknessPassage(count = 60) {
+    const xzWords = WORD_LIST.filter((w) => /[xz]/i.test(w));
+    const pool = xzWords.length > 0 ? xzWords : ['xenon', 'zodiac', 'matrix', 'horizon', 'zenith'];
+    const words = [];
+    for (let i = 0; i < count; i++) {
+        if (i % 6 === 0) words.push(pool[Math.floor(Math.random() * pool.length)]);
+        else words.push(generateWord());
+    }
+    return words.join(' ');
+}
+
+function getCommunityBoostDefinition(modeId = activeCommunityBoostMode) {
+    if (!modeId) return null;
+    return COMMUNITY_BOOST_MODES[modeId] || null;
+}
+
+function isCommunityBoostActiveForCurrentMode(mode = currentMode) {
+    const def = getCommunityBoostDefinition();
+    return !!(def && def.mode === mode);
+}
+
+function buildCommunityModeRuntime() {
+    if (!isCommunityBoostActiveForCurrentMode()) return null;
+    if (activeCommunityBoostMode === 'kinetic_shielding') {
+        const rawBaseline = Number(getAverageWpmBaseline()) || 0;
+        return {
+            baselineWpm: Math.max(20, Math.round(rawBaseline || 35)),
+            shieldBroken: false,
+            dodges: 0,
+            maxDodges: 5,
+            graceSeconds: 2,
+            damageMultiplier: 1,
+        };
+    }
+    if (activeCommunityBoostMode === 'targeted_weakness') {
+        return { xzBonusWords: 0 };
+    }
+    return null;
+}
+
+function startCommunityBoostMode(modeId) {
+    const def = COMMUNITY_BOOST_MODES[modeId];
+    if (!def) return;
+    activeCommunityBoostMode = modeId;
+    communityModeRuntime = null;
+    closeCommunityHub();
+    setMode(def.mode);
+    showUiMessage(`${def.name} engaged. Fleet damage boost active.`, 'success', 2600, 'top-left');
+}
+window.startCommunityBoostMode = startCommunityBoostMode;
+
+function clearCommunityBoostMode() {
+    if (!activeCommunityBoostMode) return;
+    activeCommunityBoostMode = null;
+    communityModeRuntime = null;
+    renderCommunityHub();
+    showUiMessage('Community boost mode disabled.', 'info', 2200, 'top-left');
+}
+window.clearCommunityBoostMode = clearCommunityBoostMode;
+
+function normalizeDamageToken(token) {
+    return String(token || '')
+        .toLowerCase()
+        .replace(/^[^a-z0-9']+|[^a-z0-9']+$/g, '');
+}
+
+function computeCommunityDamage(typedWords, typedAttempt, quoteText) {
+    let damage = Math.max(0, Math.floor(Number(typedWords) || 0));
+    const modeDef = getCommunityBoostDefinition();
+    if (!modeDef || modeDef.mode !== currentMode) return damage;
+    if (modeDef.id === 'targeted_weakness') {
+        const typedTokens = String(typedAttempt || '').split(/\s+/).filter(Boolean).map(normalizeDamageToken);
+        const quoteTokens = String(quoteText || '').split(/\s+/).filter(Boolean).map(normalizeDamageToken);
+        const compareCount = Math.min(typedTokens.length, quoteTokens.length);
+        let matchedTargetWords = 0;
+        for (let i = 0; i < compareCount; i++) {
+            if (!/[xz]/i.test(quoteTokens[i])) continue;
+            if (typedTokens[i] && typedTokens[i] === quoteTokens[i]) matchedTargetWords++;
+        }
+        damage += matchedTargetWords * 2; // triple total damage for each matched X/Z word
+        if (communityModeRuntime) communityModeRuntime.xzBonusWords = matchedTargetWords;
+        return damage;
+    }
+    if (modeDef.id === 'kinetic_shielding') {
+        const dodges = Math.max(0, Math.min(5, Number(communityModeRuntime && communityModeRuntime.dodges) || 0));
+        const multiplier = 1 + dodges * 0.2;
+        if (communityModeRuntime) communityModeRuntime.damageMultiplier = multiplier;
+        damage = Math.round(damage * multiplier);
+        return damage;
+    }
+    return damage;
+}
+
 let sfxReady = false; // suppresses sound on the initial boot call
 
 function newTest(fromModeSwitch = false) {
@@ -4791,6 +4988,7 @@ function newTest(fromModeSwitch = false) {
             if (stored) pendingGhostTimeline = JSON.parse(stored);
         } catch(e) {}
     }
+    communityModeRuntime = buildCommunityModeRuntime();
     if (activeChallengeId === 'sprint') {
         init(generateWordTest(120), 'Challenge: The Sprint \u2022 30s \u2022 100 WPM');
     } else if (activeChallengeId === 'nobackspace') {
@@ -4801,6 +4999,7 @@ function newTest(fromModeSwitch = false) {
         const q = pool[Math.floor(Math.random() * pool.length)];
         init(q.text, `Challenge: The Perfectionist \u2022 ${q.source}`);
     } else if (currentMode === 'quotes') {
+        const useTargetedPassage = activeCommunityBoostMode === 'targeted_weakness';
         const pool = getQuotePool();
         const q = pool[Math.floor(Math.random() * pool.length)];
         try {
@@ -4808,9 +5007,18 @@ function newTest(fromModeSwitch = false) {
             const stored = localStorage.getItem(gk);
             if (stored) pendingGhostTimeline = JSON.parse(stored);
         } catch(e) {}
-        init(q.text, q.source);
+        if (useTargetedPassage) {
+            init(generateTargetedWeaknessPassage(65), 'Community Mode: Targeted Weakness');
+        } else {
+            init(q.text, q.source);
+        }
     } else if (currentMode === 'words30') {
-        init(generateWordTest(120), `Random words sprint \u2022 ${RANDOM_WORDS_DURATION}s`);
+        if (activeCommunityBoostMode === 'kinetic_shielding') {
+            const baseline = Number(communityModeRuntime && communityModeRuntime.baselineWpm) || 35;
+            init(generateWordTest(120), `Community Mode: Kinetic Shielding \u2022 Hold above ${baseline} WPM`);
+        } else {
+            init(generateWordTest(120), `Random words sprint \u2022 ${RANDOM_WORDS_DURATION}s`);
+        }
     } else {
         init(generateWordTest(), '');
     }
@@ -5178,6 +5386,27 @@ function emitNebulaTrailAtCursor(force = false) {
     }
 }
 
+function emitXzLaserAtCursor(keyChar) {
+    if (activeCommunityBoostMode !== 'targeted_weakness' || currentMode !== 'quotes') return;
+    if (!quoteDisplay || !charSpans.length) return;
+    const lower = String(keyChar || '').toLowerCase();
+    if (lower !== 'x' && lower !== 'z') return;
+
+    const anchorIndex = Math.max(0, Math.min(currentIndex - 1, charSpans.length - 1));
+    const anchor = charSpans[anchorIndex];
+    if (!anchor) return;
+
+    const hostRect = quoteDisplay.getBoundingClientRect();
+    const anchorRect = anchor.getBoundingClientRect();
+    const laser = document.createElement('span');
+    laser.className = 'xz-laser-icon';
+    laser.textContent = '✦';
+    laser.style.left = `${anchorRect.left - hostRect.left + (anchorRect.width * 0.5)}px`;
+    laser.style.top = `${anchorRect.top - hostRect.top + (anchorRect.height * 0.55)}px`;
+    quoteDisplay.appendChild(laser);
+    laser.addEventListener('animationend', () => laser.remove(), { once: true });
+}
+
 function previewAuraReward() {
     const target = document.getElementById('aura-preview-word');
     if (!target) return;
@@ -5418,6 +5647,16 @@ function startTimer() {
             timerEl.textContent = Math.round(elapsed) + 's';
         }
         updateStats();
+        if (activeCommunityBoostMode === 'kinetic_shielding' && currentMode === 'words30' && communityModeRuntime && !communityModeRuntime.shieldBroken) {
+            const runtime = communityModeRuntime;
+            const wpmNow = getWPM(elapsed);
+            if (elapsed >= runtime.graceSeconds && wpmNow < runtime.baselineWpm) {
+                runtime.shieldBroken = true;
+            } else {
+                const dodges = Math.min(runtime.maxDodges, Math.floor((elapsed / RANDOM_WORDS_DURATION) * runtime.maxDodges));
+                runtime.dodges = Math.max(runtime.dodges, dodges);
+            }
+        }
         sampleWpm();
         updateLiveChart();
         if (ghostCursorEnabled && ghostTimeline.length > 0) {
@@ -7380,6 +7619,7 @@ function renderCommunityHub() {
     const wrap = document.getElementById('community-hub-content');
     if (!wrap) return;
     const rows = Array.isArray(_communityRowsCache) ? _communityRowsCache : [];
+    const activeMode = getCommunityBoostDefinition();
     const boardHtml = rows.length === 0
         ? '<div class="history-empty">No damage yet this week. Be the first to strike!</div>'
         : `<div class="community-hub-list">${rows.map((row, idx) => `
@@ -7389,10 +7629,27 @@ function renderCommunityHub() {
                 <span class="community-hub-dmg">${Number(row.damage || 0).toLocaleString()}</span>
             </div>
         `).join('')}</div>`;
+    const modesHtml = Object.values(COMMUNITY_BOOST_MODES).map((mode) => {
+        const isActive = activeMode && activeMode.id === mode.id;
+        return `
+            <div class="community-mode-card${isActive ? ' active' : ''}">
+                <div class="community-mode-title">${escapeHtml(mode.name)}${isActive ? '<span class="community-mode-badge">Active</span>' : ''}</div>
+                <div class="community-mode-desc">${escapeHtml(mode.desc)}</div>
+                <div class="community-mode-actions">
+                    <button class="community-mode-btn" onclick="startCommunityBoostMode('${escapeHtml(mode.id)}')">${isActive ? 'Restart Mode' : 'Start Mode'}</button>
+                </div>
+            </div>
+        `;
+    }).join('');
     wrap.innerHTML = `
         <div class="community-hub-grid">
             <div>${getCommunityHubCardHtml()}</div>
             <div class="community-hub-right">
+                <div class="community-modes">
+                    <div class="community-modes-title">Fleet Boost Game Modes</div>
+                    ${modesHtml}
+                    ${activeMode ? `<div class="community-mode-actions"><button class="community-mode-btn" onclick="clearCommunityBoostMode()">Disable Boost Mode</button></div>` : ''}
+                </div>
                 <div class="community-hub-title">Top Fleet Damage</div>
                 ${boardHtml}
             </div>
@@ -8620,10 +8877,11 @@ function showResults(capturedElapsed) {
     const typedAttempt = typedChars.slice(0, currentIndex).join('').trim();
     const typedWordTokens = typedAttempt ? (typedAttempt.match(/\S+/g) || []) : [];
     const typedWords = typedWordTokens.length;
+    const communityDamage = computeCommunityDamage(typedWords, typedAttempt, currentQuote);
     const scoreEntry = { wpm, rawWpm, consistency, accuracy, time, mode: currentMode, text: currentQuote, date: Date.now(), typedWords };
     saveToHistory(scoreEntry);
-    addCommunityWeeklyWords(typedWords);
-    submitCommunityContribution(typedWords);
+    addCommunityWeeklyWords(communityDamage);
+    submitCommunityContribution(communityDamage);
     renderHistory();
     const passiveDailyCompletions = completePassiveDailyChallengesIfEligible();
     const passiveWeeklyCompletions = completePassiveWeeklyChallengesIfEligible();
@@ -8805,6 +9063,21 @@ function showResults(capturedElapsed) {
     }
 
     resultOverlay.classList.add('show');
+    const communityMode = getCommunityBoostDefinition();
+    if (communityMode && communityMode.mode === currentMode) {
+        if (communityMode.id === 'targeted_weakness') {
+            const bonusWords = Number(communityModeRuntime && communityModeRuntime.xzBonusWords) || 0;
+            if (bonusWords > 0) {
+                document.getElementById('result-subtitle').textContent = `${subtitle} + ${bonusWords * 2} bonus fleet damage`;
+            }
+        } else if (communityMode.id === 'kinetic_shielding') {
+            const dodges = Number(communityModeRuntime && communityModeRuntime.dodges) || 0;
+            if (dodges > 0) {
+                const pct = Math.round((Number(communityModeRuntime && communityModeRuntime.damageMultiplier) || 1) * 100);
+                document.getElementById('result-subtitle').textContent = `${subtitle} + Kinetic Shielding ${dodges}/5 dodges (${pct}% damage)`;
+            }
+        }
+    }
     if (isModePB && currentUser) {
         saveScoreToCloud(scoreEntry).then(result => {
             if (!result.ok && !/best run/i.test(String(result.error || ''))) {
@@ -8880,6 +9153,7 @@ function handleTypingKeydown(e) {
         renderQuote(); // fallback for post-extension rebuilds
     }
     emitNebulaTrailAtCursor();
+    emitXzLaserAtCursor(e.key);
     updateStats();
     setTimeout(() => { hiddenInput.value = ''; }, 0);
 
