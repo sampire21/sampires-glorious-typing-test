@@ -113,14 +113,17 @@
             color: #e2e8f0;
             font-variant-numeric: tabular-nums;
         }
-        .stat.bible-mode-stat {
-            min-width: 140px;
-            padding: 0.55rem 0.9rem;
+        .bible-mode-inline {
             display: none;
-            gap: 0.45rem;
-            flex-direction: column;
+            gap: 0.5rem;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
+            color: #9ca3af;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         .bible-mode-switch {
             position: relative;
@@ -161,11 +164,7 @@
         .bible-mode-switch input:checked + .bible-mode-slider::before {
             transform: translateX(20px);
         }
-        .bible-mode-hint {
-            font-size: 0.64rem;
-            color: #9ca3af;
-            line-height: 1.2;
-        }
+        .bible-mode-hint { font-size: 0.64rem; color: #9ca3af; line-height: 1.2; }
 
         /* ── Progress bar ── */
         .progress-bar {
@@ -3972,9 +3971,7 @@
                 width: calc(100% - 1.5rem);
                 max-width: 360px;
             }
-            .stat.bible-mode-stat {
-                min-width: 124px;
-            }
+            .bible-mode-inline { width: 100%; justify-content: center; }
         }
 
     </style>
@@ -4093,13 +4090,12 @@
             <div class="stat-label">WPM</div>
             <div class="stat-value" id="wpm">0</div>
         </div>
-        <div class="stat bible-mode-stat" id="bible-mode-stat">
-            <div class="stat-label">Bible Mode</div>
+        <div class="bible-mode-inline" id="bible-mode-inline">
+            <span>Bible Mode</span>
             <label class="bible-mode-switch" for="bible-mode-toggle" title="Use Bible verses in Quotes mode">
                 <input id="bible-mode-toggle" type="checkbox" onchange="toggleBibleMode()">
                 <span class="bible-mode-slider" aria-hidden="true"></span>
             </label>
-            <div class="bible-mode-hint" id="bible-mode-hint">Quotes</div>
         </div>
         <div class="stat">
             <div class="stat-label">Accuracy</div>
@@ -4738,17 +4734,10 @@ function getQuotePool() {
 }
 
 function updateBibleModeUi() {
-    const stat = document.getElementById('bible-mode-stat');
+    const stat = document.getElementById('bible-mode-inline');
     const toggle = document.getElementById('bible-mode-toggle');
-    const hint = document.getElementById('bible-mode-hint');
     if (stat) stat.style.display = currentMode === 'quotes' ? 'flex' : 'none';
     if (toggle) toggle.checked = !!bibleModeEnabled;
-    if (hint) {
-        const poolSize = getBibleQuotePool().length;
-        hint.textContent = bibleModeEnabled
-            ? (poolSize > 0 ? `${poolSize} verses` : 'No verses loaded')
-            : 'Quotes';
-    }
     updatePrimaryNewTestButtons();
 }
 

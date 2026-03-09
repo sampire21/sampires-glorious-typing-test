@@ -286,3 +286,10 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - quotes mode shows Bible toggle
   - toggling Bible mode updates button label to `New Verse`
   - no startup JS errors.
+
+## Update 19: Bible toggle visual adjustment
+- Updated Bible Mode control styling per request:
+  - removed boxed/stat-card look
+  - now renders as a plain inline toggle to the left of WPM
+  - retains quote-mode-only visibility and existing behavior
+- JS parse smoke test passed after style/markup update.
