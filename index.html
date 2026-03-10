@@ -117,6 +117,31 @@
             gap: clamp(0.4rem, 1.1vh, 0.85rem);
             background: transparent;
         }
+        .entry-splash.phase-intro .entry-splash-card,
+        .entry-splash.phase-options .entry-splash-card {
+            min-height: min(760px, 94vh);
+            height: auto;
+            justify-content: center;
+            gap: 0;
+        }
+        .entry-splash-main {
+            display: none;
+            width: min(1120px, 94vw);
+            min-height: min(760px, 94vh);
+            align-items: center;
+            justify-items: center;
+            align-content: center;
+            justify-content: center;
+            gap: clamp(0.8rem, 2.1vh, 1.3rem);
+        }
+        .entry-splash.phase-intro .entry-splash-main,
+        .entry-splash.phase-options .entry-splash-main {
+            display: grid;
+        }
+        .entry-splash.phase-intro .entry-guide-panel,
+        .entry-splash.phase-options .entry-guide-panel {
+            display: none;
+        }
         .entry-splash-stars {
             position: absolute;
             inset: 0;
@@ -131,7 +156,7 @@
             display: grid;
             place-items: center;
             width: min(1120px, 92vw);
-            flex: 1 1 auto;
+            flex: 0 0 auto;
         }
         .entry-logo-image {
             width: clamp(460px, 78vw, 1120px);
@@ -160,7 +185,7 @@
             position: relative;
             width: min(860px, 96vw);
             min-height: clamp(108px, 14vh, 132px);
-            margin-top: clamp(-0.55rem, -1vh, -0.2rem);
+            margin-top: 0;
             display: grid;
             place-items: center;
             flex: 0 0 auto;
@@ -281,6 +306,258 @@
             transform: translateY(0);
             pointer-events: auto;
         }
+        .entry-guide-panel {
+            --entry-neon-purple: #bf5af2;
+            --entry-neon-green: #32d74b;
+            width: min(1120px, 95vw);
+            opacity: 0;
+            transform: translateY(16px);
+            pointer-events: none;
+            transition: opacity 0.34s ease, transform 0.34s ease;
+        }
+        .entry-splash.phase-guide .entry-logo-wrap {
+            display: none;
+        }
+        .entry-splash.phase-guide .entry-splash-stage {
+            display: none;
+        }
+        .entry-splash.phase-guide .entry-splash-main {
+            display: none;
+        }
+        .entry-splash.phase-guide .entry-splash-card {
+            justify-content: center;
+        }
+        .entry-splash.phase-guide .entry-guide-panel {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .entry-guide-shell {
+            position: relative;
+            border-radius: 18px;
+            border: 1px solid rgba(191, 90, 242, 0.44);
+            background:
+                linear-gradient(180deg, rgba(7, 10, 25, 0.95), rgba(6, 12, 27, 0.96)),
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(143, 160, 188, 0.04) 0px,
+                    rgba(143, 160, 188, 0.04) 1px,
+                    rgba(5, 8, 20, 0) 1px,
+                    rgba(5, 8, 20, 0) 4px
+                );
+            box-shadow:
+                0 18px 44px rgba(0, 0, 0, 0.56),
+                0 0 0 1px rgba(50, 215, 75, 0.08) inset,
+                0 0 28px rgba(191, 90, 242, 0.14);
+            padding: clamp(1rem, 2.2vw, 1.5rem);
+            display: grid;
+            gap: 1rem;
+            text-align: left;
+            overflow: hidden;
+        }
+        .entry-guide-shell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 18% 14%, rgba(191, 90, 242, 0.12), rgba(191, 90, 242, 0) 28%),
+                radial-gradient(circle at 84% 22%, rgba(50, 215, 75, 0.08), rgba(50, 215, 75, 0) 26%);
+            pointer-events: none;
+        }
+        .entry-guide-kicker {
+            position: relative;
+            color: rgba(227, 232, 255, 0.72);
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            font-size: 0.88rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .entry-guide-title {
+            position: relative;
+            display: inline-block;
+            color: #f5edff;
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            font-size: clamp(1.8rem, 4.1vw, 3.35rem);
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            text-shadow: 0 0 18px rgba(191, 90, 242, 0.4);
+        }
+        .entry-guide-title::before,
+        .entry-guide-title::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .entry-guide-title::before {
+            color: rgba(191, 90, 242, 0.85);
+            animation: splashGuideGlitchPurple 3.1s steps(1, end) infinite;
+        }
+        .entry-guide-title::after {
+            color: rgba(50, 215, 75, 0.8);
+            animation: splashGuideGlitchGreen 3.1s steps(1, end) infinite;
+        }
+        .entry-guide-route-note {
+            position: relative;
+            color: rgba(159, 255, 181, 0.9);
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .entry-guide-body {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(250px, 0.7fr);
+            gap: 1rem;
+            align-items: start;
+        }
+        .entry-guide-copy {
+            display: grid;
+            gap: 0.9rem;
+            color: #d7def9;
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+        }
+        .entry-guide-copy p {
+            margin: 0;
+            font-size: 0.92rem;
+            line-height: 1.75;
+        }
+        .entry-guide-shop-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.24rem;
+            color: #32d74b;
+            text-decoration: none;
+            cursor: help;
+            border-bottom: 1px dashed rgba(50, 215, 75, 0.45);
+        }
+        .entry-guide-shop-link:hover,
+        .entry-guide-shop-link:focus-visible {
+            color: #7dff90;
+            border-color: rgba(125, 255, 144, 0.72);
+            outline: none;
+        }
+        .entry-guide-shop-tooltip {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 10px);
+            width: min(280px, 76vw);
+            padding: 0.72rem 0.78rem;
+            border-radius: 12px;
+            border: 1px solid rgba(191, 90, 242, 0.44);
+            background: linear-gradient(160deg, rgba(8, 12, 28, 0.98), rgba(9, 14, 30, 0.96));
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.46), 0 0 18px rgba(191, 90, 242, 0.16);
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            z-index: 3;
+        }
+        .entry-guide-shop-link:hover .entry-guide-shop-tooltip,
+        .entry-guide-shop-link:focus-visible .entry-guide-shop-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .entry-guide-shop-tooltip-title {
+            color: #f5edff;
+            font-size: 0.76rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.55rem;
+        }
+        .entry-guide-shop-tooltip-list {
+            display: grid;
+            gap: 0.42rem;
+        }
+        .entry-guide-shop-reward {
+            padding: 0.42rem 0.48rem;
+            border-radius: 8px;
+            border: 1px solid rgba(50, 215, 75, 0.22);
+            background: rgba(14, 21, 44, 0.72);
+            color: #d9fbe0;
+            font-size: 0.74rem;
+            line-height: 1.45;
+        }
+        .entry-guide-shop-reward strong {
+            display: block;
+            color: #7dff90;
+            margin-bottom: 0.1rem;
+        }
+        .entry-guide-mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+        .entry-guide-mode-card {
+            border: 1px solid rgba(191, 90, 242, 0.26);
+            border-radius: 12px;
+            background: linear-gradient(160deg, rgba(11, 16, 37, 0.94), rgba(8, 13, 31, 0.92));
+            padding: 0.8rem 0.86rem;
+            min-height: 102px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        }
+        .entry-guide-mode-name {
+            color: #f5edff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+        .entry-guide-mode-desc {
+            color: #cfd6f1;
+            font-size: 0.76rem;
+            line-height: 1.55;
+        }
+        .entry-guide-side {
+            display: grid;
+            gap: 0.78rem;
+        }
+        .entry-guide-side-card {
+            border-radius: 12px;
+            border: 1px solid rgba(50, 215, 75, 0.24);
+            background: linear-gradient(160deg, rgba(8, 17, 25, 0.92), rgba(9, 20, 28, 0.9));
+            padding: 0.82rem 0.88rem;
+            box-shadow: inset 0 0 0 1px rgba(125, 255, 144, 0.04);
+        }
+        .entry-guide-side-title {
+            color: #7dff90;
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            font-size: 0.76rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+        .entry-guide-side-copy {
+            color: #d9fbe0;
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            font-size: 0.78rem;
+            line-height: 1.6;
+        }
+        .entry-guide-actions {
+            position: relative;
+            display: grid;
+            justify-items: center;
+            gap: 0.48rem;
+            padding-top: 0.2rem;
+        }
+        .entry-guide-cta {
+            min-width: clamp(240px, 28vw, 320px);
+            font-size: 0.86rem;
+            padding: 0.72rem 1.2rem;
+        }
+        .entry-guide-continue-note {
+            color: rgba(219, 234, 254, 0.56);
+            font-family: 'Ubuntu Mono', 'Courier New', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            animation: splashPromptPulse 3.2s ease-in-out infinite;
+        }
         @keyframes splashPromptPulse {
             0%, 100% { opacity: 0.45; transform: scale(1); }
             50% { opacity: 0.95; transform: scale(1.03); }
@@ -288,6 +565,18 @@
         @keyframes splashLogoHover {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-12px); }
+        }
+        @keyframes splashGuideGlitchPurple {
+            0%, 93%, 100% { opacity: 0; transform: translate3d(0, 0, 0); }
+            94% { opacity: 0.84; transform: translate3d(-2px, 0, 0); }
+            95% { opacity: 0.6; transform: translate3d(2px, 0, 0); }
+            96% { opacity: 0; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes splashGuideGlitchGreen {
+            0%, 95%, 100% { opacity: 0; transform: translate3d(0, 0, 0); }
+            96% { opacity: 0.78; transform: translate3d(2px, 0, 0); }
+            97% { opacity: 0.54; transform: translate3d(-2px, 0, 0); }
+            98% { opacity: 0; transform: translate3d(0, 0, 0); }
         }
         @media (max-width: 700px) {
             .entry-splash-card {
@@ -314,6 +603,25 @@
                 min-width: 138px;
                 font-size: 0.8rem;
                 padding: 0.62rem 0.82rem;
+            }
+            .entry-guide-body {
+                grid-template-columns: 1fr;
+            }
+            .entry-guide-mode-grid {
+                grid-template-columns: 1fr;
+            }
+            .entry-guide-shell {
+                padding: 0.9rem;
+            }
+            .entry-guide-kicker {
+                font-size: 0.74rem;
+            }
+            .entry-guide-copy p,
+            .entry-guide-side-copy {
+                font-size: 0.76rem;
+            }
+            .entry-guide-shop-tooltip {
+                width: min(250px, 82vw);
             }
             .entry-splash-meta {
                 font-size: 0.58rem;
@@ -4305,6 +4613,11 @@
             overflow-y: auto;
         }
         .profile-modal.show { display: flex; }
+        #login-modal,
+        #signup-modal {
+            align-items: center;
+            justify-content: center;
+        }
         .profile-modal-card {
             width: min(820px, 100%);
             border-radius: 14px;
@@ -6289,18 +6602,85 @@
 <div class="entry-splash phase-intro" id="entry-splash" aria-hidden="false" onclick="handleSplashScreenClick(event)">
     <svg class="entry-splash-stars" id="entry-splash-stars" viewBox="0 0 1200 720" preserveAspectRatio="none" aria-hidden="true"></svg>
     <div class="entry-splash-card" role="dialog" aria-modal="true" aria-labelledby="entry-splash-title">
-        <div class="entry-logo-wrap" onclick="handleSplashScreenClick(event)">
-            <img class="entry-logo-image" src="typemine-galactic-logo.png" alt="TypeMine Galactic logo" onerror="this.style.display='none';const f=document.getElementById('entry-logo-fallback');if(f)f.style.display='grid';">
-            <div class="entry-logo-fallback" id="entry-logo-fallback" aria-hidden="true">TMG</div>
-        </div>
-        <div class="entry-splash-stage" onclick="handleSplashScreenClick(event)">
-            <div class="entry-splash-prompt" id="entry-splash-title">Press any key to continue</div>
-            <div class="entry-splash-options">
-                <div class="entry-splash-actions">
-                    <button type="button" class="entry-splash-btn" id="entry-login-btn" onclick="openLoginFromSplash()">Login</button>
-                    <button type="button" class="entry-splash-btn signup" onclick="openSignupFromSplash()">Sign Up</button>
+        <div class="entry-splash-main">
+            <div class="entry-logo-wrap" onclick="handleSplashScreenClick(event)">
+                <img class="entry-logo-image" src="typemine-galactic-logo.png" alt="TypeMine Galactic logo" onerror="this.style.display='none';const f=document.getElementById('entry-logo-fallback');if(f)f.style.display='grid';">
+                <div class="entry-logo-fallback" id="entry-logo-fallback" aria-hidden="true">TMG</div>
+            </div>
+            <div class="entry-splash-stage" onclick="handleSplashScreenClick(event)">
+                <div class="entry-splash-prompt" id="entry-splash-title">Press any key to continue</div>
+                <div class="entry-splash-options">
+                    <div class="entry-splash-actions">
+                        <button type="button" class="entry-splash-btn" id="entry-login-btn" onclick="openLoginFromSplash()">Login</button>
+                        <button type="button" class="entry-splash-btn signup" onclick="openSignupFromSplash()">Sign Up</button>
+                    </div>
+                    <button type="button" class="entry-splash-guest" id="entry-guest-btn" onclick="continueAsGuestFromSplash()">Continue as Guest</button>
                 </div>
-                <button type="button" class="entry-splash-guest" id="entry-guest-btn" onclick="continueAsGuestFromSplash()">Continue as Guest</button>
+            </div>
+        </div>
+        <div class="entry-guide-panel" id="entry-guide-panel" aria-hidden="true">
+            <div class="entry-guide-shell">
+                <div class="entry-guide-kicker">Welcome to TypeMine Galactic!</div>
+                <div class="entry-guide-title" id="entry-guide-title" data-text="WELCOME, PILOT">WELCOME, PILOT</div>
+                <div class="entry-guide-route-note" id="entry-guide-route-note">Initializing guidance uplink...</div>
+                <div class="entry-guide-body">
+                    <div class="entry-guide-copy">
+                        <p>
+                            TypeMine Galactic turns every typing session into an asteroid mining operation. Mine asteroids, harvest Aether Crystals, and spend them in the
+                            <span class="entry-guide-shop-link" tabindex="0">shop
+                                <span class="entry-guide-shop-tooltip" aria-hidden="true">
+                                    <span class="entry-guide-shop-tooltip-title">Reward Preview</span>
+                                    <span class="entry-guide-shop-tooltip-list">
+                                        <span class="entry-guide-shop-reward"><strong>Your Own Personal Universe</strong>Ambient soundscape unlocks for your command deck.</span>
+                                        <span class="entry-guide-shop-reward"><strong>Word Glow</strong>Premium cosmetic aura that sharpens active text visibility.</span>
+                                        <span class="entry-guide-shop-reward"><strong>Keyboard Sound Packs</strong>Mechanical and themed keystroke sets for every run.</span>
+                                    </span>
+                                </span>
+                            </span>
+                            to expand your loadout.
+                        </p>
+                        <div class="entry-guide-mode-grid">
+                            <div class="entry-guide-mode-card">
+                                <div class="entry-guide-mode-name">Random Words</div>
+                                <div class="entry-guide-mode-desc">Randomly generated strings for raw rhythm building and clean speed reps.</div>
+                            </div>
+                            <div class="entry-guide-mode-card">
+                                <div class="entry-guide-mode-name">Quotes</div>
+                                <div class="entry-guide-mode-desc">Punctuation practice and longer passages. Enable the Bible Mode toggle for scripture memorization runs.</div>
+                            </div>
+                            <div class="entry-guide-mode-card">
+                                <div class="entry-guide-mode-name">Words 30s</div>
+                                <div class="entry-guide-mode-desc">A 30-second high-intensity sprint built for fast reaction speed and stamina.</div>
+                            </div>
+                            <div class="entry-guide-mode-card">
+                                <div class="entry-guide-mode-name">Challenges</div>
+                                <div class="entry-guide-mode-desc">Daily and weekly quests that feed XP, leveling progress, and account unlocks.</div>
+                            </div>
+                            <div class="entry-guide-mode-card">
+                                <div class="entry-guide-mode-name">Community Hub</div>
+                                <div class="entry-guide-mode-desc">Collaborative Active Attacker fleet battles where the whole player base pushes back together.</div>
+                            </div>
+                            <div class="entry-guide-mode-card">
+                                <div class="entry-guide-mode-name">Galactic Progression</div>
+                                <div class="entry-guide-mode-desc">The star-path campaign mode and story progression layer of the game.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="entry-guide-side">
+                        <div class="entry-guide-side-card">
+                            <div class="entry-guide-side-title">Mode Intel</div>
+                            <div class="entry-guide-side-copy">Leaderboards are tracked per mode, so each queue has its own competitive lane and best-score chase.</div>
+                        </div>
+                        <div class="entry-guide-side-card">
+                            <div class="entry-guide-side-title">Audio HUD</div>
+                            <div class="entry-guide-side-copy">Music and mechanical sound settings live in the top-right HUD once you enter the main command screen.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="entry-guide-actions">
+                    <button type="button" class="sector-map-btn entry-guide-cta" id="entry-guide-cta" onclick="continueFromSplashGuide()">Initialize Jump</button>
+                    <div class="entry-guide-continue-note">Press any key to continue</div>
+                </div>
             </div>
         </div>
         <div class="entry-splash-meta">
@@ -8617,6 +8997,7 @@ let progressSyncInFlight = false;
 let suppressProgressSync = false;
 let progressCloudUpdatedAt = 0;
 let cloudRefreshPromise = null;
+let splashPendingAction = null;
 let ghostCursorEnabled = true;
 let miningVisualsEnabled = true;
 let miningLaserSoundEnabled = true;
@@ -9962,29 +10343,126 @@ function isSplashOptionsVisible() {
     return !!(splash && splash.classList.contains('phase-options'));
 }
 
+function isSplashGuideVisible() {
+    const splash = document.getElementById('entry-splash');
+    return !!(splash && splash.classList.contains('phase-guide'));
+}
+
+function playUiCue(audio) {
+    if (!audio) return;
+    try {
+        const cue = audio.cloneNode(true);
+        cue.volume = audio.volume;
+        cue.currentTime = 0;
+        cue.play().catch(() => {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        });
+    } catch (e) {
+        try {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        } catch (err) {}
+    }
+}
+
+function updateSplashGuideRoute(action) {
+    const note = document.getElementById('entry-guide-route-note');
+    if (!note) return;
+    if (action === 'login') {
+        note.textContent = 'Authentication console selected. Review the systems brief, then continue to login.';
+        return;
+    }
+    if (action === 'signup') {
+        note.textContent = 'New pilot registration selected. Review the systems brief, then continue to account creation.';
+        return;
+    }
+    if (action === 'continue-user' && currentUser && currentUser.username) {
+        note.textContent = `Identity lock confirmed for ${currentUser.username}. Review the systems brief, then continue to the command deck.`;
+        return;
+    }
+    note.textContent = 'Guest access selected. Review the systems brief, then continue to the command deck.';
+}
+
 function revealSplashOptions() {
     const splash = document.getElementById('entry-splash');
     const loginBtn = document.getElementById('entry-login-btn');
     if (!splash) return;
+    splashPendingAction = null;
     splash.classList.remove('phase-intro');
+    splash.classList.remove('phase-guide');
     splash.classList.add('phase-options');
+    document.getElementById('entry-guide-panel')?.setAttribute('aria-hidden', 'true');
     if (loginBtn) setTimeout(() => loginBtn.focus(), 120);
 }
 
+function showSplashGuide(action) {
+    const splash = document.getElementById('entry-splash');
+    const guidePanel = document.getElementById('entry-guide-panel');
+    const cta = document.getElementById('entry-guide-cta');
+    if (!splash) return;
+    splashPendingAction = action;
+    updateSplashGuideRoute(action);
+    splash.classList.remove('phase-intro', 'phase-options');
+    splash.classList.add('phase-guide');
+    if (guidePanel) guidePanel.setAttribute('aria-hidden', 'false');
+    if (cta) setTimeout(() => cta.focus(), 120);
+}
+
+function runSplashPendingAction() {
+    const action = splashPendingAction;
+    splashPendingAction = null;
+    if (action === 'login') {
+        playUiCue(SFX.ding);
+        showSplashPrompt();
+        openLoginModal();
+        return;
+    }
+    if (action === 'signup') {
+        playUiCue(SFX.ding);
+        showSplashPrompt();
+        openSignupModal();
+        return;
+    }
+    if (action === 'continue-user') {
+        hideSplashScreen();
+        playUiCue(SFX.logon);
+        setAuthNote(`Continuing as ${currentUser && currentUser.username ? currentUser.username : 'pilot'}.`);
+        hiddenInput.blur();
+        return;
+    }
+    if (action === 'guest') {
+        hideSplashScreen();
+        playUiCue(SFX.logon);
+        setAuthNote('Continuing as guest.');
+        hiddenInput.blur();
+    }
+}
+
+function continueFromSplashGuide() {
+    if (!isSplashScreenOpen() || !isSplashGuideVisible() || !splashPendingAction) return;
+    runSplashPendingAction();
+}
+
 function handleSplashScreenClick(event) {
-    if (!isSplashScreenOpen() || isSplashOptionsVisible()) return;
+    if (!isSplashScreenOpen() || isSplashOptionsVisible() || isSplashGuideVisible()) return;
     if (event) {
         event.preventDefault();
         event.stopPropagation();
     }
+    playUiCue(SFX.ding);
     revealSplashOptions();
 }
 
 function showSplashPrompt() {
     const splash = document.getElementById('entry-splash');
+    const guidePanel = document.getElementById('entry-guide-panel');
     if (!splash) return;
+    splashPendingAction = null;
+    splash.classList.remove('phase-guide');
     splash.classList.remove('phase-options');
     splash.classList.add('phase-intro');
+    if (guidePanel) guidePanel.setAttribute('aria-hidden', 'true');
 }
 
 function initEntrySplashStars() {
@@ -10030,27 +10508,18 @@ function hideSplashScreen() {
 }
 
 function openLoginFromSplash() {
-    if (currentUser && currentUser.username) {
-        hideSplashScreen();
-        playOneShotSound('Sound Effects/Logon.wav');
-        setAuthNote(`Continuing as ${currentUser.username}.`);
-        hiddenInput.blur();
-        return;
-    }
-    playOneShotSound('Sound Effects/Ding.wav');
-    openLoginModal();
+    playUiCue(SFX.ding);
+    showSplashGuide(currentUser && currentUser.username ? 'continue-user' : 'login');
 }
 
 function openSignupFromSplash() {
-    playOneShotSound('Sound Effects/Ding.wav');
-    openSignupModal();
+    playUiCue(SFX.ding);
+    showSplashGuide('signup');
 }
 
 function continueAsGuestFromSplash() {
-    hideSplashScreen();
-    playOneShotSound('Sound Effects/Logon.wav');
-    setAuthNote('Continuing as guest.');
-    hiddenInput.blur();
+    playUiCue(SFX.ding);
+    showSplashGuide('guest');
 }
 
 function initializeEntrySplash() {
@@ -10144,7 +10613,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
         updateAuthUi();
         closeLoginModal();
         hideSplashScreen();
-        playOneShotSound('Sound Effects/Logon.wav');
+        playUiCue(SFX.logon);
         setAuthNote('Account created and logged in.');
         if (usingModal) {
             setSignupNote('Account created and logged in.');
@@ -10203,7 +10672,7 @@ async function loginUser() {
         updateAuthUi();
         closeLoginModal();
         hideSplashScreen();
-        playOneShotSound('Sound Effects/Logon.wav');
+        playUiCue(SFX.logon);
         setAuthNote('Logged in successfully.');
         await refreshCloudProgress();
         await refreshLeaderboard();
@@ -13664,11 +14133,19 @@ document.addEventListener('keydown', (e) => {
     const resultsOpen = resultOverlay.classList.contains('show');
     const activeEl = document.activeElement;
     if (isSplashScreenOpen()) {
-        const isStartKey = e.key === 'Enter' || e.key === ' ' || e.key === 'Tab' || e.key === 'Backspace' || e.key.length === 1;
-        if (isStartKey && !isSplashOptionsVisible()) {
+        const isModifierOnly = e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'AltGraph';
+        const isAdvanceKey = !isModifierOnly && e.key !== 'Escape';
+        if (isAdvanceKey && !isSplashOptionsVisible() && !isSplashGuideVisible()) {
             e.preventDefault();
             e.stopPropagation();
+            playUiCue(SFX.ding);
             revealSplashOptions();
+            return;
+        }
+        if (isAdvanceKey && isSplashGuideVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
+            continueFromSplashGuide();
             return;
         }
         if (e.key === 'Escape') {
@@ -13676,7 +14153,8 @@ document.addEventListener('keydown', (e) => {
             e.stopPropagation();
             closeLoginModal();
             closeSignupModal();
-            showSplashPrompt();
+            if (isSplashGuideVisible()) revealSplashOptions();
+            else showSplashPrompt();
             return;
         }
         if (activeEl === hiddenInput) {
@@ -14045,22 +14523,29 @@ function toggleMusic() {
 
 async function shareSite() {
     const url = 'https://type.sherathia.com';
+    let copied = false;
     try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(url);
-        } else {
+            copied = true;
+        }
+    } catch {}
+    if (!copied) {
+        try {
             const ta = document.createElement('textarea');
             ta.value = url;
             ta.setAttribute('readonly', '');
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
+            ta.style.cssText = 'position:fixed;left:-9999px;opacity:0';
             document.body.appendChild(ta);
+            ta.focus();
             ta.select();
-            document.execCommand('copy');
+            copied = document.execCommand('copy');
             ta.remove();
-        }
+        } catch {}
+    }
+    if (copied) {
         showUiMessage('Link copied to clipboard! Thanks for sharing!', 'success', 2600, 'top-left');
-    } catch (e) {
+    } else {
         showUiMessage('Unable to copy link. Please copy manually: https://type.sherathia.com', 'error', 3200, 'top-left');
     }
 }
