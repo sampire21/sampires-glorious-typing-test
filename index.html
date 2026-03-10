@@ -451,23 +451,78 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.38rem 0.68rem;
-            border-radius: 20px;
-            border: 1px solid rgba(125, 211, 252, 0.44);
-            background: linear-gradient(135deg, rgba(20, 46, 108, 0.88), rgba(30, 76, 165, 0.92));
-            color: #dbeafe;
+            gap: 0.42rem;
+            padding: 0.42rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid rgba(191, 90, 242, 0.62);
+            background:
+                linear-gradient(135deg, rgba(191, 90, 242, 0.94), rgba(50, 34, 122, 0.94) 48%, rgba(10, 28, 78, 0.96) 100%);
+            color: #f5edff;
             font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 0.06em;
+            font-weight: 900;
+            letter-spacing: 0.09em;
             line-height: 1;
             text-transform: uppercase;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s, border-color 0.2s;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+                0 0 14px rgba(191, 90, 242, 0.24),
+                0 0 24px rgba(41, 121, 255, 0.18);
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            animation: galacticProgressPulse 3.6s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        .sector-map-btn::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 38%);
+            opacity: 0.72;
+            pointer-events: none;
+        }
+        .sector-map-btn-icon {
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+            flex: 0 0 14px;
+            filter: drop-shadow(0 0 6px rgba(191, 90, 242, 0.52));
+        }
+        .sector-map-btn-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .sector-map-btn-label {
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
         }
         .sector-map-btn:hover {
-            border-color: rgba(147, 197, 253, 0.8);
-            background: linear-gradient(135deg, rgba(26, 60, 132, 0.94), rgba(43, 102, 206, 0.98));
-            color: #eff6ff;
+            border-color: rgba(226, 190, 255, 0.78);
+            background: linear-gradient(135deg, rgba(205, 111, 255, 0.98), rgba(67, 44, 160, 0.98) 48%, rgba(19, 42, 110, 1) 100%);
+            color: #ffffff;
+            transform: scale(1.05);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+                0 0 18px rgba(191, 90, 242, 0.38),
+                0 0 34px rgba(41, 121, 255, 0.28);
+            animation-duration: 1.8s;
+        }
+        @keyframes galacticProgressPulse {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+                    0 0 12px rgba(191, 90, 242, 0.2),
+                    0 0 22px rgba(41, 121, 255, 0.14);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+                    0 0 18px rgba(191, 90, 242, 0.32),
+                    0 0 30px rgba(41, 121, 255, 0.22);
+            }
         }
         #sector-map-modal .leaderboard-modal-card {
             width: min(1400px, 99vw);
@@ -479,6 +534,26 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            transform-origin: 50% 46%;
+        }
+        #sector-map-modal {
+            overflow: hidden;
+        }
+        #sector-map-modal::before {
+            content: '';
+            position: absolute;
+            inset: -16%;
+            background:
+                radial-gradient(circle at 50% 52%, rgba(56, 189, 248, 0.18), rgba(56, 189, 248, 0) 36%),
+                radial-gradient(circle at 50% 52%, rgba(129, 140, 248, 0.18), rgba(129, 140, 248, 0) 52%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #sector-map-modal.show::before {
+            animation: sectorMapBackdropBloom 0.9s ease-out forwards;
+        }
+        #sector-map-modal.sector-map-opening .leaderboard-modal-card {
+            animation: sectorMapCardArrival 0.72s cubic-bezier(0.18, 0.84, 0.24, 1) both;
         }
         .sector-map-soon-banner {
             margin: 0.12rem 0 0.5rem;
@@ -494,6 +569,14 @@
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
+        #sector-map-modal.sector-map-opening .sector-map-soon-banner,
+        #sector-map-modal.sector-map-opening .leaderboard-modal-header,
+        #sector-map-modal.sector-map-opening .sector-tactical-overlay {
+            animation: sectorMapUiRise 0.52s ease-out both;
+        }
+        #sector-map-modal.sector-map-opening .leaderboard-modal-header { animation-delay: 0.1s; }
+        #sector-map-modal.sector-map-opening .sector-map-soon-banner { animation-delay: 0.18s; }
+        #sector-map-modal.sector-map-opening .sector-tactical-overlay { animation-delay: 0.34s; }
         .sector-map-wrap {
             position: relative;
             border: 1px solid rgba(109, 153, 255, 0.25);
@@ -504,11 +587,54 @@
             height: auto;
             background: radial-gradient(120% 120% at 50% 18%, rgba(30, 58, 138, 0.18), rgba(2, 6, 23, 0.96) 56%);
         }
+        .sector-map-wrap::before,
+        .sector-map-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+        }
+        .sector-map-wrap::before {
+            background:
+                radial-gradient(circle at 50% 50%, rgba(125, 211, 252, 0.28), rgba(125, 211, 252, 0) 34%),
+                linear-gradient(115deg, rgba(255, 255, 255, 0) 24%, rgba(125, 211, 252, 0.24) 47%, rgba(255, 255, 255, 0) 72%);
+            transform: scale(0.84);
+        }
+        .sector-map-wrap::after {
+            inset: -8% -18%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 14%, rgba(147, 197, 253, 0.12) 48%, rgba(255, 255, 255, 0) 82%);
+            transform: translateX(-34%) skewX(-18deg);
+        }
+        #sector-map-modal.sector-map-opening .sector-map-wrap::before {
+            animation: sectorMapCoreIgnite 0.88s ease-out forwards;
+        }
+        #sector-map-modal.sector-map-opening .sector-map-wrap::after {
+            animation: sectorMapSweepIn 0.96s cubic-bezier(0.2, 0.72, 0.24, 1) forwards;
+        }
         .sector-map-svg {
             width: 100%;
             height: 100%;
             display: block;
             background: radial-gradient(120% 120% at 50% 12%, rgba(59, 130, 246, 0.09), rgba(1, 4, 15, 0.98) 58%);
+        }
+        #sector-map-modal.sector-map-opening .sector-map-svg {
+            animation: sectorMapFieldWake 0.8s ease-out both;
+        }
+        #sector-map-modal.sector-map-opening #sector-map-links,
+        #sector-map-modal.sector-map-opening #sector-map-nodes,
+        #sector-map-modal.sector-map-opening #sector-map-stars {
+            transform-origin: 50% 50%;
+        }
+        #sector-map-modal.sector-map-opening #sector-map-stars {
+            animation: sectorMapStarsDriftIn 1s ease-out both;
+        }
+        #sector-map-modal.sector-map-opening #sector-map-links {
+            animation: sectorMapLinksTraceIn 0.78s ease-out 0.2s both;
+        }
+        #sector-map-modal.sector-map-opening #sector-map-nodes {
+            animation: sectorMapNodesRiseIn 0.82s ease-out 0.28s both;
         }
         @media (max-height: 760px) {
             #sector-map-modal .leaderboard-modal-card {
@@ -535,6 +661,58 @@
             animation-timing-function: ease-in-out;
             animation-iteration-count: infinite;
             opacity: 0.18;
+        }
+        @keyframes sectorMapBackdropBloom {
+            0% { opacity: 0; transform: scale(0.92); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes sectorMapCardArrival {
+            0% {
+                opacity: 0;
+                transform: translateY(34px) scale(0.94);
+                filter: saturate(0.76) blur(8px);
+            }
+            58% {
+                opacity: 1;
+                transform: translateY(-4px) scale(1.01);
+                filter: saturate(1.05) blur(0);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: saturate(1) blur(0);
+            }
+        }
+        @keyframes sectorMapUiRise {
+            0% { opacity: 0; transform: translateY(14px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes sectorMapCoreIgnite {
+            0% { opacity: 0; transform: scale(0.8); }
+            55% { opacity: 0.92; transform: scale(1.04); }
+            100% { opacity: 0; transform: scale(1.16); }
+        }
+        @keyframes sectorMapSweepIn {
+            0% { opacity: 0; transform: translateX(-36%) skewX(-18deg); }
+            20% { opacity: 0.75; }
+            100% { opacity: 0; transform: translateX(36%) skewX(-18deg); }
+        }
+        @keyframes sectorMapFieldWake {
+            0% { opacity: 0; transform: scale(1.035); filter: saturate(0.72) brightness(0.8); }
+            100% { opacity: 1; transform: scale(1); filter: saturate(1) brightness(1); }
+        }
+        @keyframes sectorMapStarsDriftIn {
+            0% { opacity: 0; transform: translateY(24px) scale(1.04); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes sectorMapLinksTraceIn {
+            0% { opacity: 0; transform: scale(0.985); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes sectorMapNodesRiseIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.94); }
+            70% { opacity: 1; transform: translateY(-2px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .sector-link {
             stroke: rgba(147, 197, 253, 0.52);
@@ -1094,12 +1272,12 @@
         .quote-display.words30-compact {
             min-height: 0;
             height: 98px;
-            padding: 0.74rem 1.1rem 1.8rem;
+            padding: 0 1.1rem;
             font-size: 1.15rem;
             line-height: 1.1;
             white-space: nowrap;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             overflow-x: auto;
             overflow-y: hidden;
             scrollbar-width: none;
@@ -3122,7 +3300,6 @@
             background: rgba(5, 7, 22, 0.62);
             padding: 1rem;
         }
-
         .leaderboard-modal.show {
             display: flex;
         }
@@ -3137,12 +3314,25 @@
             box-shadow: 0 16px 38px rgba(2, 2, 18, 0.58);
             padding: 0.9rem 0.95rem 1rem;
         }
+        .leaderboard-modal.menu-modal-opening .leaderboard-modal-card,
+        .profile-modal.menu-modal-opening .profile-modal-card {
+            animation: menuModalCardRise 0.48s cubic-bezier(0.2, 0.84, 0.24, 1) both;
+            transform-origin: 50% 22%;
+        }
 
         .leaderboard-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.55rem;
+        }
+        .leaderboard-modal.menu-modal-opening .leaderboard-modal-header,
+        .profile-modal.menu-modal-opening .profile-modal-header {
+            animation: menuModalContentFadeUp 0.34s ease-out 0.08s both;
+        }
+        .leaderboard-modal.menu-modal-opening .leaderboard-modal-card > :not(.leaderboard-modal-header),
+        .profile-modal.menu-modal-opening .profile-modal-card > :not(.profile-modal-header) {
+            animation: menuModalContentFadeUp 0.38s ease-out 0.14s both;
         }
 
         .leaderboard-modal-title {
@@ -4293,6 +4483,33 @@
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
+        @keyframes menuModalCardRise {
+            0% {
+                opacity: 0;
+                transform: translateY(24px) scale(0.965);
+                filter: blur(8px) saturate(0.86);
+            }
+            62% {
+                opacity: 1;
+                transform: translateY(-2px) scale(1.006);
+                filter: blur(0) saturate(1.04);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0) saturate(1);
+            }
+        }
+        @keyframes menuModalContentFadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         .skills-modal-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -5223,8 +5440,8 @@
         @media (max-width: 500px) {
             h1 { font-size: 1.45rem; }
             .quote-display { font-size: 1.05rem; min-height: 144px; padding: 1.15rem 1rem 2.45rem; }
-            .quote-display.words30-compact { height: 88px; padding: 0.66rem 0.78rem 1.6rem; font-size: 1rem; }
-            .sector-map-btn { padding: 0.34rem 0.52rem; font-size: 0.62rem; }
+            .quote-display.words30-compact { height: 88px; padding: 0 0.78rem; font-size: 1rem; }
+            .sector-map-btn { padding: 0.34rem 0.68rem; font-size: 0.62rem; gap: 0.34rem; }
             .stat-value { font-size: 1.4rem; }
             .history-row { grid-template-columns: 58px 52px 66px 50px 1fr; font-size: 0.75rem; }
             .wpm-chart         { height: 90px; }
@@ -6072,11 +6289,11 @@
 <div class="entry-splash phase-intro" id="entry-splash" aria-hidden="false" onclick="handleSplashScreenClick(event)">
     <svg class="entry-splash-stars" id="entry-splash-stars" viewBox="0 0 1200 720" preserveAspectRatio="none" aria-hidden="true"></svg>
     <div class="entry-splash-card" role="dialog" aria-modal="true" aria-labelledby="entry-splash-title">
-        <div class="entry-logo-wrap">
+        <div class="entry-logo-wrap" onclick="handleSplashScreenClick(event)">
             <img class="entry-logo-image" src="typemine-galactic-logo.png" alt="TypeMine Galactic logo" onerror="this.style.display='none';const f=document.getElementById('entry-logo-fallback');if(f)f.style.display='grid';">
             <div class="entry-logo-fallback" id="entry-logo-fallback" aria-hidden="true">TMG</div>
         </div>
-        <div class="entry-splash-stage">
+        <div class="entry-splash-stage" onclick="handleSplashScreenClick(event)">
             <div class="entry-splash-prompt" id="entry-splash-title">Press any key to continue</div>
             <div class="entry-splash-options">
                 <div class="entry-splash-actions">
@@ -6111,7 +6328,15 @@
                 <span class="label">Humanity Needs Your Help!</span>
             </button>
         </div>
-        <button type="button" class="sector-map-btn" id="sector-map-btn" onclick="openSectorMap()">Sector Map</button>
+        <button type="button" class="sector-map-btn" id="sector-map-btn" onclick="openSectorMap()">
+            <span class="sector-map-btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2.8l2.05 5.15 5.15 2.05-5.15 2.05L12 17.2l-2.05-5.15L4.8 10l5.15-2.05L12 2.8z" fill="#f5edff"/>
+                    <path d="M12 6.4l1.06 2.54 2.54 1.06-2.54 1.06L12 13.6l-1.06-2.54L8.4 10l2.54-1.06L12 6.4z" fill="#bf5af2"/>
+                </svg>
+            </span>
+            <span class="sector-map-btn-label">Galactic Progression</span>
+        </button>
     </div>
     <div class="top-bar-right">
         <div class="top-controls">
@@ -9621,6 +9846,21 @@ function getModalFocusableElements(modal) {
         .filter((el) => el.offsetParent !== null || el === document.activeElement);
 }
 
+function triggerMenuModalEntrance(modal, duration = 700) {
+    if (!modal) return;
+    if (modal._menuModalIntroTimer) {
+        clearTimeout(modal._menuModalIntroTimer);
+        modal._menuModalIntroTimer = null;
+    }
+    modal.classList.remove('menu-modal-opening');
+    void modal.offsetWidth;
+    modal.classList.add('menu-modal-opening');
+    modal._menuModalIntroTimer = setTimeout(() => {
+        modal.classList.remove('menu-modal-opening');
+        modal._menuModalIntroTimer = null;
+    }, duration);
+}
+
 function openModal(modal) {
     if (!modal) return;
     if (activeModalEl === modal) return;
@@ -9634,6 +9874,7 @@ function openModal(modal) {
     }
     modal.classList.add('show');
     modal.setAttribute('aria-hidden', 'false');
+    triggerMenuModalEntrance(modal);
     activeModalEl = modal;
     const focusables = getModalFocusableElements(modal);
     if (focusables.length > 0) focusables[0].focus();
@@ -9641,6 +9882,11 @@ function openModal(modal) {
 
 function closeModal(modal) {
     if (!modal) return;
+    if (modal._menuModalIntroTimer) {
+        clearTimeout(modal._menuModalIntroTimer);
+        modal._menuModalIntroTimer = null;
+    }
+    modal.classList.remove('menu-modal-opening');
     modal.classList.remove('show');
     modal.setAttribute('aria-hidden', 'true');
     if (activeModalEl !== modal) {
@@ -9727,10 +9973,9 @@ function revealSplashOptions() {
 
 function handleSplashScreenClick(event) {
     if (!isSplashScreenOpen() || isSplashOptionsVisible()) return;
-    const target = event && event.target;
-    if (target && typeof target.closest === 'function') {
-        // Ignore clicks on modal buttons/inputs while staying in intro mode.
-        if (target.closest('.entry-splash-btn, .entry-splash-guest, .profile-modal-card, .leaderboard-modal-card')) return;
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
     }
     revealSplashOptions();
 }
@@ -9785,15 +10030,25 @@ function hideSplashScreen() {
 }
 
 function openLoginFromSplash() {
+    if (currentUser && currentUser.username) {
+        hideSplashScreen();
+        playOneShotSound('Sound Effects/Logon.wav');
+        setAuthNote(`Continuing as ${currentUser.username}.`);
+        hiddenInput.blur();
+        return;
+    }
+    playOneShotSound('Sound Effects/Ding.wav');
     openLoginModal();
 }
 
 function openSignupFromSplash() {
+    playOneShotSound('Sound Effects/Ding.wav');
     openSignupModal();
 }
 
 function continueAsGuestFromSplash() {
     hideSplashScreen();
+    playOneShotSound('Sound Effects/Logon.wav');
     setAuthNote('Continuing as guest.');
     hiddenInput.blur();
 }
@@ -9849,6 +10104,7 @@ function updateAuthUi() {
     const profileToggleLabel = document.getElementById('profile-toggle-label');
     const profileUserIcon = document.getElementById('profile-user-icon');
     const adminBtn = document.getElementById('profile-admin-btn');
+    const splashLoginBtn = document.getElementById('entry-login-btn');
     if (logoutBtn) logoutBtn.style.display = currentUser ? 'inline-block' : 'none';
     if (authGrid) authGrid.style.display = currentUser ? 'none' : 'grid';
     if (signupCta) signupCta.style.display = currentUser ? 'none' : 'flex';
@@ -9857,6 +10113,11 @@ function updateAuthUi() {
     if (profileToggleLabel) profileToggleLabel.textContent = currentUser ? 'Profile' : 'Login';
     if (profileUserIcon) profileUserIcon.textContent = currentUser ? '👤' : '🔐';
     if (adminBtn) adminBtn.style.display = isAdminCurrentUser() ? 'inline-flex' : 'none';
+    if (splashLoginBtn) {
+        splashLoginBtn.textContent = currentUser && currentUser.username
+            ? `Continue as ${currentUser.username}`
+            : 'Login';
+    }
     updateProfileToggleHoverInfo();
 }
 
@@ -9883,6 +10144,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
         updateAuthUi();
         closeLoginModal();
         hideSplashScreen();
+        playOneShotSound('Sound Effects/Logon.wav');
         setAuthNote('Account created and logged in.');
         if (usingModal) {
             setSignupNote('Account created and logged in.');
@@ -9941,6 +10203,7 @@ async function loginUser() {
         updateAuthUi();
         closeLoginModal();
         hideSplashScreen();
+        playOneShotSound('Sound Effects/Logon.wav');
         setAuthNote('Logged in successfully.');
         await refreshCloudProgress();
         await refreshLeaderboard();
@@ -11360,11 +11623,28 @@ function openSectorMap() {
     renderSectorMap();
     bindSectorMapParallax();
     openModal(modal);
+    if (modal._sectorMapIntroTimer) {
+        clearTimeout(modal._sectorMapIntroTimer);
+        modal._sectorMapIntroTimer = null;
+    }
+    modal.classList.remove('sector-map-opening');
+    // Re-trigger a sector-map-specific entrance sequence without affecting other modals.
+    void modal.offsetWidth;
+    modal.classList.add('sector-map-opening');
+    modal._sectorMapIntroTimer = setTimeout(() => {
+        modal.classList.remove('sector-map-opening');
+        modal._sectorMapIntroTimer = null;
+    }, 1200);
 }
 
 function closeSectorMap() {
     const modal = document.getElementById('sector-map-modal');
     if (!modal) return;
+    if (modal._sectorMapIntroTimer) {
+        clearTimeout(modal._sectorMapIntroTimer);
+        modal._sectorMapIntroTimer = null;
+    }
+    modal.classList.remove('sector-map-opening');
     resetSectorStarsParallax();
     hideSectorNodeHoverBubble();
     closeModal(modal);
@@ -14177,11 +14457,28 @@ const SFX = {
     below50:      new Audio('Sound Effects/Below 50 WPM.wav'),
     purchase1:    new Audio('Sound Effects/Purchase 1.mp3'),
     laser:        new Audio('Sound Effects/laser.mp3'),
+    ding:         new Audio('Sound Effects/Ding.wav'),
+    logon:        new Audio('Sound Effects/Logon.wav'),
 };
+
+Object.values(SFX).forEach((audio) => {
+    if (!audio) return;
+    audio.preload = 'auto';
+    try { audio.load(); } catch (e) {}
+});
 
 function playSound(audio) {
     audio.currentTime = 0;
     audio.play().catch(() => {}); // silently ignore autoplay policy blocks
+}
+
+function playOneShotSound(path, volume = 1) {
+    if (!path) return;
+    const audio = new Audio(path);
+    audio.preload = 'auto';
+    audio.volume = Math.max(0, Math.min(1, Number(volume) || 0));
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
 }
 
 function runPersonalBestCelebration() {

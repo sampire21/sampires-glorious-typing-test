@@ -1225,3 +1225,17 @@ Original prompt: Please look through my game and ensure that it is solid from to
 - Reworked splash/login layout sizing to scale with browser resolution using `clamp()` and viewport-based dimensions.
 - Main splash logo now shrinks with window size while preserving spacing between prompt, auth buttons, guest link, and footer meta.
 - Confirmed `index.html` scripts still parse successfully after the responsive layout changes.
+
+## Update 25: Splash auth sounds + cached-session continue label
+- Added splash/login sound cues:
+  - `Ding.wav` now plays when the user selects `Login`, `Sign Up`, or `Continue as Guest` on the splash.
+  - `Logon.wav` now plays when the user successfully logs in, successfully creates an account, or continues as a guest.
+- Updated splash primary button behavior for cached sessions:
+  - If `currentUser` is already restored, the splash login button now says `Continue as <user>`.
+  - Clicking it bypasses the login modal and continues straight into the app.
+- Fixed splash auth audio routing so `Ding.wav` only plays when opening Login/Sign Up from the splash, while cached-session continue and guest continue now play only `Logon.wav`.
+- Centered the `Words 30s` text vertically inside its compact quote box on desktop and mobile.
+- Added a sector-map-specific entrance sequence so the story-mode map now blooms in with a backdrop flare, card rise, starfield wake, route/node stagger, and UI reveal instead of appearing instantly.
+- Added shared menu entrance animations across `leaderboard-modal` and `profile-modal` screens, so login/profile/shop/inventory/challenges-related menus now open with the same backdrop bloom, card rise, and content fade-up instead of snapping in.
+- Removed the shared modal lens-flare bloom layer so menu openings keep the motion but no longer show the out-of-place flare behind the panels.
+- Restyled the story-mode button into `Galactic Progression` with a neon purple/deep-blue gradient, pulsing console glow, hover scale-up, and star icon so it reads as the primary premium entry point without affecting the adjacent `Share` button.
