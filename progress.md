@@ -964,3 +964,141 @@ Original prompt: Please look through my game and ensure that it is solid from to
   - modal max height increased to `98vh`
   - map viewport height increased to `min(92vh, 900px)`.
 - Parse smoke test passed.
+
+## Update 16: Lyra Gate mission window (Sector Map level 1)
+- Added a dedicated centered modal for `Lyra Gate` (`#lyra-gate-modal`) opened from the Sector Map node click.
+- Added Lyra mission scene UI above the words:
+  - slowly rotating pixel-styled asteroid
+  - player ship sprite (same ship style used in community goal visuals)
+  - per-correct-keystroke laser burst from ship toward asteroid
+- Added Lyra typing loop with isolated state (separate from main typing run):
+  - custom hidden input + key handler while Lyra modal is open
+  - word stream render with active-word character correctness coloring
+- Added asteroid cycle behavior every 30 correctly completed words:
+  - asteroid explosion animation
+  - pixel explosion particles
+  - Aether crystal burst that flies toward the ship
+  - ship fly-away animation
+  - automatic scene reset for next asteroid
+- Added Sector Map node interaction routing:
+  - Lyra node opens mission window when accessible
+  - locked sectors show a lock message
+  - other accessible sectors show “not online yet” message
+- Added keyboard support on sector nodes (`Enter`/`Space`) for mission launch.
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+- Ran Playwright skill client against `file://` URL due sandbox port-binding restrictions:
+  - command executed successfully
+  - one known console error from `file://` Fetch API restrictions on local sound-pack config fetch (expected in file protocol)
+
+### Notes / next agent
+- In this sandbox, direct localhost hosting is blocked (`PermissionError` on binding port), so full end-to-end UI automation against `http://127.0.0.1` could not be run here.
+- Recommend validating Lyra interaction manually in normal local dev environment:
+  1. open Sector Map
+  2. click `Lyra Gate`
+  3. type 30 correct words and confirm explosion/crystal/ship-reset sequence
+
+## Update 17: Lyra Gate typing parity + hit debris refinement
+- Adjusted Lyra typing field to better match the main typing field look/feel:
+  - same typography style family and larger type scale
+  - darker main-field-like panel styling
+  - explicit `overflow-x: hidden` to prevent bottom horizontal scrollbar
+- Added per-hit asteroid debris behavior:
+  - each correct keystroke laser now triggers 1-2 small rock chunks
+  - chunks blast from the asteroid edge and drift/fade off with randomized vectors
+- Kept existing behavior:
+  - ship remains aimed toward asteroid
+  - lasers fire only on correct keystrokes
+  - 30-word cycle explosion/crystal collection/ship fly-away reset remains intact
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 18: Lyra node click hardening
+- Added robust Sector Map node activation fallback:
+  - `handleSectorSystemSelectById(systemId)` resolver
+  - delegated click handler on `#sector-map-nodes`
+  - inline `onclick` binding per node group for extra browser resilience
+- Added larger invisible hit target circle around each star node to improve clickability.
+- Kept existing accessibility keyboard triggers (`Enter`/`Space`).
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 19: Lyra visual parity fixes (asteroid/laser/typing field)
+- Reworked Lyra asteroid from rounded-square into irregular rock silhouette:
+  - non-square border-radius profile + polygon clip-path
+- Strengthened laser visibility:
+  - raised laser/chunk/crystal/explosion layers above scene objects
+  - thicker beam, brighter glow, longer visibility window
+  - centered beam transform (`translateY(-50%)`) for correct line alignment
+- Updated Lyra typing field to match main typing field styling:
+  - same panel colors/border style and Ubuntu Mono type styling
+  - same base text metrics (font size, line-height, letter-spacing)
+  - explicit `overflow-x: hidden` to remove bottom scrollbar
+- Updated Lyra character rendering to reuse main typing classes:
+  - `char-correct`, `char-incorrect`, `char-untyped`, `char-cursor`
+  - gives identical color/cursor behavior as primary typing modes
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 20: Lyra typing/aim parity pass
+- Restored Lyra cursor/error visuals to match main typing behavior:
+  - removed Lyra-specific cursor override that hid caret
+  - Lyra stream now uses primary `char-*` styling behavior (`char-correct`, `char-incorrect`, `char-untyped`, `char-cursor`)
+- Added per-word attempt tracking for completed words in Lyra:
+  - completed words now retain correct/incorrect character coloring based on what user typed
+- Recalibrated ship aim rotation with sprite orientation offset (`+90deg`) so ship points toward asteroid.
+- Ensured aim updates on each Lyra render/keystroke, and lasers continue firing on each correct keystroke.
+- Brought Lyra typing panel spacing/typography closer to main quote field metrics.
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 21: Lyra switched to exact `.quote-display` + shared hidden input (1:1 typing path)
+- Replaced Lyra custom text container with real `.quote-display`:
+  - new element: `#lyra-quote-display` with classes `quote-display lyra-quote-display`
+- Removed Lyra-specific hidden input entirely; Lyra now reuses the main `#hidden-input` typing path.
+- Added `focusLyraInput()` and updated modal pointer/focus routing so Lyra typing always targets shared hidden input.
+- Updated hidden input focus/blur handlers to toggle `.focused` state between main quote display and Lyra quote display.
+- Fixed a runtime Lyra bug in scene reset (`chunks` was referenced before declaration).
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 22: Lyra hotkey isolation + laser path correction
+- Fixed background test reset while Lyra is open:
+  - global document key handler now suppresses typing-test hotkeys (`space`, typing intent keys) when Lyra modal is active.
+  - prevents main-mode `newTest()/restart()` from firing behind Lyra.
+- Corrected Lyra laser geometry to originate from ship muzzle and terminate at asteroid surface:
+  - anchors now compute ship center/radius and asteroid center/radius.
+  - beam start/end points are projected along the direction vector (ship edge -> asteroid edge).
+- Updated ship aim math to use center-to-center vector with sprite angle offset.
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 23: Lyra laser muzzle anchor + typed/untyped state restoration
+- Laser origin fix:
+  - added `#lyra-ship-muzzle` anchor element inside rotating ship
+  - Lyra anchor math now reads muzzle rect each frame and starts beam exactly at muzzle point
+  - beam still terminates at asteroid edge projection
+- Typing differentiation fix:
+  - removed Lyra-specific color overrides that were overriding the main `char-*` classes
+  - restored visible differentiation for `char-correct`, `char-incorrect`, and `char-untyped`
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 24: Lyra lasers now use exact normal-mode shot renderer
+- Added `emitMiningLaserShotCustom(...)` that reuses the normal mining laser visual pipeline:
+  - same classes: `.mining-laser-shot` and `.mining-laser-shot-core`
+  - same hue/width scaling and animation behavior as normal typing tests
+  - same overlay/ship element: `#mining-laser-overlay` / `.mining-laser-ship`
+- Rewired `emitLyraLaserBurst()` to compute origin/impact on Lyra ship/asteroid, then call `emitMiningLaserShotCustom(...)`.
+- Result: Lyra now mirrors normal laser behavior 1:1, with target swapped from active word to asteroid.
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
