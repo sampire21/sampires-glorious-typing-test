@@ -7,8 +7,8 @@
     <meta name="theme-color" content="#7c6ff7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sampire Type">
-    <title>Sampire's Glorious Typing Test</title>
+    <meta name="apple-mobile-web-app-title" content="TypeMine Galactic">
+    <title>TypeMine Galactic</title>
     <link rel="icon" type="image/png" href="Favicon.png">
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.webmanifest">
@@ -36,6 +36,19 @@
             position: relative;
             z-index: 1;
         }
+        body.splash-active .top-bar,
+        body.splash-active .main-title-logo-wrap,
+        body.splash-active h1,
+        body.splash-active .mode-tabs,
+        body.splash-active .community-mode-popup,
+        body.splash-active .container,
+        body.splash-active #challenge-fail-overlay,
+        body.splash-active #result-overlay,
+        body.splash-active #ui-toast,
+        body.splash-active .pb-celebration {
+            visibility: hidden;
+            pointer-events: none;
+        }
         #space-bg {
             position: fixed;
             inset: 0;
@@ -55,6 +68,258 @@
             margin-bottom: 1.25rem;
             opacity: 0.9;
             text-align: center;
+        }
+        .main-title-logo-wrap {
+            display: grid;
+            place-items: center;
+            margin-top: 1.05rem;
+            margin-bottom: 1rem;
+            width: min(780px, 100%);
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .main-title-logo {
+            width: 100%;
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.24));
+        }
+        .entry-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            display: grid;
+            place-items: center;
+            padding: clamp(0.6rem, 1.8vh, 1.2rem);
+            background:
+                radial-gradient(120% 90% at 50% 40%, rgba(110, 186, 228, 0.26), rgba(58, 98, 140, 0.22) 44%, rgba(13, 27, 44, 0.72) 72%, rgba(10, 18, 31, 0.9) 100%),
+                linear-gradient(165deg, rgba(96, 123, 140, 0.44), rgba(41, 68, 103, 0.5) 42%, rgba(20, 34, 58, 0.72) 100%);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.26s ease, visibility 0.26s ease;
+        }
+        .entry-splash.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .entry-splash-card {
+            position: relative;
+            z-index: 1;
+            width: min(1220px, 98vw);
+            min-height: min(760px, 94vh);
+            padding: clamp(0.55rem, 1.2vh, 1rem) clamp(0.8rem, 2vw, 1.2rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            gap: clamp(0.4rem, 1.1vh, 0.85rem);
+            background: transparent;
+        }
+        .entry-splash-stars {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .entry-logo-wrap {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: min(1120px, 92vw);
+            flex: 1 1 auto;
+        }
+        .entry-logo-image {
+            width: clamp(460px, 78vw, 1120px);
+            max-width: 100%;
+            max-height: min(46vh, 520px);
+            object-fit: contain;
+            filter: drop-shadow(0 0 34px rgba(56, 189, 248, 0.38));
+            animation: splashLogoHover 6.2s ease-in-out infinite;
+        }
+        .entry-logo-fallback {
+            width: 116px;
+            height: 116px;
+            border-radius: 50%;
+            border: 2px solid rgba(96, 165, 250, 0.7);
+            background:
+                radial-gradient(circle at 52% 42%, #e0f2fe 0 12%, #a855f7 30%, #312e81 58%, #0b1120 100%);
+            box-shadow: inset 0 0 0 4px rgba(14, 165, 233, 0.18), 0 0 28px rgba(59, 130, 246, 0.4);
+            display: none;
+            place-items: center;
+            color: #f8fafc;
+            font-weight: 900;
+            letter-spacing: 0.07em;
+            font-size: 1.42rem;
+        }
+        .entry-splash-stage {
+            position: relative;
+            width: min(860px, 96vw);
+            min-height: clamp(108px, 14vh, 132px);
+            margin-top: clamp(-0.55rem, -1vh, -0.2rem);
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+        }
+        .entry-splash-options,
+        .entry-splash-prompt {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+        }
+        .entry-splash-options {
+            gap: 0.62rem;
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition: opacity 0.32s ease, transform 0.32s ease;
+        }
+        .entry-splash-actions {
+            display: flex;
+            gap: clamp(0.65rem, 1.4vw, 1.05rem);
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .entry-splash-btn {
+            min-width: clamp(146px, 16vw, 176px);
+            border: 1px solid rgba(56, 189, 248, 0.64);
+            border-radius: 0;
+            padding: clamp(0.62rem, 1.2vh, 0.78rem) clamp(0.9rem, 1.6vw, 1.2rem);
+            background:
+                linear-gradient(135deg, rgba(47, 67, 92, 0.88) 0%, rgba(32, 50, 71, 0.9) 55%, rgba(39, 60, 84, 0.88) 100%);
+            color: #38bdf8;
+            font-size: clamp(0.78rem, 1.25vw, 0.96rem);
+            font-weight: 800;
+            letter-spacing: clamp(0.08em, 0.18vw, 0.12em);
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 14px rgba(14, 116, 144, 0.22);
+        }
+        .entry-splash-btn:hover {
+            border-color: rgba(103, 232, 249, 0.94);
+            background: linear-gradient(135deg, rgba(59, 83, 114, 0.94) 0%, rgba(41, 62, 87, 0.95) 55%, rgba(52, 76, 103, 0.94) 100%);
+            color: #67e8f9;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.36);
+        }
+        .entry-splash-btn.signup {
+            color: #a855f7;
+            border-color: rgba(168, 85, 247, 0.64);
+            box-shadow: 0 0 14px rgba(147, 51, 234, 0.18);
+        }
+        .entry-splash-btn.signup:hover {
+            color: #c084fc;
+            border-color: rgba(192, 132, 252, 0.9);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.34);
+        }
+        .entry-splash-guest {
+            border: none;
+            background: transparent;
+            color: rgba(198, 220, 237, 0.56);
+            font-size: clamp(0.76rem, 1.15vw, 0.92rem);
+            font-weight: 700;
+            letter-spacing: clamp(0.06em, 0.14vw, 0.1em);
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(198, 220, 237, 0.34);
+            padding: 0.12rem 0.18rem;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .entry-splash-guest:hover {
+            color: rgba(224, 242, 254, 0.86);
+            border-color: rgba(224, 242, 254, 0.7);
+        }
+        .entry-splash-meta {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: clamp(0.45rem, 1.2vh, 0.85rem);
+            width: 100vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: clamp(0.35rem, 1vw, 0.8rem);
+            color: rgba(219, 234, 254, 0.46);
+            font-size: clamp(0.52rem, 0.9vw, 0.72rem);
+            letter-spacing: clamp(0.04em, 0.12vw, 0.1em);
+            text-transform: uppercase;
+            padding: 0 clamp(0.7rem, 2vw, 1.35rem);
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            transition: opacity 0.34s ease, transform 0.34s ease;
+        }
+        .entry-splash-meta span:nth-child(1) { text-align: left; }
+        .entry-splash-meta span:nth-child(2) { text-align: center; flex: 1; }
+        .entry-splash-meta span:nth-child(3) { text-align: right; }
+        .entry-splash-prompt {
+            color: rgba(219, 234, 254, 0.56);
+            font-size: clamp(0.92rem, 2vw, 1.55rem);
+            letter-spacing: clamp(0.1em, 0.32vw, 0.2em);
+            text-transform: uppercase;
+            font-weight: 700;
+            animation: splashPromptPulse 3.2s ease-in-out infinite;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.28s ease, transform 0.28s ease;
+        }
+        .entry-splash.phase-options .entry-splash-prompt {
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+            animation: none;
+        }
+        .entry-splash.phase-options .entry-splash-options {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        @keyframes splashPromptPulse {
+            0%, 100% { opacity: 0.45; transform: scale(1); }
+            50% { opacity: 0.95; transform: scale(1.03); }
+        }
+        @keyframes splashLogoHover {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        @media (max-width: 700px) {
+            .entry-splash-card {
+                width: min(98vw, 880px);
+                min-height: min(700px, 94vh);
+                padding: 0.7rem 0.7rem;
+            }
+            .entry-splash-stage {
+                width: min(98vw, 760px);
+                min-height: 108px;
+                margin-top: -0.18rem;
+            }
+            .entry-logo-wrap {
+                width: min(92vw, 760px);
+            }
+            .entry-logo-image {
+                width: clamp(280px, 86vw, 760px);
+                max-height: min(32vh, 300px);
+            }
+            .entry-splash-actions {
+                gap: 0.7rem;
+            }
+            .entry-splash-btn {
+                min-width: 138px;
+                font-size: 0.8rem;
+                padding: 0.62rem 0.82rem;
+            }
+            .entry-splash-meta {
+                font-size: 0.58rem;
+                letter-spacing: 0.06em;
+                padding: 0 0.55rem;
+            }
         }
 
         .container {
@@ -206,11 +471,14 @@
         }
         #sector-map-modal .leaderboard-modal-card {
             width: min(1400px, 99vw);
-            max-height: 98vh;
+            max-height: min(98vh, calc(100vh - 8px));
             padding: 0.55rem 0.62rem 0.7rem;
             border: 1px solid rgba(56, 189, 248, 0.24);
             background: radial-gradient(130% 120% at 50% 0%, rgba(20, 36, 78, 0.92), rgba(3, 8, 24, 0.98));
             box-shadow: 0 20px 48px rgba(0, 0, 0, 0.58);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         .sector-map-soon-banner {
             margin: 0.12rem 0 0.5rem;
@@ -231,7 +499,9 @@
             border: 1px solid rgba(109, 153, 255, 0.25);
             border-radius: 12px;
             overflow: hidden;
-            height: min(92vh, 900px);
+            flex: 1 1 auto;
+            min-height: 280px;
+            height: auto;
             background: radial-gradient(120% 120% at 50% 18%, rgba(30, 58, 138, 0.18), rgba(2, 6, 23, 0.96) 56%);
         }
         .sector-map-svg {
@@ -239,6 +509,19 @@
             height: 100%;
             display: block;
             background: radial-gradient(120% 120% at 50% 12%, rgba(59, 130, 246, 0.09), rgba(1, 4, 15, 0.98) 58%);
+        }
+        @media (max-height: 760px) {
+            #sector-map-modal .leaderboard-modal-card {
+                max-height: calc(100vh - 6px);
+                padding: 0.42rem 0.5rem 0.52rem;
+            }
+            .sector-map-soon-banner {
+                margin: 0.08rem 0 0.34rem;
+                padding: 0.34rem 0.48rem;
+            }
+            .sector-map-wrap {
+                min-height: 220px;
+            }
         }
         .sector-grid-pulse {
             animation: sectorGridPulse 2.7s ease-in-out infinite;
@@ -5786,6 +6069,30 @@
 </head>
 <body>
 <canvas id="space-bg" aria-hidden="true"></canvas>
+<div class="entry-splash phase-intro" id="entry-splash" aria-hidden="false" onclick="handleSplashScreenClick(event)">
+    <svg class="entry-splash-stars" id="entry-splash-stars" viewBox="0 0 1200 720" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div class="entry-splash-card" role="dialog" aria-modal="true" aria-labelledby="entry-splash-title">
+        <div class="entry-logo-wrap">
+            <img class="entry-logo-image" src="typemine-galactic-logo.png" alt="TypeMine Galactic logo" onerror="this.style.display='none';const f=document.getElementById('entry-logo-fallback');if(f)f.style.display='grid';">
+            <div class="entry-logo-fallback" id="entry-logo-fallback" aria-hidden="true">TMG</div>
+        </div>
+        <div class="entry-splash-stage">
+            <div class="entry-splash-prompt" id="entry-splash-title">Press any key to continue</div>
+            <div class="entry-splash-options">
+                <div class="entry-splash-actions">
+                    <button type="button" class="entry-splash-btn" id="entry-login-btn" onclick="openLoginFromSplash()">Login</button>
+                    <button type="button" class="entry-splash-btn signup" onclick="openSignupFromSplash()">Sign Up</button>
+                </div>
+                <button type="button" class="entry-splash-guest" id="entry-guest-btn" onclick="continueAsGuestFromSplash()">Continue as Guest</button>
+            </div>
+        </div>
+        <div class="entry-splash-meta">
+            <span>Build: Alpha_7x</span>
+            <span>Version 1.0.4 Galactic</span>
+            <span>© 2026 Tetelestai Studios</span>
+        </div>
+    </div>
+</div>
 
 <!-- Space decorative graphics -->
 
@@ -5884,7 +6191,10 @@
     <div class="pb-banner">New Personal Best!</div>
 </div>
 
-<h1>Sampire's Glorious Typing Test</h1>
+<div class="main-title-logo-wrap">
+    <img class="main-title-logo" src="typemine-galactic-logo.png" alt="TypeMine Galactic" onerror="this.style.display='none';const f=document.getElementById('main-title-fallback');if(f)f.style.display='block';">
+    <h1 id="main-title-fallback" style="display:none;">TypeMine Galactic</h1>
+</div>
 
 <div class="mode-tabs">
     <button class="mode-tab" data-mode="quotes" onclick="setMode('quotes')">Quotes</button>
@@ -8000,6 +8310,7 @@ const LOCAL_AUTH_USERS_KEY = 'sampire-local-auth-users';
 const LOCAL_AUTH_SCORES_KEY = 'sampire-local-auth-scores';
 const LOCAL_GUEST_SCORES_KEY = 'sampire-local-guest-scores';
 const GUEST_SESSION_ID_KEY = 'sampire-guest-session-id';
+const GUEST_LOCATION_CACHE_KEY = 'sampire-guest-location-cache';
 const GHOST_CURSOR_ENABLED_KEY = 'sampire-ghost-cursor-enabled';
 const MINING_VISUALS_ENABLED_KEY = 'sampire-mining-visuals-enabled';
 const MINING_LASER_SOUND_ENABLED_KEY = 'sampire-mining-laser-sound-enabled';
@@ -8045,6 +8356,7 @@ const CRITICAL_STORAGE_KEYS = [
     LOCAL_AUTH_USERS_KEY,
     LOCAL_AUTH_SCORES_KEY,
     LOCAL_GUEST_SCORES_KEY,
+    GUEST_LOCATION_CACHE_KEY,
     HISTORY_KEY,
     'sampire-xp',
     'sampire-lifetime-challenges-completed',
@@ -8386,6 +8698,105 @@ function getGuestSessionId() {
     }
 }
 
+const GUEST_LOCATION_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+let guestLocationResolvePromise = null;
+
+function sanitizeGuestLocationValue(value = '') {
+    return String(value || '')
+        .trim()
+        .replace(/[<>]/g, '')
+        .slice(0, 64);
+}
+
+function getCachedGuestLocation(allowStale = false) {
+    try {
+        const raw = localStorage.getItem(GUEST_LOCATION_CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        const updatedAt = Number(parsed.updatedAt) || 0;
+        const city = sanitizeGuestLocationValue(parsed.city || '');
+        const country = sanitizeGuestLocationValue(parsed.country || '');
+        if (!city && !country) return null;
+        if (!allowStale && updatedAt > 0 && (Date.now() - updatedAt) > GUEST_LOCATION_CACHE_TTL_MS) return null;
+        return { city, country, updatedAt };
+    } catch (e) {
+        return null;
+    }
+}
+
+function cacheGuestLocation(city = '', country = '') {
+    const safeCity = sanitizeGuestLocationValue(city);
+    const safeCountry = sanitizeGuestLocationValue(country);
+    if (!safeCity && !safeCountry) return;
+    try {
+        localStorage.setItem(GUEST_LOCATION_CACHE_KEY, JSON.stringify({
+            city: safeCity,
+            country: safeCountry,
+            updatedAt: Date.now(),
+        }));
+    } catch (e) {}
+}
+
+function getGuestDisplayNameFromLocation(location = null) {
+    const city = sanitizeGuestLocationValue(location && location.city);
+    const country = sanitizeGuestLocationValue(location && location.country);
+    if (city && country) return `Guest from ${city}, ${country}`;
+    if (country) return `Guest from ${country}`;
+    if (city) return `Guest from ${city}`;
+    return 'Guest';
+}
+
+async function resolveGuestLocation() {
+    if (currentUser) return null;
+    const cached = getCachedGuestLocation(false);
+    if (cached) return cached;
+    if (guestLocationResolvePromise) return guestLocationResolvePromise;
+    guestLocationResolvePromise = (async () => {
+        try {
+            const res = await fetchWithTimeout('https://ipapi.co/json/', {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+            }, 4200);
+            if (!res || !res.ok) return getCachedGuestLocation(true);
+            const data = await res.json().catch(() => ({}));
+            const city = sanitizeGuestLocationValue(data && (data.city || data.region_city || data.town || ''));
+            const country = sanitizeGuestLocationValue(data && (data.country_name || data.country || ''));
+            if (!city && !country) return getCachedGuestLocation(true);
+            cacheGuestLocation(city, country);
+            const loc = getCachedGuestLocation(true);
+            if (loc) updateGuestScoresLocation(loc);
+            return loc;
+        } catch (e) {
+            return getCachedGuestLocation(true);
+        } finally {
+            guestLocationResolvePromise = null;
+        }
+    })();
+    return guestLocationResolvePromise;
+}
+
+function updateGuestScoresLocation(location = null) {
+    const loc = location || getCachedGuestLocation(true);
+    if (!loc) return;
+    const guestId = `guest:${getGuestSessionId()}`;
+    const guestScores = loadLocalJson(LOCAL_GUEST_SCORES_KEY, []);
+    let mutated = false;
+    for (const row of guestScores) {
+        if (!row || String(row.userId || '') !== guestId) continue;
+        if (row.city !== loc.city || row.country !== loc.country) {
+            row.city = loc.city || '';
+            row.country = loc.country || '';
+            row.username = getGuestDisplayNameFromLocation(loc);
+            mutated = true;
+        }
+    }
+    if (mutated) {
+        saveLocalJson(LOCAL_GUEST_SCORES_KEY, guestScores);
+        if (lbActiveTab === 'alltime' || lbActiveTab === 'weekly') refreshLeaderboard();
+    }
+}
+
 function makeLocalToken(userId) {
     return `local-token:${userId}`;
 }
@@ -8605,7 +9016,10 @@ async function localApiFetch(url, options = {}, headers = {}) {
             .sort((a, b) => b.wpm - a.wpm || b.accuracy - a.accuracy || b.date - a.date)
             .slice(0, limit)
             .map(s => ({
+                userId: s.userId,
                 username: s.username,
+                city: String(s.city || ''),
+                country: String(s.country || ''),
                 mode: s.mode,
                 wpm: s.wpm,
                 accuracy: s.accuracy,
@@ -9292,6 +9706,109 @@ function handleSignupModalBackdrop(event) {
     if (event && event.target === document.getElementById('signup-modal')) closeSignupModal();
 }
 
+function isSplashScreenOpen() {
+    const splash = document.getElementById('entry-splash');
+    return !!(splash && !splash.classList.contains('hidden'));
+}
+
+function isSplashOptionsVisible() {
+    const splash = document.getElementById('entry-splash');
+    return !!(splash && splash.classList.contains('phase-options'));
+}
+
+function revealSplashOptions() {
+    const splash = document.getElementById('entry-splash');
+    const loginBtn = document.getElementById('entry-login-btn');
+    if (!splash) return;
+    splash.classList.remove('phase-intro');
+    splash.classList.add('phase-options');
+    if (loginBtn) setTimeout(() => loginBtn.focus(), 120);
+}
+
+function handleSplashScreenClick(event) {
+    if (!isSplashScreenOpen() || isSplashOptionsVisible()) return;
+    const target = event && event.target;
+    if (target && typeof target.closest === 'function') {
+        // Ignore clicks on modal buttons/inputs while staying in intro mode.
+        if (target.closest('.entry-splash-btn, .entry-splash-guest, .profile-modal-card, .leaderboard-modal-card')) return;
+    }
+    revealSplashOptions();
+}
+
+function showSplashPrompt() {
+    const splash = document.getElementById('entry-splash');
+    if (!splash) return;
+    splash.classList.remove('phase-options');
+    splash.classList.add('phase-intro');
+}
+
+function initEntrySplashStars() {
+    const starsLayer = document.getElementById('entry-splash-stars');
+    if (!starsLayer || starsLayer.dataset.ready === '1') return;
+    starsLayer.innerHTML = '';
+    const starCount = 100 + Math.floor(Math.random() * 51);
+    const regularStarPalette = ['#eff6ff', '#e2e8f0', '#dbeafe', '#bfdbfe'];
+    const aetherStarPalette = ['#ddd6fe', '#c4b5fd', '#fde68a', '#facc15'];
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const isAetherTint = Math.random() < 0.1;
+        const palette = isAetherTint ? aetherStarPalette : regularStarPalette;
+        const color = palette[Math.floor(Math.random() * palette.length)];
+        const cx = Math.random() * 1200;
+        const cy = Math.random() * 720;
+        const r = 0.5 + Math.random() * 1.5;
+        const duration = 1.6 + Math.random() * 3.6;
+        const delay = Math.random() * 6.5;
+        const minOpacity = 0.06 + Math.random() * 0.18;
+        const maxOpacity = 0.72 + Math.random() * 0.28;
+
+        star.setAttribute('class', 'sector-star');
+        star.setAttribute('cx', cx.toFixed(2));
+        star.setAttribute('cy', cy.toFixed(2));
+        star.setAttribute('r', r.toFixed(2));
+        star.setAttribute('fill', color);
+        star.style.animationDuration = `${duration.toFixed(2)}s`;
+        star.style.animationDelay = `${delay.toFixed(2)}s`;
+        star.style.setProperty('--min-o', minOpacity.toFixed(2));
+        star.style.setProperty('--max-o', maxOpacity.toFixed(2));
+        starsLayer.appendChild(star);
+    }
+    starsLayer.dataset.ready = '1';
+}
+
+function hideSplashScreen() {
+    const splash = document.getElementById('entry-splash');
+    if (!splash) return;
+    splash.classList.add('hidden');
+    splash.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('splash-active');
+}
+
+function openLoginFromSplash() {
+    openLoginModal();
+}
+
+function openSignupFromSplash() {
+    openSignupModal();
+}
+
+function continueAsGuestFromSplash() {
+    hideSplashScreen();
+    setAuthNote('Continuing as guest.');
+    hiddenInput.blur();
+}
+
+function initializeEntrySplash() {
+    const splash = document.getElementById('entry-splash');
+    if (!splash) return;
+    initEntrySplashStars();
+    document.body.classList.add('splash-active');
+    showSplashPrompt();
+    splash.classList.remove('hidden');
+    splash.setAttribute('aria-hidden', 'false');
+    hiddenInput.blur();
+}
+
 function openLoginModal() {
     const modal = document.getElementById('login-modal');
     if (!modal) return;
@@ -9365,6 +9882,7 @@ async function signupUser(usernameOverride = null, passwordOverride = null) {
         ensureFounderBadgeForBeta();
         updateAuthUi();
         closeLoginModal();
+        hideSplashScreen();
         setAuthNote('Account created and logged in.');
         if (usingModal) {
             setSignupNote('Account created and logged in.');
@@ -9422,6 +9940,7 @@ async function loginUser() {
         ensureFounderBadgeForBeta();
         updateAuthUi();
         closeLoginModal();
+        hideSplashScreen();
         setAuthNote('Logged in successfully.');
         await refreshCloudProgress();
         await refreshLeaderboard();
@@ -9564,11 +10083,18 @@ function saveGuestScoreToLeaderboard(score, isSessionPB) {
     if (!isSessionPB) {
         return { ok: false, error: 'Only session personal best runs can be submitted by guests.' };
     }
+    const cachedLocation = getCachedGuestLocation(true);
+    if (!cachedLocation) {
+        // Resolve asynchronously for future guest submissions.
+        void resolveGuestLocation();
+    }
     const guestUserId = `guest:${getGuestSessionId()}`;
     const guestEntry = {
         id: crypto.randomUUID(),
         userId: guestUserId,
-        username: 'Guest',
+        username: getGuestDisplayNameFromLocation(cachedLocation),
+        city: String(cachedLocation && cachedLocation.city || ''),
+        country: String(cachedLocation && cachedLocation.country || ''),
         wpm: Number(score.wpm) || 0,
         accuracy: Number(score.accuracy) || 0,
         rawWpm: Number(score.rawWpm) || 0,
@@ -10171,9 +10697,52 @@ function emitLyraLaserBurst() {
     laserLayer.appendChild(impact);
     impact.addEventListener('animationend', () => impact.remove(), { once: true });
 
-    if (miningLaserSoundEnabled) playSound(SFX.laser);
     updateLyraShipAim();
     setTimeout(() => emitLyraAsteroidChunks(1 + Math.floor(Math.random() * 2)), 42);
+}
+
+function emitLyraWordCompletionShatter() {
+    if (!isLyraGateOpen() || !miningVisualsEnabled) return;
+    const stream = document.getElementById('lyra-quote-display');
+    const activeWord = stream ? stream.querySelector('.lyra-word.active') : null;
+    if (!stream || !activeWord) return;
+
+    const hostRect = stream.getBoundingClientRect();
+    const wordRect = activeWord.getBoundingClientRect();
+    const centerX = wordRect.left - hostRect.left + (wordRect.width * 0.5);
+    const centerY = wordRect.top - hostRect.top + (wordRect.height * 0.58);
+    const burstCount = 18;
+    const palette = ['#fde047', '#fb923c', '#f97316', '#ef4444', '#facc15'];
+
+    const core = document.createElement('span');
+    core.className = 'mining-shatter-core';
+    core.style.setProperty('--x', `${centerX.toFixed(1)}px`);
+    core.style.setProperty('--y', `${centerY.toFixed(1)}px`);
+    stream.appendChild(core);
+    core.addEventListener('animationend', () => core.remove(), { once: true });
+
+    for (let i = 0; i < burstCount; i++) {
+        const particle = document.createElement('span');
+        particle.className = 'mining-shatter-particle';
+        const theta = (Math.PI * 2 * i / burstCount) + (Math.random() * 0.34);
+        const travel = 16 + Math.random() * 24;
+        const dx = Math.cos(theta) * travel;
+        const dy = Math.sin(theta) * travel - (4 + Math.random() * 7);
+        const size = 4 + Math.random() * 4;
+        const duration = 0.3 + Math.random() * 0.16;
+        const color = palette[Math.floor(Math.random() * palette.length)];
+
+        particle.style.setProperty('--x', `${centerX.toFixed(1)}px`);
+        particle.style.setProperty('--y', `${centerY.toFixed(1)}px`);
+        particle.style.setProperty('--dx', `${dx.toFixed(1)}px`);
+        particle.style.setProperty('--dy', `${dy.toFixed(1)}px`);
+        particle.style.setProperty('--size', `${size.toFixed(1)}px`);
+        particle.style.setProperty('--dur', `${duration.toFixed(2)}s`);
+        particle.style.setProperty('--pixel', color);
+
+        stream.appendChild(particle);
+        particle.addEventListener('animationend', () => particle.remove(), { once: true });
+    }
 }
 
 function emitLyraAsteroidChunks(count = 1) {
@@ -10374,6 +10943,8 @@ function handleLyraGateKeydown(e) {
         lyraGateState.attempts[lyraGateState.wordIndex] = lyraGateState.typed;
         const isPerfectWord = lyraGateState.typed === currentWord;
         if (isPerfectWord) {
+            emitLyraWordCompletionShatter();
+            if (miningLaserSoundEnabled) playSound(SFX.laser);
             lyraGateState.totalCompleted += 1;
             if (lyraGateState.totalCompleted % LYRA_WORDS_PER_ASTEROID === 0) triggerLyraAsteroidCycle();
         }
@@ -11054,8 +11625,17 @@ function renderScoreLeaderboardRows(rows) {
     `;
     listEl.innerHTML = header;
     visible.forEach((row, idx) => {
-        const username = String(row.username || 'Unknown').trim() || 'Unknown';
+        const userId = String(row.userId || '');
+        const isGuest = userId.startsWith('guest:') || /^guest\b/i.test(String(row.username || ''));
+        const location = {
+            city: String(row.city || ''),
+            country: String(row.country || ''),
+        };
+        const username = isGuest
+            ? getGuestDisplayNameFromLocation(location)
+            : (String(row.username || 'Unknown').trim() || 'Unknown');
         const safeUsername = escapeHtml(username);
+        const userClass = isGuest ? 'lb-user' : 'lb-user lb-user-hover';
         const el = document.createElement('div');
         el.className = 'leaderboard-row';
         if (lbActiveTab === 'weekly' && idx < crownCutoff) el.classList.add('lb-crown-row');
@@ -11070,7 +11650,7 @@ function renderScoreLeaderboardRows(rows) {
             ? '<span class="lb-crown" title="Top 10% this week">&#128081;</span>' : '';
         el.innerHTML = `
             <span class="lb-rank">#${idx + 1} ${crownBadge}</span>
-            <span class="lb-user lb-user-hover" data-username="${safeUsername}">${safeUsername}</span>
+            <span class="${userClass}" data-username="${safeUsername}">${safeUsername}</span>
             <span class="lb-mode">${escapeHtml(modeLabel)}</span>
             <span class="lb-wpm">${Math.round(row.wpm || 0)}</span>
             <span class="lb-acc">${Math.round(row.accuracy || 0)}%</span>
@@ -12669,6 +13249,10 @@ function showResults(capturedElapsed) {
 
 // ── Input handling ─────────────────────────────────────────────────────────
 function handleTypingKeydown(e) {
+    if (isSplashScreenOpen()) {
+        e.preventDefault();
+        return;
+    }
     if (isLyraGateOpen()) {
         if (handleLyraGateKeydown(e)) return;
     }
@@ -12799,6 +13383,28 @@ document.addEventListener('keydown', handleModalFocusTrap);
 document.addEventListener('keydown', (e) => {
     const resultsOpen = resultOverlay.classList.contains('show');
     const activeEl = document.activeElement;
+    if (isSplashScreenOpen()) {
+        const isStartKey = e.key === 'Enter' || e.key === ' ' || e.key === 'Tab' || e.key === 'Backspace' || e.key.length === 1;
+        if (isStartKey && !isSplashOptionsVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
+            revealSplashOptions();
+            return;
+        }
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            closeLoginModal();
+            closeSignupModal();
+            showSplashPrompt();
+            return;
+        }
+        if (activeEl === hiddenInput) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        return;
+    }
     if (isLyraGateOpen()) {
         if (e.key === 'Escape') {
             e.preventDefault();
@@ -15205,6 +15811,7 @@ loadMiningLaserSoundPreference();
 updateGhostToggleButton();
 updateMiningFxToggleButton();
 updateSectorMapButtonVisibility();
+initializeEntrySplash();
 renderHistory();
 newTest();
 sfxReady = true; // enable sounds after initial load
@@ -15213,6 +15820,7 @@ updateXPDisplay();
 restoreSession().then(() => {
     refreshLeaderboard();
     if (currentUser) refreshCloudProgress();
+    if (!currentUser) void resolveGuestLocation();
 });
 
 if ('serviceWorker' in navigator) {

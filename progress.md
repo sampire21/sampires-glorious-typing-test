@@ -1102,3 +1102,126 @@ Original prompt: Please look through my game and ensure that it is solid from to
 
 ### Validation
 - Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 25: Guest rough-location capture + leaderboard display
+- Added guest location cache in `localStorage`:
+  - key: `sampire-guest-location-cache`
+  - payload: `{ city, country, updatedAt }`
+  - TTL: 7 days
+- Added guest location resolver (`resolveGuestLocation`) that fetches rough IP-based location via `https://ipapi.co/json/` and caches it.
+- Guest leaderboard submissions now store `city` and `country` fields with each guest score row.
+- Guest leaderboard display name now formats as:
+  - `Guest from City, Country` (or best available fallback)
+- Local leaderboard API mapping now returns `userId`, `city`, and `country` so rendering can format guest rows.
+- Disabled profile tooltip hover fetch for guest rows (no account summary for guests).
+- Boot now triggers background guest location resolution for non-logged-in users.
+
+### Validation
+- Inline JS parse smoke test passed (`parse-ok`).
+
+## Update 9: Lyra mining FX parity + laser SFX timing
+- Sector map Lyra mode now mirrors main-mode word completion burst visuals:
+  - Added `emitLyraWordCompletionShatter()` using the same `mining-shatter-core` and `mining-shatter-particle` effect profile.
+  - Triggered on perfect word completion (spacebar when typed word exactly matches target).
+- Adjusted Lyra laser audio timing:
+  - Removed `playSound(SFX.laser)` from per-keystroke `emitLyraLaserBurst()` path.
+  - Laser SFX now plays only on perfect word completion and respects `miningLaserSoundEnabled`.
+
+## Update 10: Sector map viewport fit
+- Updated `#sector-map-modal .leaderboard-modal-card` to a flex column with hidden overflow so the map uses available modal space instead of forcing inner scrolling.
+- Changed `.sector-map-wrap` from fixed `92vh` height to flexible fill (`flex:1`, `height:auto`) with minimum heights.
+- Added small-height media query to tighten modal/banner padding and keep the full map visible on shorter screens.
+
+## Update 11: Entry splash + rebrand to TypeMine Galactic
+- Added a full-screen pre-entry splash overlay (`#entry-splash`) that appears before the main page UI.
+- Splash includes three actions:
+  - `Login` -> opens existing login modal
+  - `Create New Account` -> opens existing signup modal
+  - `Continue as Guest` -> dismisses splash and enters main page
+- Added splash lock behavior so gameplay typing input is blocked while splash is open.
+- On successful login/signup, splash is auto-dismissed.
+- Renamed visible app name in primary surfaces:
+  - `index.html` `<title>` and `h1` now `TypeMine Galactic`
+  - `apple-mobile-web-app-title` now `TypeMine Galactic`
+  - `manifest.webmanifest` `name`/`short_name` now `TypeMine Galactic` / `TypeMine`
+- Added logo image slot on splash (`typemine-galactic-logo.png`) with a built-in fallback emblem if the file is not present.
+
+## Update 12: Splash UI restyle toward reference look
+- Restyled entry splash to a cleaner cinematic/start-screen look closer to the provided reference:
+  - Larger centered logo.
+  - Added moving shine sweep over logo.
+  - Neon rectangular `LOGIN` and `SIGN UP` buttons.
+  - `CONTINUE AS GUEST` converted to subtle underlined text button.
+  - Added bottom metadata strip (`Build`, `Version`, copyright).
+  - Added centered prompt text: `Press any key to start`.
+- Behavior update: while splash is open, pressing a start key now continues as guest and dismisses splash.
+
+## Update 13: Splash pulse + sector-style starfield
+- Added a slow pulsing animation to the splash prompt text (`Press any key to start`).
+- Added splash star background layer (`#entry-splash-stars`) using the same randomized generation logic/colors/twinkle behavior as sector map stars.
+- Kept grid disabled on splash (stars only), per request.
+
+## Update 14: Splash logo style adjustment
+- Re-copied splash logo asset from `/home/sampire/Downloads/typemine logo.png` to project logo path (`typemine-galactic-logo.png`).
+- Updated splash logo presentation:
+  - Removed shine sweep animation.
+  - Increased logo display size substantially.
+  - Added slow hover animation (`splashLogoHover`) so logo gently floats.
+
+## Update 15: Hide main UI behind splash
+- Added `body.splash-active` state to hide the visible main game interface while splash is open.
+- Main typing/test UI (top bar, title, tabs, container and overlays) is now hidden and non-interactive until splash is dismissed.
+- `initializeEntrySplash()` now adds `splash-active`; `hideSplashScreen()` removes it.
+
+## Update 16: Two-step splash interaction + larger logo
+- Splash now starts in `phase-intro`:
+  - Only `Press any key to start` is visible.
+  - Login/Sign Up/Guest/meta are hidden.
+- First key press now transitions splash to `phase-options`:
+  - Prompt fades out.
+  - Login/Sign Up/Guest/meta fade in.
+- Removed prior behavior where first key auto-continued as guest.
+- Increased splash logo size again for stronger visual emphasis.
+
+## Update 17: Larger splash logo + restored footer meta
+- Increased splash logo render size significantly (upscaled to near full-screen cap).
+- Restored splash footer metadata visibility (Build / Version / Copyright now visible in intro phase and options phase).
+
+## Update 18: Splash fit fix after oversized logo
+- Reduced extreme logo scaling to a large-but-contained responsive size so splash content fits on screen again.
+- Added mobile-specific logo size caps to prevent overflow on smaller viewports.
+- Slightly reduced splash card min-height cap to improve vertical fit.
+
+## Update 19: Splash layout rebalance (large logo + fit-safe spacing)
+- Reworked splash card to a vertical flex layout with `space-between` for consistent centering and spacing.
+- Increased logo size significantly, but constrained with responsive `vw` + `vh` caps so it fits on screen.
+- Reduced splash padding on shorter screens and tuned mobile logo caps to prevent overflow.
+- Centered and wrapped footer metadata for cleaner alignment across widths.
+
+## Update 20: Splash prompt/options replacement + Escape return behavior
+- Changed splash center interaction area to a shared stage (`entry-splash-stage`) so prompt and auth options occupy the same position.
+- Updated prompt copy to: `Press any key to continue`.
+- First key press now fades prompt out and fades options in at the exact same slot (not underneath).
+- `Escape` while splash is active now:
+  - closes login/signup modals
+  - returns splash from options phase back to intro prompt phase.
+- Nudged stage upward (closer to logo) for tighter vertical composition.
+
+## Update 21: Main game header logo swap
+- Replaced the main game title text (`TypeMine Galactic`) with the logo image in the primary header area.
+- Added a fallback text title that appears only if the logo image fails to load.
+- Added dedicated main-title logo sizing/style to keep the header centered and clean.
+
+## Update 22: Logo asset crop + larger in-game header logo
+- Reprocessed `typemine-galactic-logo.png` to a tighter, transparent crop around the logo text/glow so scaling uses the visible mark instead of large empty margins.
+- Increased main game header logo max-height to improve perceived size at full container width.
+
+## Update 23: Splash logo size correction
+- Reduced splash/login logo scaling to fit cleanly in the login screen.
+- Kept the larger in-game header logo unchanged.
+- Adjusted both desktop and mobile splash logo caps.
+
+## Update 24: Resolution-aware splash scaling
+- Reworked splash/login layout sizing to scale with browser resolution using `clamp()` and viewport-based dimensions.
+- Main splash logo now shrinks with window size while preserving spacing between prompt, auth buttons, guest link, and footer meta.
+- Confirmed `index.html` scripts still parse successfully after the responsive layout changes.
