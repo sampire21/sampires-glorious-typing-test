@@ -33,18 +33,6 @@ async function networkFirst(request) {
   }
 }
 
-async function staleWhileRevalidate(request) {
-  const runtime = await caches.open(RUNTIME_CACHE);
-  const cached = await runtime.match(request);
-  const fetchPromise = fetch(request)
-    .then((response) => {
-      if (response && response.ok) runtime.put(request, response.clone());
-      return response;
-    })
-    .catch(() => null);
-  return cached || fetchPromise || fetch(request);
-}
-
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -57,10 +45,5 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request));
-    return;
-  }
-
-  event.respondWith(staleWhileRevalidate(request));
+  event.respondWith(networkFirst(request));
 });

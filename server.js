@@ -50,7 +50,11 @@ function writeData(data) {
 }
 
 function sendJson(res, code, payload) {
-    res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.writeHead(code, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+    });
     res.end(JSON.stringify(payload));
 }
 
@@ -79,6 +83,12 @@ function parseBody(req) {
 function hashPassword(password, saltHex = crypto.randomBytes(16).toString('hex')) {
     const hash = crypto.scryptSync(password, saltHex, 64).toString('hex');
     return { hash, salt: saltHex };
+}
+
+function constantTimeEqual(a, b) {
+    if (typeof a !== 'string' || typeof b !== 'string') return false;
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
 function buildToken(payloadObj) {
@@ -136,8 +146,20 @@ function serveStatic(req, res) {
         res.end('Bad request');
         return;
     }
+    if (reqPath.includes('\0')) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad request');
+        return;
+    }
     const resolved = path.resolve(__dirname, `.${reqPath}`);
-    if (!resolved.startsWith(__dirname)) {
+    if (!resolved.startsWith(__dirname + path.sep) && resolved !== __dirname) {
+        res.writeHead(403, { 'Content-Type': 'text/plain' });
+        res.end('Forbidden');
+        return;
+    }
+    // Block access to data directory and dotfiles
+    const relative = path.relative(__dirname, resolved);
+    if (relative.startsWith('data') || relative.startsWith('.') || relative.includes(path.sep + '.')) {
         res.writeHead(403, { 'Content-Type': 'text/plain' });
         res.end('Forbidden');
         return;
@@ -149,7 +171,11 @@ function serveStatic(req, res) {
             res.end('Not found');
             return;
         }
-        res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+        const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+        if (ext === '.html') {
+            headers['Cache-Control'] = 'no-cache';
+        }
+        res.writeHead(200, headers);
         res.end(file);
     });
 }
@@ -195,7 +221,7 @@ async function handleApi(req, res) {
         const user = data.users.find(u => u.usernameNorm === username);
         if (!user) return sendJson(res, 401, { error: 'Invalid username or password' });
         const { hash } = hashPassword(password, user.passwordSalt);
-        if (hash !== user.passwordHash) return sendJson(res, 401, { error: 'Invalid username or password' });
+        if (!constantTimeEqual(hash, user.passwordHash)) return sendJson(res, 401, { error: 'Invalid username or password' });
         const token = buildToken({ uid: user.id, exp: Date.now() + SESSION_TTL_MS });
         return sendJson(res, 200, { user: publicUser(user), token });
     }

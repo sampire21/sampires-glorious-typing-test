@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
+    <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#7c6ff7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,6 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { overflow-x: hidden; }
 
         body {
             background-color: #05011a;
@@ -92,6 +93,8 @@
             display: grid;
             place-items: center;
             padding: clamp(0.6rem, 1.8vh, 1.2rem);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             background:
                 radial-gradient(120% 90% at 50% 40%, rgba(110, 186, 228, 0.26), rgba(58, 98, 140, 0.22) 44%, rgba(13, 27, 44, 0.72) 72%, rgba(10, 18, 31, 0.9) 100%),
                 linear-gradient(165deg, rgba(96, 123, 140, 0.44), rgba(41, 68, 103, 0.5) 42%, rgba(20, 34, 58, 0.72) 100%);
@@ -633,6 +636,9 @@
         .container {
             width: 100%;
             max-width: 780px;
+        }
+        #typing-area {
+            position: relative;
         }
 
         /* ── Mode tabs ── */
@@ -1961,10 +1967,16 @@
         /* ── Hidden input ── */
         #hidden-input {
             position: absolute;
+            left: 0;
+            top: 0;
             opacity: 0;
             pointer-events: none;
             width: 1px;
             height: 1px;
+            /* Prevent iOS zoom: must be ≥16px */
+            font-size: 16px;
+            /* Prevent transforms that cause viewport jumps on mobile */
+            transform: none;
         }
 
         /* ── Result overlay ── */
@@ -6595,6 +6607,399 @@
             }
         }
 
+        /* ═══════════════════════════════════════════════════════════════════
+           MOBILE / RESPONSIVE – additive overrides (no desktop breakage)
+           ═══════════════════════════════════════════════════════════════════ */
+
+        /* Use dvh where supported so 100vh accounts for mobile browser chrome */
+        @supports (height: 100dvh) {
+            .entry-splash { min-height: 100dvh; }
+            .result-overlay { min-height: 100dvh; }
+            .leaderboard-modal { min-height: 100dvh; }
+        }
+
+        /* --- Tablet / small-desktop (≤768px) --- */
+        @media (max-width: 768px) {
+            body { padding: 3.2rem 1rem 2rem; }
+
+            .top-bar {
+                flex-wrap: wrap;
+                padding: 0.4rem 0.55rem;
+                gap: 0.3rem;
+            }
+            .top-bar-left { gap: 0.3rem; flex-wrap: wrap; }
+            .top-bar-right { gap: 0.3rem; flex-wrap: wrap; }
+
+            .mode-tabs { flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.25rem; }
+            .mode-tab { padding: 0.38rem 0.9rem; font-size: 0.8rem; }
+
+            .stat { padding: 0.6rem 1rem; min-width: 72px; }
+            .stat-value { font-size: 1.45rem; }
+
+            .quote-display { padding: 1.4rem 1.2rem 2.2rem; font-size: 1.15rem; }
+
+            .buttons { flex-wrap: wrap; gap: 0.5rem; }
+
+            .result-main { grid-template-columns: 1fr; gap: 0.75rem; }
+            .result-extra { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+
+            .auth-grid { grid-template-columns: 1fr; }
+            .auth-grid input { font-size: 1rem; }
+
+            .leaderboard-modal-card { width: min(860px, 98vw); padding: 0.7rem; }
+
+            .history-row {
+                grid-template-columns: 58px 50px 64px 48px 1fr;
+                font-size: 0.76rem;
+                gap: 0.35rem;
+                padding: 0.45rem 0.55rem;
+            }
+        }
+
+        /* --- Phone (≤480px) --- */
+        @media (max-width: 480px) {
+            body { padding: 2.8rem 0.5rem 1.5rem; }
+            .container { overflow: hidden; }
+
+            h1 { font-size: 1.25rem; margin-top: 0.8rem; margin-bottom: 0.8rem; }
+
+            .main-title-logo-wrap { margin-top: 0.6rem; margin-bottom: 0.5rem; }
+            .main-title-logo { max-height: 180px; }
+
+            /* Top bar: compact single row */
+            .top-bar {
+                padding: 0.32rem 0.4rem;
+                gap: 0.22rem;
+            }
+            .top-bar-left { gap: 0.2rem; }
+            .top-bar-right { gap: 0.2rem; }
+
+            .share-toggle,
+            .profile-toggle,
+            .leaderboard-toggle,
+            .keysound-toggle,
+            .music-toggle {
+                padding: 0.32rem 0.5rem;
+                font-size: 0.72rem;
+                border-radius: 16px;
+            }
+            .sector-map-btn {
+                padding: 0.3rem 0.55rem;
+                font-size: 0.58rem;
+                gap: 0.28rem;
+            }
+            .sector-map-btn-label { display: none; }
+            .sector-map-btn-icon { width: 16px; height: 16px; flex: 0 0 16px; }
+
+            .xp-bar-wrap { min-width: 90px; }
+            .level-badge { font-size: 0.52rem; }
+            .xp-counter { font-size: 0.48rem; }
+            .community-alert-btn { width: 1.9rem; min-width: 1.9rem; height: 1.9rem; }
+
+            /* Hide labels that take too much space, keep icons */
+            .keysound-toggle #keysound-label,
+            .profile-toggle #profile-toggle-label { display: none; }
+
+            /* Mode tabs: horizontally scrollable */
+            .mode-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                justify-content: flex-start;
+                padding: 0 0.5rem;
+                margin-bottom: 1rem;
+                gap: 0.3rem;
+                max-width: calc(100vw - 1rem);
+            }
+            .mode-tabs::-webkit-scrollbar { display: none; }
+            .mode-tab {
+                flex: 0 0 auto;
+                padding: 0.36rem 0.75rem;
+                font-size: 0.74rem;
+                white-space: nowrap;
+            }
+
+            /* Stats bar */
+            .stats { gap: 0.5rem; flex-wrap: wrap; }
+            .stat { padding: 0.5rem 0.65rem; min-width: 64px; }
+            .stat-label { font-size: 0.56rem; letter-spacing: 0.08em; }
+            .stat-value { font-size: 1.2rem; }
+            .bible-mode-inline { font-size: 0.72rem; }
+
+            /* Quote display */
+            .quote-display {
+                font-size: 1rem;
+                padding: 1rem 0.75rem 1.8rem;
+                min-height: 120px;
+                border-radius: 10px;
+                line-height: 1.75;
+            }
+            .quote-display.words30-compact {
+                height: 80px;
+                padding: 0 0.6rem;
+                font-size: 0.95rem;
+            }
+
+            /* Hint with mobile-friendly text */
+            .hint { font-size: 0.72rem; margin-bottom: 1rem; }
+            .btn-hint { display: none; }
+
+            /* Buttons: wrap and stack */
+            .buttons {
+                flex-wrap: wrap;
+                gap: 0.4rem;
+            }
+            .buttons button {
+                padding: 0.55rem 1rem;
+                font-size: 0.78rem;
+                min-height: 44px;
+            }
+            .new-test-btn {
+                width: 100%;
+                order: -1;
+            }
+
+            /* History */
+            .history-section { padding: 0.75rem 0.7rem; }
+            .history-row {
+                grid-template-columns: 52px 46px 60px 44px 1fr;
+                font-size: 0.7rem;
+                gap: 0.2rem;
+                padding: 0.4rem 0.45rem;
+            }
+
+            /* WPM chart */
+            .wpm-chart { height: 75px; }
+            .wpm-chart--result { height: 85px; }
+
+            /* Result overlay */
+            .result-overlay { padding: 0.5rem; }
+            .result-card {
+                width: 100%;
+                padding: 1.1rem 0.75rem 0.85rem;
+                border-radius: 12px;
+                max-height: calc(100vh - 1rem);
+            }
+            .result-main { grid-template-columns: 1fr; gap: 0.6rem; }
+            .result-stats { gap: 0.4rem; }
+            .result-extra { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; }
+            .result-card .buttons { gap: 0.35rem; }
+            .result-card .buttons button { font-size: 0.74rem; padding: 0.5rem 0.8rem; }
+            .result-close { width: 36px; height: 36px; top: 0.5rem; right: 0.5rem; }
+
+            /* Leaderboard */
+            .leaderboard-modal-card {
+                width: 100%;
+                max-height: calc(100vh - 0.5rem);
+                padding: 0.55rem;
+                border-radius: 10px;
+            }
+            .leaderboard-row {
+                grid-template-columns: 22px 1fr 0.7fr 42px 46px 36px 48px;
+                font-size: 0.62rem;
+                gap: 0.15rem;
+            }
+            .lb-tabs { padding: 0.3rem 0.5rem 0.45rem; gap: 0.3rem; }
+            .lb-tab { padding: 0.2rem 0.55rem; font-size: 0.68rem; }
+
+            /* Auth modals */
+            .auth-grid {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+            }
+            .signup-modal-grid input,
+            .auth-grid input {
+                font-size: 1rem;
+                padding: 0.6rem 0.65rem;
+                min-height: 44px;
+            }
+            .signup-cta { flex-direction: column; text-align: center; gap: 0.5rem; }
+
+            /* Sector map modal */
+            #sector-map-modal .leaderboard-modal-card {
+                width: 100%;
+                max-height: calc(100vh - 4px);
+                padding: 0.35rem;
+            }
+
+            /* Community hub */
+            #community-hub-modal .leaderboard-modal-card {
+                width: 100%;
+                max-height: calc(100vh - 4px);
+                padding: 0.5rem;
+            }
+            .community-hub-grid { grid-template-columns: 1fr; }
+
+            /* Skills modal */
+            .skills-modal-grid {
+                grid-template-columns: 1fr;
+            }
+            .skills-modal-header-row {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                gap: 0.4rem;
+            }
+
+            /* Profile modal */
+            .profile-level-badges-row { grid-template-columns: 1fr; }
+
+            /* Entry splash fine-tuning */
+            .entry-splash-card {
+                min-height: min(680px, 96vh);
+                padding: 0.5rem;
+            }
+            .entry-logo-image {
+                width: clamp(220px, 80vw, 460px);
+                max-height: min(28vh, 240px);
+            }
+            .entry-splash-btn {
+                min-width: 120px;
+                font-size: 0.76rem;
+                padding: 0.58rem 0.7rem;
+                min-height: 44px;
+            }
+            .entry-splash-guest { font-size: 0.74rem; min-height: 44px; display: inline-flex; align-items: center; }
+            .entry-guide-title { font-size: clamp(1.2rem, 5.5vw, 1.8rem); }
+            .entry-guide-copy p { font-size: 0.78rem; line-height: 1.6; }
+            .entry-guide-side-copy { font-size: 0.72rem; }
+            .entry-guide-mode-grid { grid-template-columns: 1fr; }
+            .entry-guide-body { grid-template-columns: 1fr; }
+            .entry-guide-shell { padding: 0.75rem; border-radius: 12px; }
+            .entry-guide-cta { min-width: 200px; font-size: 0.8rem; min-height: 44px; }
+
+            /* Challenge panel */
+            .challenge-panel { font-size: 0.78rem; }
+
+            /* Admin panel */
+            .admin-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Ensure inputs ≥16px to prevent iOS Safari zoom ── */
+        @media (max-width: 768px) {
+            input[type="text"],
+            input[type="password"],
+            input[type="email"],
+            input[type="number"],
+            textarea,
+            select {
+                font-size: max(1rem, 16px);
+            }
+        }
+
+        /* ── Touch-friendly minimum tap targets ── */
+        @media (pointer: coarse) {
+            .mode-tab,
+            .lb-tab,
+            .keysound-option,
+            .music-option,
+            .community-mode-popup-exit,
+            .history-clear,
+            .result-close,
+            .leaderboard-modal-close,
+            .create-account-btn,
+            .entry-splash-btn,
+            .entry-splash-guest,
+            .entry-guide-cta {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .keysound-option,
+            .music-option {
+                padding: 0.55rem 0.6rem;
+            }
+            .quote-display {
+                cursor: pointer;
+            }
+            /* Bigger close buttons on touch */
+            .result-close,
+            .leaderboard-modal-close {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* ── Virtual keyboard open state ── */
+        body.vk-open .main-title-logo-wrap,
+        body.vk-open h1 {
+            display: none;
+        }
+        body.vk-open .mode-tabs {
+            margin-bottom: 0.5rem;
+        }
+        body.vk-open .stats {
+            margin-bottom: 0.5rem;
+        }
+        body.vk-open .stat {
+            padding: 0.3rem 0.5rem;
+        }
+        body.vk-open .stat-value {
+            font-size: 1rem;
+        }
+        body.vk-open .stat-label {
+            font-size: 0.52rem;
+        }
+        body.vk-open .quote-display {
+            min-height: 90px;
+            padding: 0.6rem 0.65rem 1rem;
+            font-size: 0.95rem;
+            line-height: 1.65;
+        }
+        body.vk-open .quote-display.words30-compact {
+            height: 64px;
+            font-size: 0.88rem;
+        }
+        body.vk-open .hint {
+            display: none;
+        }
+        body.vk-open .buttons {
+            display: none;
+        }
+        body.vk-open .wpm-chart {
+            display: none;
+        }
+        body.vk-open .history-section {
+            display: none !important;
+        }
+        body.vk-open .bible-mode-inline {
+            display: none;
+        }
+        body.vk-open .progress-bar {
+            margin-bottom: 0.3rem;
+        }
+        body.vk-open .mining-laser-overlay {
+            display: none;
+        }
+        body.vk-open {
+            padding-top: 2.6rem;
+        }
+
+        /* Mobile tap-to-type overlay prompt */
+        .mobile-tap-hint {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            background: rgba(26, 26, 46, 0.85);
+            color: rgba(124, 111, 247, 0.9);
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: inherit;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (pointer: coarse) {
+            .quote-display:not(.focused) .mobile-tap-hint {
+                display: flex;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -6608,7 +7013,7 @@
                 <div class="entry-logo-fallback" id="entry-logo-fallback" aria-hidden="true">TMG</div>
             </div>
             <div class="entry-splash-stage" onclick="handleSplashScreenClick(event)">
-                <div class="entry-splash-prompt" id="entry-splash-title">Press any key to continue</div>
+                <div class="entry-splash-prompt" id="entry-splash-title">Tap or press any key to continue</div>
                 <div class="entry-splash-options">
                     <div class="entry-splash-actions">
                         <button type="button" class="entry-splash-btn" id="entry-login-btn" onclick="openLoginFromSplash()">Login</button>
@@ -6679,7 +7084,7 @@
                 </div>
                 <div class="entry-guide-actions">
                     <button type="button" class="sector-map-btn entry-guide-cta" id="entry-guide-cta" onclick="continueFromSplashGuide()">Initialize Jump</button>
-                    <div class="entry-guide-continue-note">Press any key to continue</div>
+                    <div class="entry-guide-continue-note">Tap or press any key to continue</div>
                 </div>
             </div>
         </div>
@@ -6700,7 +7105,7 @@
 <div class="top-bar" id="top-bar">
     <div class="top-bar-left">
         <div class="top-left-actions">
-            <button class="share-toggle" id="share-toggle" onclick="shareSite()">
+            <button class="share-toggle" id="share-toggle" onclick="shareSite()" aria-label="Share this site">
                 <span>Share</span>
             </button>
             <button class="community-alert-btn" id="community-alert-btn" onclick="openCommunityHub()" aria-label="Humanity Needs Your Help! Open community goal">
@@ -6780,9 +7185,9 @@
                     <div class="music-menu-title">Main Menu Theme</div>
                     <div class="menu-volume-row">
                         <span class="menu-volume-label">Volume</span>
-                        <span class="menu-volume-value" id="music-volume-value">100%</span>
+                        <span class="menu-volume-value" id="music-volume-value">25%</span>
                     </div>
-                    <input type="range" class="menu-volume-slider" id="music-volume-slider" min="0" max="100" step="1" value="100" oninput="handleMusicVolumeInput(event)" aria-label="Music volume">
+                    <input type="range" class="menu-volume-slider" id="music-volume-slider" min="0" max="100" step="1" value="25" oninput="handleMusicVolumeInput(event)" aria-label="Music volume">
                     <button type="button" class="music-option" data-theme="dark" onclick="selectMusicTheme('dark', event)">Dark Main Theme</button>
                     <button type="button" class="music-option" data-theme="universe" onclick="selectMusicTheme('universe', event)">Your Own Personal Universe</button>
                     <button type="button" class="music-option" onclick="toggleMusicMuteFromMenu()">Toggle On / Off</button>
@@ -6845,7 +7250,7 @@
         <div class="progress-fill" id="progress"></div>
     </div>
 
-    <div class="quote-display" id="quote-display" onclick="focusInput()"></div>
+    <div class="quote-display" id="quote-display" onclick="focusInput()"><div class="mobile-tap-hint" id="mobile-tap-hint">Tap here to start typing</div></div>
     <div class="mining-laser-overlay" id="mining-laser-overlay" aria-hidden="true">
         <span class="mining-laser-ship" id="mining-laser-ship" aria-hidden="true"></span>
     </div>
@@ -6854,8 +7259,10 @@
     <canvas id="wpm-chart" class="wpm-chart" aria-hidden="true"></canvas>
 
     <input type="text" id="hidden-input" name="typing_capture_input"
+           inputmode="text" enterkeyhint="done"
            autocomplete="off" autocorrect="off"
            autocapitalize="off" spellcheck="false"
+           aria-label="Type the displayed text here"
            data-bwignore="true" data-1p-ignore="true"
            data-lpignore="true" data-form-type="other">
 
@@ -8106,6 +8513,12 @@ function focusInput() {
         hiddenInput.focus();
     }
     quoteDisplay.classList.add('focused');
+    // On touch devices, scroll the quote display into view after keyboard opens
+    if (matchMedia('(pointer: coarse)').matches) {
+        setTimeout(() => {
+            quoteDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    }
 }
 
 function shouldUseCompactTypingViewport() {
@@ -8195,6 +8608,15 @@ function renderQuote() {
         }
     }
     applyAuraStyles();
+    // Re-append the mobile tap hint (cleared by innerHTML = '')
+    const tapHint = document.getElementById('mobile-tap-hint') || (() => {
+        const d = document.createElement('div');
+        d.className = 'mobile-tap-hint';
+        d.id = 'mobile-tap-hint';
+        d.textContent = 'Tap here to start typing';
+        return d;
+    })();
+    quoteDisplay.appendChild(tapHint);
     syncTypingViewportScroll(true);
     updateMiningLaserAtActiveWord();
 }
@@ -12008,7 +12430,6 @@ function renderSectorMap() {
         hit.setAttribute('fill', 'rgba(255,255,255,0.001)');
         hit.setAttribute('class', 'node-hit-target');
         hit.setAttribute('pointer-events', 'all');
-        g.setAttribute('onclick', `handleSectorSystemSelectById('${String(node.id).replace(/'/g, "\\'")}')`);
 
         halo.setAttribute('cx', String(node.x));
         halo.setAttribute('cy', String(node.y));
@@ -13683,6 +14104,7 @@ function renderHistory() {
 function showResults(capturedElapsed) {
     resultsPendingOpen = false;
     clearInterval(timerHandle);
+    timerHandle = null;
     clearMiningLaserOverlay();
 
     const elapsedRaw = capturedElapsed != null ? capturedElapsed : getElapsed();
@@ -13711,6 +14133,12 @@ function showResults(capturedElapsed) {
         : [{ t: 0, index: 0 }, { t: Math.max(elapsed, 0.1), index: currentIndex }];
     lastAttemptByTest.set(completedKey, completedAttempt);
     lastTimelineByTest.set(completedKey, completedTimeline);
+    // Cap ghost Maps to prevent unbounded memory growth from random-word tests
+    if (lastAttemptByTest.size > 50) {
+        const oldest = lastAttemptByTest.keys().next().value;
+        lastAttemptByTest.delete(oldest);
+        lastTimelineByTest.delete(oldest);
+    }
     lastCompletedTestKey = completedKey;
     lastCompletedAttempt = completedAttempt.slice();
     lastCompletedTimeline = completedTimeline.map(p => ({ t: p.t, index: p.index }));
@@ -14029,13 +14457,20 @@ function handleTypingKeydown(e) {
                 for (let i = 0; i < count; i++) { typedChars.pop(); }
                 backspaces += count;
                 currentIndex = target;
+                renderQuote();
             } else {
+                const prevIdx = currentIndex;
                 backspaces++;
                 currentIndex--;
                 typedChars.pop();
+                if (charSpans.length === currentQuote.length) {
+                    updateCharSpan(prevIdx);      // old cursor -> untyped
+                    updateCharSpan(currentIndex);  // new cursor position
+                } else {
+                    renderQuote();
+                }
             }
             recordAttemptTimelinePoint();
-            renderQuote();
             syncTypingViewportScroll();
             updateStats();
         }
@@ -14127,6 +14562,106 @@ hiddenInput.addEventListener('focus', () => {
 document.getElementById('lyra-gate-modal')?.addEventListener('pointerdown', () => {
     if (isLyraGateOpen()) setTimeout(() => focusLyraInput(), 0);
 });
+
+// ── Mobile virtual keyboard detection ──────────────────────────────────────
+(function initMobileSupport() {
+    const isTouchDevice = matchMedia('(pointer: coarse)').matches;
+    if (!isTouchDevice) return;
+
+    // Update hint text for mobile users
+    const hintEl = document.getElementById('hint');
+    if (hintEl) hintEl.textContent = 'Tap the text above to begin · Buttons below to restart';
+
+    // Virtual keyboard detection via visualViewport API
+    if (window.visualViewport) {
+        let vkOpen = false;
+        const VK_THRESHOLD = 150; // pixels of height reduction to consider keyboard open
+        const checkVK = () => {
+            const heightDiff = window.innerHeight - window.visualViewport.height;
+            const nowOpen = heightDiff > VK_THRESHOLD;
+            if (nowOpen !== vkOpen) {
+                vkOpen = nowOpen;
+                document.body.classList.toggle('vk-open', vkOpen);
+                if (vkOpen) {
+                    // Scroll the quote display into view
+                    requestAnimationFrame(() => {
+                        const qd = document.getElementById('quote-display');
+                        if (qd) qd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
+                }
+            }
+        };
+        window.visualViewport.addEventListener('resize', checkVK);
+        window.visualViewport.addEventListener('scroll', checkVK);
+    }
+
+    // Handle mobile input via 'input' event for soft keyboards that don't fire keydown.
+    // Track whether keydown already processed this input to avoid double-counting
+    // on tablets with external keyboards.
+    let keydownHandledInput = false;
+    const origHandler = handleTypingKeydown;
+    handleTypingKeydown = function(e) {
+        if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            keydownHandledInput = true;
+            setTimeout(() => { keydownHandledInput = false; }, 0);
+        }
+        return origHandler.call(this, e);
+    };
+    // Re-bind the patched handler
+    hiddenInput.removeEventListener('keydown', origHandler);
+    hiddenInput.addEventListener('keydown', handleTypingKeydown);
+
+    hiddenInput.addEventListener('input', (e) => {
+        if (keydownHandledInput) { hiddenInput.value = ''; return; }
+        if (isComplete || isSplashScreenOpen()) return;
+        const val = hiddenInput.value;
+        if (!val) return;
+        // Process each character in the input value
+        for (const ch of val) {
+            if (ch.length !== 1) continue;
+            if (isLyraGateOpen()) {
+                // Simulate a minimal keydown-like event for Lyra gate
+                const fakeEvent = { key: ch, preventDefault() {}, stopPropagation() {}, ctrlKey: false, metaKey: false, altKey: false, repeat: false };
+                handleLyraGateKeydown(fakeEvent);
+                continue;
+            }
+            if (ch === ' ' && !startTime) continue; // idle: skip space
+            if (activeChallengeId === 'perfectionist' && ch !== currentQuote[currentIndex]) {
+                showChallengeFail();
+                hiddenInput.value = '';
+                return;
+            }
+            playKeypressSound(ch, null);
+            if (!startTime) startTimer();
+            if (isTimedMode()) extendWordBuffer();
+            keyStrokes++;
+            if (ch !== currentQuote[currentIndex]) mistakeCount++;
+            const prevIdx = currentIndex;
+            typedChars[currentIndex] = ch;
+            currentIndex++;
+            recordAttemptTimelinePoint();
+            if (charSpans.length === currentQuote.length) {
+                updateCharSpan(prevIdx);
+                updateCharSpan(currentIndex);
+            } else {
+                renderQuote();
+            }
+            maybeTriggerMiningShatter(prevIdx);
+            if (ch !== ' ' && typedChars[prevIdx] === currentQuote[prevIdx]) emitMiningLaserShotAtWord(prevIdx);
+            syncTypingViewportScroll();
+            emitNebulaTrailAtCursor();
+            updateStats();
+            if (!isTimedMode() && currentIndex === currentQuote.length) {
+                isComplete = true;
+                resultsPendingOpen = true;
+                const _capturedElapsed = getElapsed();
+                setTimeout(() => showResults(_capturedElapsed), 400);
+                break;
+            }
+        }
+        hiddenInput.value = '';
+    });
+})();
 
 document.addEventListener('keydown', handleModalFocusTrap);
 document.addEventListener('keydown', (e) => {
@@ -14222,22 +14757,24 @@ document.addEventListener('keydown', (e) => {
         return;
     }
 
-    if (e.key === 'Escape' && resultOverlay.classList.contains('show')) closeResults();
-    if (e.key === 'Escape') closeLeaderboard();
-    if (e.key === 'Escape') closeSkills();
-    if (e.key === 'Escape') closeInventory();
-    if (e.key === 'Escape') closeAccountManagement();
-    if (e.key === 'Escape') closeDeleteAccountConfirm();
-    if (e.key === 'Escape') closeSignupModal();
-    if (e.key === 'Escape') closeLoginModal();
-    if (e.key === 'Escape') closeAdminPanel();
-    if (e.key === 'Escape') closeCommunityHub();
-    if (e.key === 'Escape') closeSectorMap();
-    if (e.key === 'Escape') closeLyraGate();
-    if (e.key === 'Escape') closeLifetimeStatsModal();
-    if (e.key === 'Escape') closeMissionBriefing();
-    if (e.key === 'Escape') closeKeySoundMenu();
-    if (e.key === 'Escape') closeMusicMenu();
+    if (e.key === 'Escape') {
+        if (resultOverlay.classList.contains('show')) closeResults();
+        closeLeaderboard();
+        closeSkills();
+        closeInventory();
+        closeAccountManagement();
+        closeDeleteAccountConfirm();
+        closeSignupModal();
+        closeLoginModal();
+        closeAdminPanel();
+        closeCommunityHub();
+        closeSectorMap();
+        closeLyraGate();
+        closeLifetimeStatsModal();
+        closeMissionBriefing();
+        closeKeySoundMenu();
+        closeMusicMenu();
+    }
 });
 
 document.addEventListener('pointerdown', (e) => {
@@ -14261,7 +14798,7 @@ const themeMusic = {
 const soundscapePreviewAudio = new Audio('Sound Effects/Your Own Personal Universe.mp3');
 const MUSIC_VOLUME_KEY = 'sampire-music-volume';
 const KEY_SOUND_VOLUME_KEY = 'sampire-key-sound-volume';
-const DEFAULT_MUSIC_VOLUME = 1;
+const DEFAULT_MUSIC_VOLUME = 0.25;
 const DEFAULT_KEY_SOUND_VOLUME = 1;
 
 themeMusic.dark.loop = true;

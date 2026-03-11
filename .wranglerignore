@@ -1,0 +1,21 @@
+# Server-side code should not be served as static assets
+server.js
+worker.js
+functions/
+docker/
+data/
+
+# Config and build files
+wrangler.toml
+package.json
+package-lock.json
+Dockerfile
+CLOUDFLARE_SETUP.md
+progress.md
+
+# Dependencies and tooling
+node_modules/
+.claude/
+.git/
+.env
+.env.*

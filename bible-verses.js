@@ -4,8 +4,6 @@
   Expected shape:
     { text: "Verse text...", source: "Book Chapter:Verse" }
 */
-window.BIBLE_VERSES = window.BIBLE_VERSES || [];
-
 window.BIBLE_VERSES = [
   { text: "The Lord bless you and keep you; the Lord make his face to shine upon you, and be gracious to you; the Lord lift up his countenance upon you, and give you peace.", source: "Numbers 6:24-26" },
   { text: "Hear, O Israel: The Lord is our God, the Lord alone. You shall love the Lord your God with all your heart, and with all your soul, and with all your might.", source: "Deuteronomy 6:4-5" },
