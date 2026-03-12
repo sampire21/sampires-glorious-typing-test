@@ -14,7 +14,7 @@
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { overflow-x: hidden; }
@@ -1130,30 +1130,272 @@
             transform: translate3d(0, 0, 0) scale(1);
         }
         #lyra-gate-modal .leaderboard-modal-card {
-            width: min(940px, 94vw);
+            width: min(1180px, 96vw);
             max-height: 88vh;
+            height: min(92vh, 960px);
             border: 1px solid rgba(76, 201, 240, 0.4);
             background: radial-gradient(130% 140% at 50% 0%, rgba(21, 38, 84, 0.96), rgba(4, 10, 26, 0.98));
             box-shadow: 0 24px 54px rgba(0, 0, 0, 0.6);
             padding: 0.95rem;
+            overflow: visible;
         }
         .lyra-gate-wrap {
-            border: 1px solid rgba(96, 165, 250, 0.34);
-            border-radius: 12px;
-            background: linear-gradient(180deg, rgba(2, 6, 23, 0.78), rgba(10, 20, 48, 0.88));
-            padding: 0.9rem;
+            --lyra-terminal-border: rgba(126, 146, 193, 0.14);
+            --lyra-terminal-border-strong: rgba(107, 168, 255, 0.34);
+            --lyra-terminal-panel: rgba(255, 255, 255, 0.05);
+            --lyra-terminal-panel-strong: rgba(255, 255, 255, 0.08);
+            --lyra-terminal-glow: rgba(102, 233, 255, 0.16);
+            --lyra-terminal-glow-strong: rgba(250, 198, 96, 0.24);
+            --lyra-terminal-text: #eef3ff;
+            --lyra-terminal-muted: #a5b3d1;
+            --lyra-terminal-accent: #66e9ff;
+            --lyra-terminal-accent-2: #f8c660;
+            --lyra-terminal-warning: #7c6ff7;
+            --lyra-terminal-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+            --lyra-terminal-blur: blur(10px);
+            --lyra-neon-low: 0 0 12px rgba(102, 233, 255, 0.12);
+            --lyra-neon-mid: 0 0 22px rgba(102, 233, 255, 0.18);
+            --lyra-neon-high: 0 0 32px rgba(248, 198, 96, 0.18);
+            border-radius: 20px;
+            background:
+                radial-gradient(120% 120% at 0% 0%, rgba(124, 111, 247, 0.16), transparent 52%),
+                radial-gradient(140% 130% at 100% 0%, rgba(102, 233, 255, 0.1), transparent 48%),
+                linear-gradient(180deg, rgba(8, 11, 34, 0.86), rgba(6, 12, 27, 0.9));
+            backdrop-filter: var(--lyra-terminal-blur);
+            -webkit-backdrop-filter: var(--lyra-terminal-blur);
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), var(--lyra-terminal-shadow);
+            height: min(84vh, 880px);
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+        }
+        .lyra-global-stats {
+            display: flex;
+            gap: 1.2rem;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #97a6c8;
+            text-transform: uppercase;
+            align-items: center;
+            padding: 0.28rem 0.65rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-global-stats span > span:first-child { font-weight: 900; }
+        .lyra-global-stats .lyra-wpm-value { color: #7dd3fc; }
+        .lyra-global-stats .lyra-acc-value { color: #f8c660; }
+        .lyra-global-stats .lyra-time-value { color: #c4b5fd; }
+        .lyra-exit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.48rem 0.82rem;
+            border-radius: 999px;
+            border: 1px solid rgba(120, 139, 180, 0.18);
+            background: linear-gradient(180deg, rgba(14, 20, 46, 0.88), rgba(8, 12, 28, 0.92));
+            color: #dbe7ff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+        }
+        .lyra-exit-btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(96, 165, 250, 0.34);
+            box-shadow: 0 0 18px rgba(96, 165, 250, 0.14);
+            background: linear-gradient(180deg, rgba(22, 34, 72, 0.9), rgba(10, 17, 38, 0.94));
+        }
+        .lyra-exit-icon {
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+        .lyra-gate-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 20%, transparent 78%, rgba(102, 233, 255, 0.04)),
+                repeating-linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.028) 0px,
+                    rgba(255, 255, 255, 0.028) 1px,
+                    transparent 2px,
+                    transparent 6px
+                );
+            opacity: 0.34;
+            animation: lyraScanlineDrift 7.4s linear infinite;
+            mix-blend-mode: screen;
+        }
+        .lyra-gate-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: 19px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+        }
+        .lyra-gate-wrap.overload-active {
+            animation: lyraOverloadShake 0.22s linear infinite;
+        }
+        .lyra-scene.crit-shake {
+            animation: lyraCritShake 0.22s ease-out;
+        }
+        .lyra-main-layout {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.42fr) minmax(300px, 0.86fr);
+            gap: 1rem;
+            align-items: stretch;
+            min-height: 0;
+            overflow: visible;
+        }
+        .lyra-play-panel {
+            min-width: 0;
+            display: flex;
+            min-height: 0;
+            overflow: visible;
+        }
+        .lyra-combat-hud {
+            position: relative;
+            width: 100%;
+            display: grid;
+            grid-template-rows: 1fr;
+            gap: 0;
+            padding: 0.45rem;
+            border-radius: 18px;
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            min-height: 0;
+            height: 100%;
+            overflow: visible;
+        }
+        .lyra-combat-hud::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(135deg, rgba(102, 233, 255, 0.05), transparent 28%, transparent 72%, rgba(248, 198, 96, 0.03));
         }
         .lyra-scene {
             position: relative;
-            height: 220px;
-            border-radius: 10px;
-            border: 1px solid rgba(56, 189, 248, 0.26);
+            min-height: clamp(360px, 50vh, 600px);
+            height: auto;
+            border-radius: 16px;
             background:
-                radial-gradient(120px 80px at 20% 40%, rgba(59, 130, 246, 0.18), transparent 70%),
-                radial-gradient(140px 90px at 80% 20%, rgba(192, 132, 252, 0.12), transparent 72%),
-                linear-gradient(180deg, rgba(8, 15, 40, 0.92), rgba(3, 7, 24, 0.96));
+                radial-gradient(210px 150px at 22% 36%, rgba(139, 92, 246, 0.16), transparent 70%),
+                radial-gradient(240px 170px at 80% 18%, rgba(96, 165, 250, 0.12), transparent 72%),
+                radial-gradient(420px 260px at 50% 112%, rgba(56, 189, 248, 0.08), transparent 76%),
+                linear-gradient(180deg, rgba(8, 10, 28, 0.98), rgba(5, 8, 23, 0.99));
             overflow: hidden;
-            margin-bottom: 0.72rem;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03), 0 26px 48px rgba(0, 0, 0, 0.22);
+            z-index: 1;
+        }
+        .lyra-scene::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(180px 120px at 50% 45%, rgba(139, 92, 246, 0.16), transparent 68%),
+                radial-gradient(240px 160px at 50% 100%, rgba(96, 165, 250, 0.08), transparent 72%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .lyra-scene::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 8;
+            box-shadow: inset 0 0 65px rgba(0, 0, 0, 0.78), inset 0 0 24px rgba(0, 0, 0, 0.54);
+        }
+        .lyra-scene.overload-active::before {
+            opacity: 1;
+            animation: lyraOverloadPulse 0.9s ease-in-out infinite;
+        }
+        .lyra-popup-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 6;
+        }
+        .lyra-story-loading-overlay {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 1.5rem;
+            background: radial-gradient(circle at 50% 50%, rgba(7, 12, 28, 0.32), rgba(2, 6, 23, 0.64));
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.18s ease, visibility 0.18s ease;
+            z-index: 9;
+        }
+        .lyra-story-loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .lyra-story-loading-card {
+            width: min(360px, 100%);
+            display: grid;
+            gap: 0.58rem;
+            padding: 0.95rem 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(120, 139, 180, 0.18);
+            background: linear-gradient(180deg, rgba(11, 17, 39, 0.94), rgba(7, 11, 26, 0.9));
+            box-shadow: 0 18px 42px rgba(2, 6, 23, 0.38);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .lyra-story-loading-label {
+            color: var(--lyra-terminal-text);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-story-loading-bar {
+            position: relative;
+            height: 10px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.08);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+        }
+        .lyra-story-loading-fill {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 0%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, rgba(96, 165, 250, 0.9), rgba(125, 211, 252, 0.95) 55%, rgba(248, 198, 96, 0.95));
+            box-shadow: 0 0 16px rgba(96, 165, 250, 0.28);
+            transition: width 0.12s ease;
+        }
+        .lyra-story-loading-meta {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
         }
         .lyra-stars-layer {
             position: absolute;
@@ -1174,27 +1416,63 @@
             left: 50%;
             top: 32%;
             transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
+            --lyra-asteroid-size: 120px;
+            width: var(--lyra-asteroid-size);
+            height: var(--lyra-asteroid-size);
             z-index: 3;
+            --lyra-asteroid-glow: rgba(124, 111, 247, 0.34);
+        }
+        .lyra-asteroid-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 999px;
+            background: radial-gradient(circle, var(--lyra-asteroid-glow) 0%, transparent 72%);
+            filter: blur(12px);
+            opacity: 0.92;
+            pointer-events: none;
         }
         .lyra-asteroid {
             position: relative;
             width: 100%;
             height: 100%;
             transform-origin: center;
+            --lyra-asteroid-base-rotation: 0deg;
             animation: lyraAsteroidRotate 16s linear infinite;
+            transition: filter 160ms ease, opacity 160ms ease;
+            background: transparent;
         }
-        .lyra-asteroid svg { width: 100%; height: 100%; display: block; }
+        .lyra-asteroid canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: transparent;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: optimizeSpeed;
+        }
         .lyra-asteroid.exploding {
             animation: lyraAsteroidExplode 0.72s ease-out forwards;
+        }
+        .lyra-asteroid[data-health-band="healthy"] {
+            filter: drop-shadow(0 0 18px rgba(124, 111, 247, 0.34));
+        }
+        .lyra-asteroid[data-health-band="fractured"] {
+            filter: hue-rotate(12deg) saturate(1.04) drop-shadow(0 0 18px rgba(102, 233, 255, 0.26));
+        }
+        .lyra-asteroid[data-health-band="critical"] {
+            filter: brightness(1.08) drop-shadow(0 0 20px rgba(248, 198, 96, 0.34));
+        }
+        .lyra-asteroid.hit-flash {
+            opacity: 0.78;
         }
         .lyra-ship {
             position: absolute;
             width: 86px;
             height: 86px;
-            right: 18px;
-            bottom: 10px;
+            right: 116px;
+            bottom: 42px;
             z-index: 5;
             transform-origin: 70% 55%;
             --lyra-ship-angle: -12deg;
@@ -1203,7 +1481,7 @@
         .lyra-ship .community-ship-svg {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.32));
+            filter: drop-shadow(0 0 16px rgba(96, 165, 250, 0.32));
         }
         .lyra-ship-muzzle {
             position: absolute;
@@ -1220,6 +1498,7 @@
             animation: lyraShipFlyAway 1.05s ease-in forwards;
         }
         .lyra-laser-layer,
+        .lyra-drone-layer,
         .lyra-chunk-layer,
         .lyra-crystal-layer,
         .lyra-explosion-layer {
@@ -1227,18 +1506,170 @@
             inset: 0;
             pointer-events: none;
         }
+        .lyra-drone-layer { z-index: 4; }
         .lyra-laser-layer { z-index: 4; }
         .lyra-chunk-layer { z-index: 4; }
         .lyra-crystal-layer { z-index: 4; }
         .lyra-explosion-layer { z-index: 4; }
+        .lyra-drone {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.34));
+            transition: opacity 0.18s ease;
+        }
+        .lyra-drone-shell,
+        .lyra-drone-arm,
+        .lyra-drone-pod,
+        .lyra-drone-thruster,
+        .lyra-drone-nose,
+        .lyra-drone-fin,
+        .lyra-drone-core {
+            position: absolute;
+        }
+        .lyra-drone-shell {
+            left: 50%;
+            top: 50%;
+            width: 16px;
+            height: 20px;
+            transform: translate(-50%, -52%);
+            border-radius: 8px 8px 10px 10px;
+            background: linear-gradient(180deg, #d9e7f8 0%, #7b93b4 44%, #32465f 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 0 8px rgba(96, 165, 250, 0.18);
+            border: 1px solid rgba(13, 24, 42, 0.58);
+        }
+        .lyra-drone-core {
+            position: absolute;
+            left: 50%;
+            top: 42%;
+            width: 7px;
+            height: 7px;
+            transform: translate(-50%, -50%);
+            border-radius: 999px;
+            background: radial-gradient(circle, #f8fafc 0%, #8ddcff 48%, #4f8dff 100%);
+            box-shadow: 0 0 10px rgba(125, 211, 252, 0.65);
+        }
+        .lyra-drone-nose {
+            left: 50%;
+            top: 3px;
+            width: 8px;
+            height: 10px;
+            transform: translateX(-50%);
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+            background: linear-gradient(180deg, #f8fbff, #89a5cc);
+            border: 1px solid rgba(13, 24, 42, 0.5);
+            border-bottom: none;
+        }
+        .lyra-drone-arm {
+            top: 15px;
+            width: 12px;
+            height: 3px;
+            background: linear-gradient(90deg, #435872, #91abca);
+            border-radius: 999px;
+            box-shadow: 0 0 5px rgba(96, 165, 250, 0.12);
+        }
+        .lyra-drone-arm.left { left: 5px; transform: rotate(-10deg); transform-origin: right center; }
+        .lyra-drone-arm.right { right: 5px; transform: rotate(10deg); transform-origin: left center; }
+        .lyra-drone-pod {
+            top: 11px;
+            width: 9px;
+            height: 15px;
+            border-radius: 5px;
+            background: linear-gradient(180deg, #7f99bb 0%, #39506c 100%);
+            border: 1px solid rgba(13, 24, 42, 0.55);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.28);
+        }
+        .lyra-drone-pod.left { left: 1px; }
+        .lyra-drone-pod.right { right: 1px; }
+        .lyra-drone-thruster {
+            bottom: 6px;
+            width: 4px;
+            height: 9px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(248, 198, 96, 0.12), rgba(125, 211, 252, 0.95));
+            box-shadow: 0 0 8px rgba(125, 211, 252, 0.55);
+            animation: lyraDroneThrusterPulse 1.1s ease-in-out infinite;
+        }
+        .lyra-drone-thruster.left { left: 7px; animation-delay: -0.18s; }
+        .lyra-drone-thruster.right { right: 7px; animation-delay: -0.42s; }
+        .lyra-drone-fin {
+            bottom: 7px;
+            width: 6px;
+            height: 10px;
+            background: linear-gradient(180deg, #2a3850, #0f1a2b);
+            clip-path: polygon(50% 100%, 100% 0%, 0% 0%);
+            opacity: 0.82;
+        }
+        .lyra-drone-fin.left { left: 10px; transform: rotate(-12deg); }
+        .lyra-drone-fin.right { right: 10px; transform: rotate(12deg); }
+        @keyframes lyraDroneThrusterPulse {
+            0%, 100% { opacity: 0.52; transform: scaleY(0.82); }
+            50% { opacity: 1; transform: scaleY(1.08); }
+        }
+        @keyframes lyraCritShake {
+            0% { transform: translate3d(0, 0, 0); }
+            20% { transform: translate3d(-1.5px, 0.8px, 0); }
+            40% { transform: translate3d(1.3px, -0.8px, 0); }
+            60% { transform: translate3d(-1px, 0.5px, 0); }
+            80% { transform: translate3d(0.8px, -0.4px, 0); }
+            100% { transform: translate3d(0, 0, 0); }
+        }
+        .lyra-scene-readout {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            top: 14px;
+            z-index: 7;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            pointer-events: none;
+            padding: 0.48rem 0.62rem;
+            border-radius: 14px;
+            border: 1px solid rgba(120, 139, 180, 0.18);
+            background: linear-gradient(180deg, rgba(14, 20, 46, 0.62), rgba(8, 12, 28, 0.56));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+        }
+        .lyra-scene-pill {
+            min-width: 0;
+            flex: 1 1 0;
+            padding: 0.28rem 0.42rem;
+            border: 1px solid rgba(120, 139, 180, 0.16);
+            border-radius: 999px;
+            background: rgba(10, 14, 30, 0.52);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.35rem;
+            color: var(--lyra-terminal-muted);
+            font-size: 0.58rem;
+            font-weight: 800;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .lyra-scene-pill strong {
+            color: var(--lyra-terminal-text);
+            font-size: 0.7rem;
+            letter-spacing: 0.03em;
+        }
         .lyra-laser-burst {
             position: absolute;
             height: 5px;
             border-radius: 999px;
             transform-origin: left center;
-            background: linear-gradient(90deg, rgba(34, 211, 238, 0.18) 0%, rgba(34, 211, 238, 1) 15%, rgba(255, 255, 255, 1) 68%, rgba(255, 255, 255, 0) 100%);
-            box-shadow: 0 0 18px rgba(34, 211, 238, 1), 0 0 26px rgba(191, 219, 254, 0.85);
+            background: linear-gradient(90deg, rgba(96, 165, 250, 0.18) 0%, rgba(96, 165, 250, 1) 15%, rgba(255, 255, 255, 1) 68%, rgba(255, 255, 255, 0) 100%);
+            box-shadow: 0 0 18px rgba(96, 165, 250, 0.95), 0 0 26px rgba(191, 219, 254, 0.85);
             animation: lyraLaserShot 0.44s ease-out forwards;
+        }
+        .lyra-laser-burst.drone-shot {
+            animation-duration: 0.2s;
         }
         .lyra-laser-impact {
             position: absolute;
@@ -1249,6 +1680,9 @@
             box-shadow: 0 0 12px rgba(103, 232, 249, 0.95), 0 0 20px rgba(255, 255, 255, 0.7);
             transform: translate(-50%, -50%);
             animation: lyraLaserImpactFlash 0.32s ease-out forwards;
+        }
+        .lyra-laser-impact.drone-shot {
+            animation-duration: 0.16s;
         }
         .lyra-crystal {
             position: absolute;
@@ -1272,10 +1706,10 @@
         .lyra-quote-display {
             min-height: 0;
             max-height: none;
-            height: 52px;
-            padding: 0.7rem 1.1rem;
-            font-size: 1.15rem;
-            line-height: 1.1;
+            height: 104px;
+            padding: 1.05rem 1rem;
+            font-size: 1.2rem;
+            line-height: 1.28;
             white-space: nowrap;
             display: flex;
             align-items: center;
@@ -1284,26 +1718,190 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
             margin-bottom: 0;
+            margin-top: 0;
             position: relative;
+            z-index: 2;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(10, 15, 36, 0.94), rgba(7, 12, 28, 0.96));
+            box-shadow:
+                inset 0 0 0 1px rgba(255,255,255,0.04),
+                0 -1px 0 rgba(255,255,255,0.04),
+                0 -14px 26px rgba(3, 7, 18, 0.28);
         }
         .lyra-quote-display::-webkit-scrollbar { display: none; }
+        .lyra-typing-bay {
+            position: relative;
+            z-index: 2;
+            padding: 0.65rem 0.45rem 0.45rem;
+        }
+        .lyra-typing-bay .lyra-quote-display {
+            min-height: 104px;
+        }
+        .lyra-story-footer {
+            margin-top: 0.52rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.8rem;
+            position: relative;
+            z-index: 6;
+            padding: 0.55rem 0.7rem 0;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .lyra-story-meta {
+            color: rgba(219, 229, 255, 0.72);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            text-align: left;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+        .lyra-story-controls {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+        }
+        .lyra-book-progress {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 11px;
+            background: rgba(255,255,255,0.05);
+            color: #f8c660;
+            padding: 0.5rem 0.62rem;
+            min-width: 72px;
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            box-shadow: 0 0 14px rgba(248, 198, 96, 0.1);
+        }
+        .lyra-story-reset {
+            position: relative;
+            flex: 0 0 auto;
+        }
+        .lyra-story-sfx-toggle {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 11px;
+            background: rgba(255,255,255,0.05);
+            color: var(--lyra-terminal-text);
+            padding: 0.48rem 0.62rem;
+            min-width: 52px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
+        }
+        .lyra-story-sfx-toggle:hover {
+            border-color: rgba(96, 165, 250, 0.34);
+            background: linear-gradient(180deg, rgba(28, 45, 87, 0.9), rgba(14, 21, 49, 0.9));
+            box-shadow: var(--lyra-neon-low);
+        }
+        .lyra-story-sfx-toggle.muted {
+            opacity: 0.7;
+        }
+        .lyra-story-reset-toggle {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 11px;
+            background: rgba(255,255,255,0.05);
+            color: var(--lyra-terminal-text);
+            padding: 0.48rem 0.62rem;
+            min-width: 112px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.55rem;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
+        }
+        .lyra-story-reset-toggle:hover,
+        .lyra-story-reset.open .lyra-story-reset-toggle {
+            border-color: rgba(96, 165, 250, 0.34);
+            background: linear-gradient(180deg, rgba(28, 45, 87, 0.9), rgba(14, 21, 49, 0.9));
+            box-shadow: var(--lyra-neon-low);
+        }
+        .lyra-story-reset-arrow {
+            font-size: 0.82rem;
+            line-height: 1;
+            transition: transform 0.14s ease;
+        }
+        .lyra-story-reset.open .lyra-story-reset-arrow {
+            transform: rotate(180deg);
+        }
+        .lyra-story-reset-menu {
+            position: absolute;
+            bottom: calc(100% + 0.42rem);
+            right: 0;
+            min-width: 280px;
+            display: grid;
+            gap: 0.42rem;
+            padding: 0.48rem;
+            border: 1px solid rgba(120, 139, 180, 0.18);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(11, 17, 39, 0.98), rgba(7, 11, 26, 0.96));
+            box-shadow: 0 18px 42px rgba(2, 6, 23, 0.42);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(4px);
+            transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s ease;
+            z-index: 12;
+        }
+        .lyra-story-reset.open .lyra-story-reset-menu {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .lyra-story-reset-option {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 11px;
+            background: rgba(255,255,255,0.04);
+            color: var(--lyra-terminal-text);
+            padding: 0.62rem 0.68rem;
+            display: grid;
+            gap: 0.18rem;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.14s ease, background 0.14s ease, transform 0.14s ease;
+        }
+        .lyra-story-reset-option:hover {
+            border-color: rgba(96, 165, 250, 0.3);
+            background: rgba(34, 51, 90, 0.58);
+            transform: translateY(-1px);
+        }
+        .lyra-story-reset-option strong {
+            font-size: 0.69rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-story-reset-option span {
+            color: rgba(248, 198, 96, 0.88);
+            font-size: 0.64rem;
+            line-height: 1.35;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-story-reset-option.danger span {
+            color: rgba(255, 144, 181, 0.9);
+        }
         .lyra-quote-display::before,
         .lyra-quote-display::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 42px;
-            pointer-events: none;
-            z-index: 10;
-        }
-        .lyra-quote-display::before {
-            left: 0;
-            background: linear-gradient(90deg, var(--quote-panel-bg) 22%, rgba(26, 26, 46, 0) 100%);
-        }
-        .lyra-quote-display::after {
-            right: 0;
-            background: linear-gradient(270deg, var(--quote-panel-bg) 22%, rgba(26, 26, 46, 0) 100%);
+            display: none;
         }
         .lyra-word {
             opacity: 1;
@@ -1311,10 +1909,21 @@
             flex: 0 0 auto;
             display: inline-block;
             vertical-align: middle;
+            color: #7a8086;
         }
-        .lyra-word.done { opacity: 0.45; }
-        .lyra-word.active { opacity: 1; }
+        .lyra-word.done { opacity: 1; color: rgba(248, 198, 96, 0.72); }
+        .lyra-word.active { opacity: 1; color: #ffffff; }
         .lyra-word .lyra-char { display: inline; }
+        .lyra-word:not(.active):not(.done) .lyra-char,
+        .lyra-word .lyra-char.pending,
+        .lyra-word .char-untyped {
+            color: #7a8086;
+        }
+        .lyra-word.done .lyra-char { color: rgba(248, 198, 96, 0.72); }
+        .lyra-word.active .lyra-char,
+        .lyra-word.active .char-untyped {
+            color: #ffffff;
+        }
         .lyra-rock-chunk {
             position: absolute;
             width: 8px;
@@ -1329,14 +1938,739 @@
             justify-content: space-between;
             align-items: center;
             gap: 0.72rem;
-            margin-bottom: 0.58rem;
-            color: #bfdbfe;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
+            margin-bottom: 0.15rem;
+            color: var(--lyra-terminal-muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-hud strong { color: var(--lyra-terminal-text); }
+        .lyra-overload-wrap {
+            position: absolute;
+            left: 14px;
+            bottom: 14px;
+            z-index: 9;
+            display: grid;
+            grid-template-columns: 138px;
+            justify-items: center;
+            gap: 0.42rem;
+            padding: 0.68rem 0.65rem 0.5rem;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: linear-gradient(180deg, rgba(12, 18, 40, 0.62), rgba(7, 10, 25, 0.58));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 18px 28px rgba(0, 0, 0, 0.28);
+        }
+        .lyra-overload-gauge {
+            position: relative;
+            width: 118px;
+            min-height: 132px;
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            align-items: end;
+            gap: 0.7rem;
+        }
+        .lyra-overload-battery {
+            position: relative;
+            width: 34px;
+            height: 118px;
+            padding: 8px 5px 10px;
+            border-radius: 10px 10px 12px 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: linear-gradient(180deg, rgba(16, 24, 48, 0.9), rgba(9, 13, 28, 0.96));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 16px rgba(96, 165, 250, 0.12);
+            display: grid;
+            align-content: end;
+            gap: 3px;
+            overflow: hidden;
+        }
+        .lyra-overload-battery::before {
+            content: '';
+            position: absolute;
+            top: -7px;
+            left: 50%;
+            width: 14px;
+            height: 7px;
+            transform: translateX(-50%);
+            border-radius: 5px 5px 0 0;
+            background: rgba(208, 220, 245, 0.22);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-bottom: none;
+        }
+        .lyra-overload-segment {
+            height: 7px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.08);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+            opacity: 0.32;
+            transition: opacity 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+        }
+        .lyra-overload-segment.active {
+            opacity: 1;
+            transform: scaleX(1.02);
+        }
+        .lyra-overload-segment.tier-low.active {
+            background: linear-gradient(180deg, #ff7a59, #d9342b);
+            box-shadow: 0 0 10px rgba(255, 90, 59, 0.35);
+        }
+        .lyra-overload-segment.tier-mid.active {
+            background: linear-gradient(180deg, #f8df65, #e0a91c);
+            box-shadow: 0 0 10px rgba(248, 223, 101, 0.34);
+        }
+        .lyra-overload-segment.tier-high.active {
+            background: linear-gradient(180deg, #74f58a, #24c95d);
+            box-shadow: 0 0 10px rgba(84, 240, 117, 0.4);
+        }
+        .lyra-overload-wrap.ready .lyra-overload-segment.active,
+        .lyra-overload-wrap.overload-active .lyra-overload-segment.active {
+            animation: lyraBatteryPulse 0.68s ease-in-out infinite;
+        }
+        .lyra-overload-center {
+            position: relative;
+            display: grid;
+            align-content: center;
+            gap: 0.24rem;
+            min-height: 96px;
+            text-align: left;
+        }
+        .lyra-overload-center span {
+            color: #dbe4ff;
+            font-size: 0.56rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            line-height: 1.1;
+        }
+        .lyra-overload-center strong {
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.05;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            display: block;
+        }
+        .lyra-overload-meta {
+            display: grid;
+            place-items: center;
+            width: 100%;
+            color: #d9c2ef;
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            min-height: 1.15rem;
+        }
+        .lyra-overload-meta strong {
+            color: #f4ecff;
+            font-size: 0.66rem;
+            text-align: center;
+            display: inline-flex;
+            align-items: baseline;
+            justify-content: center;
+            min-width: 12ch;
+        }
+        .lyra-overload-meta strong.lyra-overload-charging::after {
+            content: '...';
+            display: inline-block;
+            width: 3ch;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: lyraChargingDots 1.5s steps(4, end) infinite;
+        }
+        .lyra-overload-trigger {
+            width: 100%;
+            border: 1px solid rgba(216, 180, 254, 0.22);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(56, 20, 84, 0.88), rgba(36, 12, 61, 0.78));
+            color: #f6ebff;
+            padding: 0.5rem 0.64rem;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease, opacity 0.14s ease;
+            box-shadow: 0 0 0 rgba(191, 90, 242, 0);
+        }
+        .lyra-overload-trigger.ready {
+            border-color: rgba(216, 180, 254, 0.62);
+            box-shadow: 0 0 24px rgba(191, 90, 242, 0.4);
+        }
+        .lyra-overload-trigger.ready:not(:disabled) {
+            animation: lyraOverloadReadyPulse 0.86s ease-in-out infinite;
+        }
+        .lyra-overload-trigger:not(:disabled):hover {
+            transform: translateY(-1px);
+        }
+        .lyra-overload-trigger:disabled {
+            opacity: 0.46;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        @keyframes lyraOverloadReadyPulse {
+            0%, 100% {
+                box-shadow: 0 0 16px rgba(191, 90, 242, 0.18), 0 0 0 0 rgba(191, 90, 242, 0.12);
+                border-color: rgba(216, 180, 254, 0.56);
+            }
+            50% {
+                box-shadow: 0 0 28px rgba(191, 90, 242, 0.42), 0 0 0 3px rgba(191, 90, 242, 0.08);
+                border-color: rgba(216, 180, 254, 0.78);
+            }
+        }
+        .lyra-terminal-sidebar {
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 0.75rem;
+            padding: 0.95rem;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: var(--lyra-terminal-blur);
+            -webkit-backdrop-filter: var(--lyra-terminal-blur);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+            min-height: 0;
+            overflow: hidden;
+        }
+        .lyra-sidebar-head {
+            display: grid;
+            gap: 0.55rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(120, 139, 180, 0.14);
+        }
+        .lyra-sidebar-eyebrow {
+            color: var(--lyra-terminal-accent-2);
+            font-size: 0.66rem;
+            font-weight: 900;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-sidebar-currency,
+        .lyra-sidebar-stat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+        }
+        .lyra-sidebar-currency span,
+        .lyra-sidebar-stat span {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-sidebar-currency strong,
+        .lyra-sidebar-stat strong {
+            color: var(--lyra-terminal-text);
+            font-size: 1rem;
+            font-weight: 900;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-sidebar-currency strong {
+            font-size: 1.18rem;
+            color: #f8c660;
+            text-shadow: 0 0 14px rgba(248, 198, 96, 0.26);
+        }
+        .lyra-sidebar-summary {
+            display: grid;
+            gap: 0.38rem;
+        }
+        .lyra-sidebar-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.4rem;
+        }
+        .lyra-sidebar-tab {
+            border: 1px solid rgba(120, 139, 180, 0.14);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            color: var(--lyra-terminal-muted);
+            padding: 0.62rem 0.42rem;
+            font-size: 0.63rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+        }
+        .lyra-sidebar-tab.active {
+            border-color: var(--lyra-terminal-border-strong);
+            color: var(--lyra-terminal-text);
+            background: linear-gradient(180deg, rgba(36, 53, 99, 0.86), rgba(18, 27, 58, 0.94));
+            box-shadow: var(--lyra-neon-mid);
+        }
+        .lyra-sidebar-panels {
+            position: relative;
+            min-height: 0;
+            height: 100%;
+            min-height: 520px;
+            overflow: hidden;
+        }
+        .lyra-sidebar-panel {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            gap: 0.72rem;
+            align-content: start;
+            overflow: auto;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.18s ease, visibility 0.18s ease;
+            z-index: 1;
+        }
+        .lyra-sidebar-panel.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 2;
+        }
+        .lyra-systems-panel,
+        .lyra-upgrade-list,
+        .lyra-library-panel,
+        .lyra-specialization-panel,
+        .lyra-statistics-panel {
+            display: grid;
+            gap: 0.7rem;
+        }
+        .lyra-systems-panel {
+            grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+            min-height: 0;
+            height: 100%;
+        }
+        .lyra-upgrade-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            align-content: start;
+            min-height: 0;
+            overflow: auto;
+            padding-right: 0.2rem;
+        }
+        .lyra-upgrade-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.04);
+            padding: 0.78rem;
+            display: grid;
+            gap: 0.46rem;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease, background 0.16s ease;
+        }
+        .lyra-upgrade-card.can-afford {
+            border-color: rgba(96, 165, 250, 0.3);
+            box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.08), var(--lyra-neon-low);
+        }
+        .lyra-upgrade-card.selected {
+            border-color: rgba(248, 198, 96, 0.44);
+            background: linear-gradient(180deg, rgba(35, 46, 82, 0.92), rgba(16, 22, 45, 0.92));
+            box-shadow: 0 0 0 1px rgba(248, 198, 96, 0.12), 0 0 18px rgba(248, 198, 96, 0.12);
+        }
+        .lyra-upgrade-card.purchase-flash {
+            animation: lyraPurchaseFlash 0.38s ease;
+        }
+        .lyra-upgrade-top {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            align-items: start;
+            gap: 0.36rem;
+        }
+        .lyra-upgrade-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+        }
+        .lyra-upgrade-icon {
+            width: 28px;
+            height: 28px;
+            flex: 0 0 auto;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .lyra-upgrade-icon svg {
+            width: 15px;
+            height: 15px;
+            stroke: #66e9ff;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .lyra-upgrade-name {
+            min-width: 0;
+            display: block;
+            color: var(--lyra-terminal-text);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            line-height: 1.2;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .lyra-upgrade-level {
+            flex: 0 0 auto;
+            color: #f8c660;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .lyra-upgrade-detail {
+            margin-top: 0.1rem;
+            border: 1px solid rgba(120, 139, 180, 0.14);
+            border-radius: 15px;
+            background: linear-gradient(180deg, rgba(11, 17, 39, 0.95), rgba(7, 11, 26, 0.9));
+            padding: 0.86rem;
+            display: grid;
+            gap: 0.58rem;
+            min-height: 0;
+            align-content: start;
+        }
+        .lyra-upgrade-detail-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.65rem;
+        }
+        .lyra-upgrade-detail-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+            color: var(--lyra-terminal-text);
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+        .lyra-upgrade-detail-copy {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.67rem;
+            line-height: 1.45;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-upgrade-detail-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.48rem;
+        }
+        .lyra-upgrade-detail-chip {
+            border: 1px solid rgba(120, 139, 180, 0.12);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            padding: 0.55rem 0.62rem;
+            display: grid;
+            gap: 0.18rem;
+        }
+        .lyra-upgrade-detail-chip span {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.56rem;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
             font-weight: 700;
         }
-        .lyra-hud strong { color: #f0f9ff; }
+        .lyra-upgrade-detail-chip strong {
+            color: var(--lyra-terminal-text);
+            font-size: 0.86rem;
+            font-weight: 800;
+        }
+        .lyra-upgrade-buy {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            color: var(--lyra-terminal-text);
+            padding: 0.62rem 0.72rem;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+        }
+        .lyra-upgrade-buy::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 18%, rgba(248, 198, 96, 0.2) 48%, transparent 78%);
+            transform: translateX(-110%);
+        }
+        .lyra-upgrade-buy.can-afford {
+            border-color: rgba(102, 233, 255, 0.32);
+            background: linear-gradient(180deg, rgba(39, 60, 112, 0.82), rgba(24, 36, 72, 0.86));
+            color: #eef5ff;
+            box-shadow: var(--lyra-neon-mid);
+        }
+        .lyra-upgrade-buy:not(:disabled):hover {
+            transform: translateY(-1px);
+        }
+        .lyra-upgrade-buy.glitch-success {
+            animation: lyraButtonGlitch 0.34s steps(2, end);
+        }
+        .lyra-upgrade-buy.glitch-success::after {
+            animation: lyraButtonSweep 0.34s ease;
+        }
+        .lyra-upgrade-buy:disabled {
+            opacity: 0.46;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .lyra-library-card {
+            border: 1px solid rgba(120, 139, 180, 0.14);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(11, 17, 39, 0.92), rgba(7, 11, 26, 0.78));
+            padding: 0.82rem;
+            display: grid;
+            gap: 0.55rem;
+        }
+        .lyra-library-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.7rem;
+            align-items: baseline;
+        }
+        .lyra-library-title {
+            color: var(--lyra-terminal-text);
+            font-size: 0.74rem;
+            font-weight: 900;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-library-copy {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.7rem;
+            line-height: 1.5;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-library-books {
+            display: grid;
+            gap: 0.55rem;
+        }
+        .lyra-library-book {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            color: var(--lyra-terminal-text);
+            padding: 0.72rem;
+            text-align: left;
+            display: grid;
+            gap: 0.2rem;
+            cursor: pointer;
+            transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+        }
+        .lyra-library-book strong {
+            font-size: 0.76rem;
+            letter-spacing: 0.04em;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-library-book span {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.66rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .lyra-library-book small {
+            color: rgba(219, 229, 255, 0.78);
+            font-size: 0.72rem;
+            line-height: 1.35;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-library-book.active,
+        .lyra-library-book:not(:disabled):hover {
+            border-color: rgba(96, 165, 250, 0.38);
+            background: linear-gradient(180deg, rgba(28, 45, 87, 0.9), rgba(14, 21, 49, 0.9));
+            box-shadow: var(--lyra-neon-low);
+            transform: translateY(-1px);
+        }
+        .lyra-library-book:disabled {
+            opacity: 0.56;
+            cursor: not-allowed;
+        }
+        .lyra-specialization-panel {
+            display: grid;
+            gap: 0.55rem;
+        }
+        .lyra-specialization-card {
+            border: 1px solid rgba(120, 139, 180, 0.14);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(11, 17, 39, 0.9), rgba(7, 11, 26, 0.76));
+            padding: 0.8rem;
+            display: grid;
+            gap: 0.46rem;
+        }
+        .lyra-specialization-card.locked {
+            border-color: rgba(120, 139, 180, 0.12);
+            background: linear-gradient(180deg, rgba(9, 14, 31, 0.88), rgba(6, 10, 22, 0.74));
+        }
+        .lyra-specialization-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.6rem;
+            align-items: baseline;
+        }
+        .lyra-specialization-label {
+            color: var(--lyra-terminal-text);
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-specialization-status {
+            color: #f8c660;
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-specialization-desc {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.71rem;
+            line-height: 1.45;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-specialization-options {
+            display: grid;
+            gap: 0.45rem;
+        }
+        .lyra-specialization-option {
+            border: 1px solid rgba(120, 139, 180, 0.14);
+            border-radius: 12px;
+            background: rgba(10, 14, 30, 0.74);
+            color: var(--lyra-terminal-text);
+            padding: 0.62rem 0.68rem;
+            text-align: left;
+            display: grid;
+            gap: 0.18rem;
+            cursor: pointer;
+            transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+        }
+        .lyra-specialization-option strong {
+            font-size: 0.71rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-specialization-option span {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.69rem;
+            line-height: 1.35;
+        }
+        .lyra-specialization-option.active,
+        .lyra-specialization-option:not(:disabled):hover {
+            border-color: rgba(96, 165, 250, 0.4);
+            background: linear-gradient(180deg, rgba(28, 45, 87, 0.9), rgba(14, 21, 49, 0.9));
+            box-shadow: var(--lyra-neon-low);
+            transform: translateY(-1px);
+        }
+        .lyra-specialization-option:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .lyra-stat-card {
+            border: 1px solid rgba(120, 139, 180, 0.14);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(11, 17, 39, 0.92), rgba(7, 11, 26, 0.74));
+            padding: 0.82rem;
+            display: grid;
+            gap: 0.48rem;
+        }
+        .lyra-stat-card-title {
+            color: var(--lyra-terminal-accent-2);
+            font-size: 0.66rem;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+        .lyra-stat-chip {
+            border: 1px solid rgba(120, 139, 180, 0.12);
+            border-radius: 12px;
+            padding: 0.62rem;
+            background: rgba(10, 14, 30, 0.62);
+            display: grid;
+            gap: 0.2rem;
+        }
+        .lyra-stat-chip span {
+            color: var(--lyra-terminal-muted);
+            font-size: 0.6rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-stat-chip strong {
+            color: var(--lyra-terminal-text);
+            font-size: 0.96rem;
+            font-family: 'Ubuntu', 'Nunito', sans-serif;
+        }
+        .lyra-quote-display {
+            min-height: 0;
+            max-height: none;
+            height: 74px;
+            margin-top: 0;
+            align-self: stretch;
+            padding: 0.7rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(120, 139, 180, 0.14);
+            background: linear-gradient(180deg, rgba(11, 17, 39, 0.84), rgba(7, 11, 26, 0.92));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+        }
+        .lyra-quote-display::before,
+        .lyra-quote-display::after {
+            width: 24px;
+        }
+        @media (max-width: 980px) {
+            .lyra-main-layout {
+                grid-template-columns: 1fr;
+            }
+            .lyra-terminal-sidebar {
+                order: -1;
+            }
+            .lyra-upgrade-list {
+                grid-template-columns: 1fr;
+            }
+            .lyra-overload-wrap {
+                position: relative;
+                left: auto;
+                bottom: auto;
+                justify-self: end;
+                margin-left: auto;
+            }
+            .lyra-scene {
+                min-height: min(52vh, 480px);
+            }
+            .lyra-scene-readout {
+                flex-wrap: wrap;
+            }
+        }
 
         .lyra-clear-splash {
             position: absolute;
@@ -1433,13 +2767,13 @@
         }
 
         @keyframes lyraAsteroidRotate {
-            from { transform: rotate(0deg) scale(1); }
-            to { transform: rotate(360deg) scale(1); }
+            from { transform: rotate(var(--lyra-asteroid-base-rotation)) scale(1); }
+            to { transform: rotate(calc(var(--lyra-asteroid-base-rotation) + 360deg)) scale(1); }
         }
         @keyframes lyraAsteroidExplode {
-            0% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1); }
-            50% { transform: scale(1.22) rotate(9deg); opacity: 1; filter: brightness(1.4); }
-            100% { transform: scale(0.65) rotate(24deg); opacity: 0; filter: brightness(1.9); }
+            0% { transform: scale(1) rotate(var(--lyra-asteroid-base-rotation)); opacity: 1; filter: brightness(1); }
+            50% { transform: scale(1.22) rotate(calc(var(--lyra-asteroid-base-rotation) + 9deg)); opacity: 1; filter: brightness(1.4); }
+            100% { transform: scale(0.65) rotate(calc(var(--lyra-asteroid-base-rotation) + 24deg)); opacity: 0; filter: brightness(1.9); }
         }
         @keyframes lyraShipHover {
             0%, 100% { transform: translateY(0px) rotate(var(--lyra-ship-angle)); }
@@ -1453,6 +2787,58 @@
             0% { opacity: 0; transform: scaleX(0.1); }
             12% { opacity: 1; transform: scaleX(1); }
             100% { opacity: 0; transform: scaleX(1.07); }
+        }
+        @keyframes lyraScanlineDrift {
+            0% { transform: translateY(-12%); }
+            100% { transform: translateY(12%); }
+        }
+        @keyframes lyraOverloadPulse {
+            0%, 100% { opacity: 0.48; filter: saturate(1) brightness(1); }
+            50% { opacity: 0.9; filter: saturate(1.25) brightness(1.16); }
+        }
+        @keyframes lyraBatteryPulse {
+            0%, 100% { filter: brightness(1); transform: scaleX(1.02); }
+            50% { filter: brightness(1.18); transform: scaleX(1.06); }
+        }
+        @keyframes lyraChargingDots {
+            0% { width: 0ch; }
+            25% { width: 1ch; }
+            50% { width: 2ch; }
+            75%, 100% { width: 3ch; }
+        }
+        @keyframes lyraOverloadBarGlow {
+            0%, 100% { box-shadow: 0 0 14px rgba(191, 90, 242, 0.45); filter: brightness(0.96); }
+            50% { box-shadow: 0 0 24px rgba(216, 180, 254, 0.78); filter: brightness(1.12); }
+        }
+        @keyframes lyraOverloadShake {
+            0% { transform: translate3d(0, 0, 0); }
+            20% { transform: translate3d(-1px, 1px, 0); }
+            40% { transform: translate3d(1px, -1px, 0); }
+            60% { transform: translate3d(-1px, -1px, 0); }
+            80% { transform: translate3d(1px, 1px, 0); }
+            100% { transform: translate3d(0, 0, 0); }
+        }
+        @keyframes lyraPurchaseFlash {
+            0% { box-shadow: 0 0 0 rgba(50,215,75,0); border-color: rgba(50,215,75,0.15); }
+            40% { box-shadow: 0 0 0 1px rgba(50,215,75,0.24), 0 0 30px rgba(50,215,75,0.32); border-color: rgba(50,215,75,0.52); }
+            100% { box-shadow: 0 0 0 rgba(50,215,75,0); border-color: rgba(50,215,75,0.15); }
+        }
+        @keyframes lyraButtonGlitch {
+            0%, 100% { transform: translate(0, 0); filter: none; }
+            20% { transform: translate(-1px, 1px); filter: hue-rotate(20deg); }
+            40% { transform: translate(1px, -1px); filter: brightness(1.25); }
+            60% { transform: translate(-1px, 0); filter: hue-rotate(-18deg); }
+            80% { transform: translate(1px, 1px); filter: brightness(1.12); }
+        }
+        @keyframes lyraButtonSweep {
+            0% { transform: translateX(-110%); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateX(110%); opacity: 0; }
+        }
+        @keyframes lyraDroneBeam {
+            0% { opacity: 0; transform: scaleX(0.2); }
+            20% { opacity: 1; }
+            100% { opacity: 0; transform: scaleX(1); }
         }
         @keyframes lyraLaserImpactFlash {
             0% { opacity: 0; transform: translate(-50%, -50%) scale(0.45); }
@@ -1627,6 +3013,8 @@
         }
         #quote-display,
         #quote-display span,
+        #lyra-quote-display,
+        #lyra-quote-display span,
         #quote-source,
         #hidden-input {
             font-family: 'Ubuntu Mono', 'Courier New', Courier, monospace;
@@ -3068,6 +4456,23 @@
 
         .toggle-indicator.on { color: #4ade80; }
         .toggle-indicator.off { color: #ef4444; }
+
+        /* ── Music / Key Sound toggle active/inactive states ── */
+        body .music-toggle.active,
+        body .keysound-toggle.active {
+            border-color: rgba(74, 222, 128, 0.5);
+            background: rgba(74, 222, 128, 0.1);
+            color: #d1fae5;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.15);
+        }
+        body .music-toggle.inactive,
+        body .keysound-toggle.inactive {
+            opacity: 0.45;
+            border-color: rgba(107, 114, 128, 0.3);
+            background: rgba(20, 20, 35, 0.6);
+            color: #6b7280;
+            box-shadow: none;
+        }
         .ui-toast {
             position: fixed;
             left: 50%;
@@ -3775,9 +5180,11 @@
         #community-hub-modal .leaderboard-modal-header::before {
             content: 'EMERGENCY TRANSMISSION';
             position: absolute;
-            right: 3rem;
+            right: 3.8rem;
             top: 50%;
             transform: translateY(-50%);
+            padding-right: 0.7rem;
+            border-right: 1px solid rgba(248, 113, 113, 0.35);
             font-size: 0.58rem;
             font-weight: 700;
             letter-spacing: 0.18em;
@@ -7367,30 +8774,126 @@
     <div class="leaderboard-modal-card" role="dialog" aria-modal="true" aria-labelledby="lyra-gate-title">
         <div class="leaderboard-modal-header">
             <div class="leaderboard-modal-title" id="lyra-gate-title" style="min-width:90px">Lyra Gate</div>
-            <div class="lyra-stats" id="lyra-stats" style="display:flex;gap:1.2rem;font-size:0.78rem;font-weight:700;letter-spacing:0.04em;color:#94a3b8;text-transform:uppercase;align-items:center;">
-                <span><span style="color:#7dd3fc" id="lyra-wpm">0</span> WPM</span>
-                <span><span style="color:#a5f3fc" id="lyra-acc">100</span>% ACC</span>
-                <span><span style="color:#c4b5fd" id="lyra-time">0:00</span></span>
+            <div class="lyra-global-stats" id="lyra-stats">
+                <span><span class="lyra-wpm-value" id="lyra-wpm">0</span> WPM</span>
+                <span><span class="lyra-acc-value" id="lyra-acc">100</span>% ACC</span>
+                <span><span class="lyra-time-value" id="lyra-time">0:00</span></span>
             </div>
-            <button type="button" class="leaderboard-modal-close secondary" onclick="closeLyraGate()" aria-label="Close Lyra Gate">X</button>
+            <button type="button" class="lyra-exit-btn" onclick="closeLyraGate()" aria-label="Exit to galaxy">
+                <span class="lyra-exit-icon" aria-hidden="true">←</span>
+                <span>Exit to Galaxy</span>
+            </button>
         </div>
         <div class="lyra-gate-wrap">
             <div class="lyra-hud">
                 <span>Mining Operation</span>
-                <span id="lyra-progress-text">Asteroid 1 / 15  ·  0 / 30 words</span>
+                <span id="lyra-progress-text">Layer 1 · HP 180 / 180 · Combo x1.00</span>
             </div>
-            <div class="lyra-scene" id="lyra-scene">
-                <div class="lyra-stars-layer" id="lyra-stars-layer"></div>
-                <div class="lyra-laser-layer" id="lyra-laser-layer"></div>
-                <div class="lyra-chunk-layer" id="lyra-chunk-layer"></div>
-                <div class="lyra-crystal-layer" id="lyra-crystal-layer"></div>
-                <div class="lyra-explosion-layer" id="lyra-explosion-layer"></div>
-                <div class="lyra-asteroid-wrap" id="lyra-asteroid-wrap">
-                    <div class="lyra-asteroid" id="lyra-asteroid"></div>
+            <div class="lyra-main-layout">
+                <div class="lyra-play-panel">
+                    <div class="lyra-combat-hud">
+                        <div class="lyra-scene" id="lyra-scene">
+                            <div class="lyra-stars-layer" id="lyra-stars-layer"></div>
+                            <div class="lyra-story-loading-overlay" id="lyra-story-loading-overlay" aria-hidden="true">
+                                <div class="lyra-story-loading-card">
+                                    <div class="lyra-story-loading-label" id="lyra-story-loading-label">Downloading Data...</div>
+                                    <div class="lyra-story-loading-bar">
+                                        <span class="lyra-story-loading-fill" id="lyra-story-loading-fill"></span>
+                                    </div>
+                                    <div class="lyra-story-loading-meta" id="lyra-story-loading-meta">0%</div>
+                                </div>
+                            </div>
+                            <canvas class="lyra-popup-canvas" id="lyra-popup-canvas" aria-hidden="true"></canvas>
+                            <div class="lyra-drone-layer" id="lyra-drone-layer"></div>
+                            <div class="lyra-laser-layer" id="lyra-laser-layer"></div>
+                            <div class="lyra-chunk-layer" id="lyra-chunk-layer"></div>
+                            <div class="lyra-crystal-layer" id="lyra-crystal-layer"></div>
+                            <div class="lyra-explosion-layer" id="lyra-explosion-layer"></div>
+                            <div class="lyra-asteroid-wrap" id="lyra-asteroid-wrap">
+                                <div class="lyra-asteroid" id="lyra-asteroid"></div>
+                            </div>
+                            <div class="lyra-overload-wrap" id="lyra-overload-wrap">
+                                <div class="lyra-overload-gauge" aria-hidden="true">
+                                    <div class="lyra-overload-battery" id="lyra-overload-battery">
+                                        <span class="lyra-overload-segment tier-high" data-overload-segment="10"></span>
+                                        <span class="lyra-overload-segment tier-high" data-overload-segment="9"></span>
+                                        <span class="lyra-overload-segment tier-high" data-overload-segment="8"></span>
+                                        <span class="lyra-overload-segment tier-mid" data-overload-segment="7"></span>
+                                        <span class="lyra-overload-segment tier-mid" data-overload-segment="6"></span>
+                                        <span class="lyra-overload-segment tier-mid" data-overload-segment="5"></span>
+                                        <span class="lyra-overload-segment tier-mid" data-overload-segment="4"></span>
+                                        <span class="lyra-overload-segment tier-low" data-overload-segment="3"></span>
+                                        <span class="lyra-overload-segment tier-low" data-overload-segment="2"></span>
+                                        <span class="lyra-overload-segment tier-low" data-overload-segment="1"></span>
+                                    </div>
+                                    <div class="lyra-overload-center">
+                                        <span>Overload</span>
+                                        <strong id="lyra-overload-status">0%</strong>
+                                    </div>
+                                </div>
+                                <div class="lyra-overload-meta">
+                                    <strong id="lyra-overload-hint">Offline</strong>
+                                </div>
+                                <button type="button" class="lyra-overload-trigger" id="lyra-overload-trigger" onclick="triggerLyraOverload('button')" disabled>Activate</button>
+                            </div>
+                            <div class="lyra-scene-readout" id="lyra-scene-readout">
+                                <div class="lyra-scene-pill"><span>HP</span><strong id="lyra-scene-hp">180 / 180</strong></div>
+                                <div class="lyra-scene-pill"><span>DPS</span><strong id="lyra-scene-dps">0</strong></div>
+                                <div class="lyra-scene-pill"><span>Combo</span><strong id="lyra-scene-combo">x1.00</strong></div>
+                            </div>
+                            <div class="lyra-ship" id="lyra-ship"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="lyra-ship" id="lyra-ship"></div>
+                <aside class="lyra-terminal-sidebar" id="lyra-upgrades-sidebar">
+                    <div class="lyra-sidebar-head">
+                        <div class="lyra-sidebar-eyebrow">Systems Console</div>
+                        <div class="lyra-sidebar-currency"><span>Aether Crystals</span><strong id="lyra-sidebar-crystals">0</strong></div>
+                        <div class="lyra-sidebar-summary">
+                            <div class="lyra-sidebar-stat"><span>Current Layer</span><strong id="lyra-sidebar-layer">1</strong></div>
+                            <div class="lyra-sidebar-stat"><span>Total DPS</span><strong id="lyra-sidebar-dps">0</strong></div>
+                        </div>
+                    </div>
+                    <div class="lyra-sidebar-tabs" role="tablist" aria-label="Mining systems tabs">
+                        <button type="button" class="lyra-sidebar-tab active" data-lyra-tab="systems" onclick="setLyraSidebarTab('systems')">Systems</button>
+                        <button type="button" class="lyra-sidebar-tab" data-lyra-tab="library" onclick="setLyraSidebarTab('library')">Library</button>
+                        <button type="button" class="lyra-sidebar-tab" data-lyra-tab="firmware" onclick="setLyraSidebarTab('firmware')">Firmware</button>
+                        <button type="button" class="lyra-sidebar-tab" data-lyra-tab="statistics" onclick="setLyraSidebarTab('statistics')">Statistics</button>
+                    </div>
+                    <div class="lyra-sidebar-panels">
+                        <div class="lyra-sidebar-panel active" id="lyra-panel-systems"></div>
+                        <div class="lyra-sidebar-panel" id="lyra-panel-library"></div>
+                        <div class="lyra-sidebar-panel" id="lyra-panel-firmware"></div>
+                        <div class="lyra-sidebar-panel" id="lyra-panel-statistics"></div>
+                    </div>
+                </aside>
             </div>
-            <div class="quote-display lyra-quote-display" id="lyra-quote-display" onclick="focusLyraInput()"></div>
+            <div class="lyra-typing-bay">
+                <div class="quote-display lyra-quote-display" id="lyra-quote-display" onclick="focusLyraInput()"></div>
+                <div class="lyra-story-footer">
+                    <div class="lyra-story-meta" id="lyra-story-meta">Alice in Wonderland | Lewis Carroll</div>
+                    <div class="lyra-story-controls">
+                        <div class="lyra-book-progress" id="lyra-book-progress">0.0%</div>
+                        <button type="button" class="lyra-story-sfx-toggle" id="lyra-story-sfx-toggle" onclick="toggleMiningLaserSound()" aria-label="Mute mining sound effects" title="Mute mining sound effects">🔊</button>
+                        <div class="lyra-story-reset" id="lyra-story-reset">
+                            <button type="button" class="lyra-story-reset-toggle" id="lyra-story-reset-toggle" onclick="toggleLyraStoryResetMenu(event)" aria-expanded="false" aria-controls="lyra-story-reset-menu">
+                                Restart
+                                <span class="lyra-story-reset-arrow" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="lyra-story-reset-menu" id="lyra-story-reset-menu" aria-hidden="true">
+                                <button type="button" class="lyra-story-reset-option" onclick="restartLyraStoryProgress('chapter')">
+                                    <strong>Restart Chapter</strong>
+                                    <span>Warning: your saved place jumps to this chapter start.</span>
+                                </button>
+                                <button type="button" class="lyra-story-reset-option danger" onclick="restartLyraStoryProgress('book')">
+                                    <strong>Restart Book</strong>
+                                    <span>Warning: your saved place resets to the first word.</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -7696,6 +9199,7 @@
 </div>
 
 <script src="bible-verses.js"></script>
+<script src="js/mining-mode.js"></script>
 <script>
 const APP_STORAGE_SCHEMA_KEY = 'sampire-storage-schema-version';
 const APP_STORAGE_SCHEMA_VERSION = '2026-03-08.1';
@@ -8341,13 +9845,21 @@ function updateGhostToggleButton() {
 
 function updateMiningLaserSoundToggleButton() {
     const btn = document.getElementById('mining-fx-sfx-toggle-btn');
-    if (!btn) return;
-    btn.textContent = miningLaserSoundEnabled ? '🔊' : '🔇';
-    btn.classList.toggle('on', miningLaserSoundEnabled);
-    btn.classList.toggle('muted', !miningLaserSoundEnabled);
-    btn.setAttribute('aria-label', miningLaserSoundEnabled ? 'Mute laser sounds' : 'Enable laser sounds');
-    btn.title = miningLaserSoundEnabled ? 'Mute laser sounds' : 'Enable laser sounds';
-    btn.style.display = miningVisualsEnabled ? 'inline-flex' : 'none';
+    const lyraBtn = document.getElementById('lyra-story-sfx-toggle');
+    if (btn) {
+        btn.textContent = miningLaserSoundEnabled ? '🔊' : '🔇';
+        btn.classList.toggle('on', miningLaserSoundEnabled);
+        btn.classList.toggle('muted', !miningLaserSoundEnabled);
+        btn.setAttribute('aria-label', miningLaserSoundEnabled ? 'Mute laser sounds' : 'Enable laser sounds');
+        btn.title = miningLaserSoundEnabled ? 'Mute laser sounds' : 'Enable laser sounds';
+        btn.style.display = miningVisualsEnabled ? 'inline-flex' : 'none';
+    }
+    if (lyraBtn) {
+        lyraBtn.textContent = miningLaserSoundEnabled ? '🔊' : '🔇';
+        lyraBtn.classList.toggle('muted', !miningLaserSoundEnabled);
+        lyraBtn.setAttribute('aria-label', miningLaserSoundEnabled ? 'Mute mining sound effects' : 'Enable mining sound effects');
+        lyraBtn.title = miningLaserSoundEnabled ? 'Mute mining sound effects' : 'Enable mining sound effects';
+    }
 }
 
 function updateMiningFxToggleButton() {
@@ -9271,7 +10783,7 @@ function startTimer() {
             clearInterval(timerHandle);
             timerHandle = null;
             timerEl.textContent = '0s';
-            setTimeout(showResults, 120);
+            setTimeout(() => { if (resultsPendingOpen) showResults(); }, 120);
         }
     }, 150);
 }
@@ -11544,43 +13056,379 @@ function setLbTab(tab) {
 
 const LYRA_WORDS_PER_ASTEROID = 30;
 const LYRA_ASTEROIDS_TO_CLEAR = 15;
+const LYRA_VISIBLE_WORD_WINDOW = 18;
 let lyraStatsInterval = null;
+const LYRA_DAMAGE_POPUP_POOL_SIZE = 100;
 let lyraGateState = {
     words: [],
-    wordIndex: 0,
+    storyBaseIndex: 0,
     typed: '',
-    attempts: [],
     totalCompleted: 0,
     cycleBusy: false,
     asteroidSeed: 0,
     startTime: null,
     totalChars: 0,
     correctChars: 0,
+    comboStreak: 0,
+    bestCombo: 0,
+    recentDamageBursts: [],
+};
+let lyraMiningState = null;
+let lyraDamagePopupPool = [];
+let lyraDamagePopupFrame = 0;
+let lyraDamagePopupLastTs = 0;
+let lyraDroneOrbitState = [];
+let lyraDroneOrbitFrame = 0;
+let lyraDroneOrbitLastTs = 0;
+let lyraCharSpans = [];
+let lyraWordSlots = [];
+let lyraSidebarTab = 'systems';
+let lyraSelectedUpgradeId = 'automated_drones';
+let lyraOverloadHintInterval = null;
+let lyraOverloadHintFrame = 0;
+let lyraStoryLibraryCache = new Map();
+let lyraStoryLoadPromise = null;
+let lyraStoryResetMenuOpen = false;
+let lyraStoryLoadingState = {
+    active: false,
+    progress: 0,
+    label: 'Downloading Data...',
+    meta: '0%',
 };
 
 function isLyraGateOpen() {
     return !!document.getElementById('lyra-gate-modal')?.classList.contains('show');
 }
 
+function randomizeLyraAsteroidSeed() {
+    lyraGateState.asteroidSeed = Math.floor(Math.random() * 1e9);
+}
+
+function getLyraStoryLibrary() {
+    const api = getMiningApi();
+    return api && Array.isArray(api.STORY_LIBRARY) ? api.STORY_LIBRARY : [];
+}
+
+function getLyraCurrentStoryBookId() {
+    return String(lyraMiningState && lyraMiningState.currentStoryBookId || 'alice-in-wonderland');
+}
+
+function normalizeLyraChar(char) {
+    return String(char || '').toLowerCase();
+}
+
+function lyraCharsMatch(a, b) {
+    return normalizeLyraChar(a) === normalizeLyraChar(b);
+}
+
+function lyraWordsMatch(attempt, target) {
+    return normalizeLyraChar(attempt) === normalizeLyraChar(target);
+}
+
+function getLyraCurrentStoryWords() {
+    return lyraStoryLibraryCache.get(getLyraCurrentStoryBookId()) || [];
+}
+
+function renderLyraStoryLoadingOverlay() {
+    const overlay = document.getElementById('lyra-story-loading-overlay');
+    const label = document.getElementById('lyra-story-loading-label');
+    const fill = document.getElementById('lyra-story-loading-fill');
+    const meta = document.getElementById('lyra-story-loading-meta');
+    if (!overlay || !label || !fill || !meta) return;
+    overlay.classList.toggle('active', !!lyraStoryLoadingState.active);
+    overlay.setAttribute('aria-hidden', lyraStoryLoadingState.active ? 'false' : 'true');
+    label.textContent = lyraStoryLoadingState.label || 'Downloading Data...';
+    fill.style.width = `${Math.max(0, Math.min(100, Number(lyraStoryLoadingState.progress) || 0)).toFixed(1)}%`;
+    meta.textContent = lyraStoryLoadingState.meta || `${Math.round(Number(lyraStoryLoadingState.progress) || 0)}%`;
+}
+
+function setLyraStoryLoadingState(patch) {
+    lyraStoryLoadingState = {
+        ...lyraStoryLoadingState,
+        ...(patch && typeof patch === 'object' ? patch : {}),
+    };
+    renderLyraStoryLoadingOverlay();
+}
+
+function getLyraStoryWindow(startIndex, count) {
+    const storyWords = getLyraCurrentStoryWords();
+    if (!storyWords.length) return ['loading', 'story'];
+    const start = Math.max(0, Math.floor(Number(startIndex) || 0));
+    const size = Math.max(1, Math.floor(Number(count) || 1));
+    const slice = storyWords.slice(start, start + size);
+    return slice.length ? slice : ['the', 'end'];
+}
+
+function normalizeLyraStoryChar(char) {
+    const map = {
+        '\u2018': '\'',
+        '\u2019': '\'',
+        '\u201c': '"',
+        '\u201d': '"',
+        '\u2014': '-',
+        '\u2013': '-',
+    };
+    return map[char] || char;
+}
+
+async function tokenizeLyraStoryTextInChunks(text, chunkSize = 5000, onProgress = null) {
+    const source = String(text || '').replace(/\r/g, '');
+    const words = [];
+    let token = '';
+    let chunkWordCount = 0;
+    let processedWords = 0;
+    for (let i = 0; i < source.length; i++) {
+        const char = normalizeLyraStoryChar(source[i]);
+        if (/\s/.test(char)) {
+            if (token) {
+                words.push(token);
+                token = '';
+                chunkWordCount++;
+                processedWords++;
+                if (chunkWordCount >= chunkSize) {
+                    if (typeof onProgress === 'function') onProgress(processedWords);
+                    chunkWordCount = 0;
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+                }
+            }
+            continue;
+        }
+        token += char;
+    }
+    if (token) {
+        words.push(token);
+        processedWords++;
+    }
+    if (typeof onProgress === 'function') onProgress(processedWords, true);
+    return words;
+}
+
+async function fetchLyraStoryPayload(book, options = {}) {
+    const response = await fetch(book.assetPath, { cache: options.force ? 'no-store' : 'force-cache' });
+    if (!response.ok) throw new Error(`Failed to load ${book.name}`);
+    const totalBytes = Math.max(0, Number(response.headers.get('content-length')) || 0);
+    if (!response.body || typeof response.body.getReader !== 'function') {
+        const text = await response.text();
+        setLyraStoryLoadingState({
+            active: true,
+            progress: 55,
+            label: 'Downloading Data...',
+            meta: totalBytes ? `${formatMiningNumber(totalBytes)} bytes` : 'Preparing stream',
+        });
+        return text;
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let received = 0;
+    let text = '';
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        received += value ? value.byteLength : 0;
+        text += decoder.decode(value, { stream: true });
+        const progress = totalBytes > 0 ? Math.min(55, (received / totalBytes) * 55) : Math.min(55, 8 + (received / 200000) * 47);
+        setLyraStoryLoadingState({
+            active: true,
+            progress,
+            label: 'Downloading Data...',
+            meta: totalBytes > 0
+                ? `${Math.round((received / totalBytes) * 100)}% of source payload`
+                : `${formatMiningNumber(received)} bytes streamed`,
+        });
+    }
+    text += decoder.decode();
+    return text;
+}
+
+async function loadLyraStoryBook(bookId, options = {}) {
+    const api = getMiningApi();
+    const book = api && typeof api.getStoryBookDefinition === 'function'
+        ? api.getStoryBookDefinition(bookId)
+        : null;
+    if (!book || book.locked || !book.assetPath) return [];
+    if (!options.force && lyraStoryLibraryCache.has(book.id)) {
+        return lyraStoryLibraryCache.get(book.id);
+    }
+    setLyraStoryLoadingState({
+        active: true,
+        progress: 4,
+        label: 'Downloading Data...',
+        meta: `Linking ${book.name}`,
+    });
+    try {
+        const rawText = await fetchLyraStoryPayload(book, options);
+        setLyraStoryLoadingState({
+            active: true,
+            progress: 62,
+            label: 'Converting Data...',
+            meta: 'Preparing word array',
+        });
+        const payload = JSON.parse(rawText);
+        let words = [];
+        if (Array.isArray(payload)) {
+            words = payload.filter((word) => typeof word === 'string' && word.length > 0);
+            setLyraStoryLoadingState({
+                active: true,
+                progress: 100,
+                label: 'Downloading Data...',
+                meta: `${formatMiningNumber(words.length)} words ready`,
+            });
+        } else if (payload && typeof payload.text === 'string') {
+            words = await tokenizeLyraStoryTextInChunks(payload.text, 5000, (processed) => {
+                const progress = Math.min(100, 62 + (Math.min(processed, 50000) / 50000) * 38);
+                setLyraStoryLoadingState({
+                    active: true,
+                    progress,
+                    label: 'Converting Data...',
+                    meta: `${formatMiningNumber(processed)} words processed`,
+                });
+            });
+        } else if (typeof payload === 'string') {
+            words = await tokenizeLyraStoryTextInChunks(payload, 5000, (processed) => {
+                const progress = Math.min(100, 62 + (Math.min(processed, 50000) / 50000) * 38);
+                setLyraStoryLoadingState({
+                    active: true,
+                    progress,
+                    label: 'Converting Data...',
+                    meta: `${formatMiningNumber(processed)} words processed`,
+                });
+            });
+        }
+        lyraStoryLibraryCache.set(book.id, words);
+        setLyraStoryLoadingState({
+            active: true,
+            progress: 100,
+            label: 'Downloading Data...',
+            meta: `${formatMiningNumber(words.length)} words ready`,
+        });
+        setTimeout(() => {
+            if (lyraStoryLoadingState.progress >= 100) {
+                setLyraStoryLoadingState({ active: false, progress: 0, meta: '0%', label: 'Downloading Data...' });
+            }
+        }, 180);
+        return words;
+    } catch (error) {
+        setLyraStoryLoadingState({ active: false, progress: 0, meta: '0%', label: 'Downloading Data...' });
+        throw error;
+    }
+}
+
+function primeLyraCurrentStoryBook() {
+    const bookId = getLyraCurrentStoryBookId();
+    lyraStoryLoadPromise = loadLyraStoryBook(bookId, { force: true }).catch((error) => {
+        console.error('Lyra story fetch failed', error);
+        showUiMessage('Story Mode failed to load that book.', 'error', 2200, 'top-right');
+        return [];
+    });
+    return lyraStoryLoadPromise;
+}
+
+function renderLyraStoryMeta() {
+    const meta = document.getElementById('lyra-story-meta');
+    const progressEl = document.getElementById('lyra-book-progress');
+    const api = getMiningApi();
+    if ((!meta && !progressEl) || !api || typeof api.getStoryBookDefinition !== 'function') return;
+    const book = api.getStoryBookDefinition(getLyraCurrentStoryBookId());
+    if (meta) meta.textContent = book ? `${book.name} | ${book.author || 'Unknown Author'}` : 'Story Mode';
+    if (progressEl) {
+        const totalWords = Math.max(1, getLyraCurrentStoryWords().length || 1);
+        const currentIndex = Math.max(0, Math.floor(Number(lyraMiningState && lyraMiningState.currentStoryProgress) || 0));
+        progressEl.textContent = `${((currentIndex / totalWords) * 100).toFixed(1)}%`;
+    }
+}
+
+function updateLyraStoryResetMenu() {
+    const wrap = document.getElementById('lyra-story-reset');
+    const toggle = document.getElementById('lyra-story-reset-toggle');
+    const menu = document.getElementById('lyra-story-reset-menu');
+    if (!wrap || !toggle || !menu) return;
+    wrap.classList.toggle('open', lyraStoryResetMenuOpen);
+    toggle.setAttribute('aria-expanded', lyraStoryResetMenuOpen ? 'true' : 'false');
+    menu.setAttribute('aria-hidden', lyraStoryResetMenuOpen ? 'false' : 'true');
+}
+
+function closeLyraStoryResetMenu() {
+    lyraStoryResetMenuOpen = false;
+    updateLyraStoryResetMenu();
+}
+
+function toggleLyraStoryResetMenu(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    lyraStoryResetMenuOpen = !lyraStoryResetMenuOpen;
+    updateLyraStoryResetMenu();
+}
+window.toggleLyraStoryResetMenu = toggleLyraStoryResetMenu;
+
+function getLyraCurrentChapterStartIndex() {
+    const storyWords = getLyraCurrentStoryWords();
+    const currentIndex = Math.max(0, Math.floor(Number(lyraMiningState && lyraMiningState.currentStoryProgress) || 0));
+    if (!storyWords.length || currentIndex <= 0) return 0;
+    for (let i = Math.min(currentIndex, storyWords.length - 1); i >= 0; i--) {
+        if (String(storyWords[i] || '').toUpperCase() === 'CHAPTER') {
+            return i;
+        }
+    }
+    return 0;
+}
+
+function restartLyraStoryProgress(scope) {
+    const api = getMiningApi();
+    if (!api || !lyraMiningState || typeof api.setCurrentStoryProgress !== 'function') return;
+    const targetIndex = scope === 'book' ? 0 : getLyraCurrentChapterStartIndex();
+    const updated = api.setCurrentStoryProgress(lyraMiningState, targetIndex);
+    lyraMiningState = updated.state;
+    closeLyraStoryResetMenu();
+    if (lyraStatsInterval) {
+        clearInterval(lyraStatsInterval);
+        lyraStatsInterval = null;
+    }
+    resetLyraGateState();
+    renderLyraWordStream();
+    renderLyraMiningHud();
+    renderLyraMiningSidebar();
+    updateLyraStats();
+    focusLyraInput();
+    showUiMessage(
+        scope === 'book' ? 'Story progress reset to the beginning of the book.' : 'Story progress reset to the start of this chapter.',
+        'info',
+        1800,
+        'top-right',
+    );
+}
+window.restartLyraStoryProgress = restartLyraStoryProgress;
+
 function ensureLyraWordsBuffer(minWordCount = 120) {
+    const storyWords = getLyraCurrentStoryWords();
+    if (storyWords.length) {
+        const desiredCount = Math.max(1, Math.min(LYRA_VISIBLE_WORD_WINDOW, minWordCount));
+        lyraGateState.words = getLyraStoryWindow(lyraGateState.storyBaseIndex, desiredCount);
+        return;
+    }
     const needed = Math.max(0, minWordCount - lyraGateState.words.length);
     if (needed <= 0) return;
     const extra = generateWordTest(Math.max(needed, 100)).split(' ').filter(Boolean);
     lyraGateState.words.push(...extra);
+    lyraGateState.words = lyraGateState.words.slice(0, Math.max(1, minWordCount));
 }
 
 function resetLyraGateState() {
+    const storyBaseIndex = Math.max(0, Math.floor(Number(lyraMiningState && lyraMiningState.currentStoryProgress) || 0));
     lyraGateState = {
-        words: generateWordTest(140).split(' ').filter(Boolean),
-        wordIndex: 0,
+        words: getLyraStoryWindow(storyBaseIndex, LYRA_VISIBLE_WORD_WINDOW),
+        storyBaseIndex,
         typed: '',
-        attempts: [],
         totalCompleted: 0,
         cycleBusy: false,
-        asteroidSeed: Math.floor(Math.random() * 1e6),
+        asteroidSeed: Math.floor(Math.random() * 1e9),
         startTime: null,
         totalChars: 0,
         correctChars: 0,
+        comboStreak: 0,
+        bestCombo: 0,
+        recentDamageBursts: [],
     };
 }
 
@@ -11603,60 +13451,1046 @@ function markSectorCleared(sectorId) {
     } catch {}
 }
 
+function getMiningApi() {
+    return window.TypeMineMining || null;
+}
+
+function formatMiningNumber(value) {
+    const api = getMiningApi();
+    if (api && typeof api.formatMiningNumber === 'function') return api.formatMiningNumber(value);
+    return String(Math.max(0, Math.round(Number(value) || 0)));
+}
+
+function formatMiningDamageText(value, isCritical = false) {
+    const api = getMiningApi();
+    if (api && typeof api.formatDamageText === 'function') return api.formatDamageText(value, { isCritical });
+    const base = formatMiningNumber(value);
+    return isCritical ? `${base}!!` : base;
+}
+
+function getLyraEffectiveMiningStats() {
+    const api = getMiningApi();
+    if (!api || !lyraMiningState || typeof api.getEffectiveMiningStats !== 'function') return null;
+    return api.getEffectiveMiningStats(lyraMiningState, Date.now());
+}
+
+function pruneLyraDamageBursts(now = performance.now()) {
+    const windowMs = 4000;
+    lyraGateState.recentDamageBursts = (lyraGateState.recentDamageBursts || []).filter((entry) => {
+        return entry && Number.isFinite(entry.ts) && (now - entry.ts) <= windowMs;
+    });
+    return lyraGateState.recentDamageBursts;
+}
+
+function recordLyraDamageBurst(amount, source = 'typing') {
+    const damage = Math.max(0, Number(amount) || 0);
+    if (damage <= 0 || source !== 'typing') return;
+    const now = performance.now();
+    pruneLyraDamageBursts(now);
+    lyraGateState.recentDamageBursts.push({ ts: now, damage });
+}
+
+function getLyraActiveTypingDps(now = performance.now()) {
+    const bursts = pruneLyraDamageBursts(now);
+    if (!bursts.length) return 0;
+    const totalDamage = bursts.reduce((sum, entry) => sum + (Number(entry.damage) || 0), 0);
+    return totalDamage / 4;
+}
+
+function getLyraDisplayedDps(stats = null) {
+    const effectiveStats = stats || getLyraEffectiveMiningStats();
+    const passiveDps = effectiveStats
+        ? Math.max(0, Number(effectiveStats.effectiveDps) || 0)
+        : Math.max(0, Number(lyraMiningState && lyraMiningState.dps) || 0);
+    return passiveDps + getLyraActiveTypingDps();
+}
+
+function isLyraOverloadActive() {
+    const stats = getLyraEffectiveMiningStats();
+    return !!(stats && stats.overloadActive);
+}
+
+function getLyraCurrentWpm() {
+    const elapsed = lyraGateState.startTime ? (performance.now() - lyraGateState.startTime) / 1000 : 0;
+    const minutes = elapsed / 60;
+    return minutes > 0.01 ? Math.round((lyraGateState.correctChars / 5) / minutes) : 0;
+}
+
+function getLyraAccuracyRatio() {
+    if (lyraGateState.totalChars <= 0) return 1;
+    return Math.max(0, Math.min(1, lyraGateState.correctChars / lyraGateState.totalChars));
+}
+
+function getLyraComboMultiplierDisplay() {
+    return (1 + (Math.max(0, lyraGateState.comboStreak) * 0.03)).toFixed(2);
+}
+
+function syncLyraMiningStateWithWallet(state) {
+    const api = getMiningApi();
+    if (!api) return null;
+    const normalized = api.recalculateDerivedState(state || api.loadMiningState());
+    const wallet = getSkillPoints();
+    const nextCrystals = Math.max(0, Math.floor(Number(wallet) || 0));
+    if (nextCrystals !== normalized.totalAetherCrystals) {
+        normalized.totalAetherCrystals = nextCrystals;
+    }
+    lyraMiningState = api.saveMiningState(normalized);
+    return lyraMiningState;
+}
+
+function syncLyraWalletFromMiningState(prevCrystalCount = null) {
+    if (!lyraMiningState) return;
+    const nextCrystals = Math.max(0, Math.floor(Number(lyraMiningState.totalAetherCrystals) || 0));
+    if (prevCrystalCount == null || nextCrystals !== Math.floor(Number(prevCrystalCount) || 0)) {
+        setSkillPoints(nextCrystals);
+        updateSkillDisplay();
+        flushProgressSyncNow();
+    }
+}
+
+function getLyraAsteroidHealthBand(state = lyraMiningState) {
+    if (!state) return 'healthy';
+    const maxHp = Math.max(1, Number(state.asteroidMaxHP) || 1);
+    const ratio = Math.max(0, Math.min(1, (Number(state.asteroidHP) || 0) / maxHp));
+    if (ratio <= 0.33) return 'critical';
+    if (ratio <= 0.66) return 'fractured';
+    return 'healthy';
+}
+
+function getLyraAsteroidDisplaySize(state = lyraMiningState) {
+    const api = getMiningApi();
+    const maxHp = Math.max(1, Number(state && state.asteroidMaxHP) || 1);
+    const baseHp = Math.max(1, Number(api && typeof api.getLayerMaxHp === 'function' ? api.getLayerMaxHp(0) : 180) || 180);
+    const sizeFloor = 120;
+    const sizeCeiling = 220;
+    const growthRatio = Math.max(1, maxHp / baseHp);
+    const normalized = Math.min(1, Math.log10(growthRatio) / 1.1);
+    return Math.round(sizeFloor + ((sizeCeiling - sizeFloor) * normalized));
+}
+
+function updateLyraAsteroidVisualState() {
+    const asteroid = document.getElementById('lyra-asteroid');
+    const wrap = document.getElementById('lyra-asteroid-wrap');
+    if (!asteroid || !wrap || !lyraMiningState) return;
+    const band = getLyraAsteroidHealthBand(lyraMiningState);
+    const displaySize = getLyraAsteroidDisplaySize(lyraMiningState);
+    asteroid.dataset.healthBand = band;
+    wrap.style.setProperty('--lyra-asteroid-size', `${displaySize}px`);
+    if (band === 'critical') wrap.style.setProperty('--lyra-asteroid-glow', 'rgba(248, 198, 96, 0.4)');
+    else if (band === 'fractured') wrap.style.setProperty('--lyra-asteroid-glow', 'rgba(102, 233, 255, 0.34)');
+    else wrap.style.setProperty('--lyra-asteroid-glow', 'rgba(124, 111, 247, 0.34)');
+}
+
+function getLyraDroneCount() {
+    const level = Math.max(0, Number(lyraMiningState && lyraMiningState.upgrades && lyraMiningState.upgrades.automated_drones) || 0);
+    if (level <= 0) return 0;
+    return Math.min(3, 1 + Math.floor((level - 1) / 5));
+}
+
+function stopLyraDroneOrbitLoop() {
+    if (lyraDroneOrbitFrame) cancelAnimationFrame(lyraDroneOrbitFrame);
+    lyraDroneOrbitFrame = 0;
+    lyraDroneOrbitLastTs = 0;
+}
+
+function ensureLyraDroneOrbitState(count) {
+    if (!Number.isFinite(count) || count <= 0) {
+        lyraDroneOrbitState = [];
+        return;
+    }
+    if (lyraDroneOrbitState.length === count) return;
+    const next = [];
+    for (let i = 0; i < count; i++) {
+        const existing = lyraDroneOrbitState[i];
+        next.push(existing || {
+            angle: Math.random() * Math.PI * 2,
+            speed: (0.45 + Math.random() * 0.65) * (Math.random() > 0.5 ? 1 : -1),
+            radius: 168 + Math.random() * 42,
+            verticalScale: 0.64 + Math.random() * 0.2,
+            wobbleAmp: 6 + Math.random() * 9,
+            wobbleSpeed: 1.2 + Math.random() * 1.4,
+            bobAmp: 1.2 + Math.random() * 2.4,
+            bobSpeed: 1.8 + Math.random() * 1.3,
+            phase: Math.random() * Math.PI * 2,
+        });
+    }
+    lyraDroneOrbitState = next;
+}
+
+function positionLyraDroneElement(drone, orbit, anchors, ts = performance.now()) {
+    if (!drone || !orbit || !anchors) return;
+    const wobble = Math.sin((ts / 1000) * orbit.wobbleSpeed + orbit.phase) * orbit.wobbleAmp;
+    const radius = orbit.radius + wobble;
+    const x = anchors.asteroidCenterX + Math.cos(orbit.angle) * radius;
+    const bob = Math.sin((ts / 1000) * orbit.bobSpeed + orbit.phase * 1.7) * orbit.bobAmp;
+    const y = anchors.asteroidCenterY + Math.sin(orbit.angle) * (radius * orbit.verticalScale) + bob;
+    const facing = (Math.atan2(anchors.asteroidCenterY - y, anchors.asteroidCenterX - x) * 180 / Math.PI) + 90;
+    drone.style.left = `${x.toFixed(1)}px`;
+    drone.style.top = `${y.toFixed(1)}px`;
+    drone.style.transform = `translate(-50%, -50%) rotate(${facing.toFixed(2)}deg)`;
+    drone.dataset.orbitX = x.toFixed(2);
+    drone.dataset.orbitY = y.toFixed(2);
+}
+
+function updateLyraDroneOrbitFrame(ts) {
+    const layer = document.getElementById('lyra-drone-layer');
+    const anchors = getLyraSceneAnchors();
+    const drones = [...document.querySelectorAll('#lyra-drone-layer .lyra-drone')];
+    if (!layer || !anchors || drones.length === 0) {
+        stopLyraDroneOrbitLoop();
+        return;
+    }
+    if (!lyraDroneOrbitLastTs) lyraDroneOrbitLastTs = ts;
+    const dt = Math.min(0.05, Math.max(0.001, (ts - lyraDroneOrbitLastTs) / 1000));
+    lyraDroneOrbitLastTs = ts;
+
+    for (let i = 0; i < drones.length; i++) {
+        const drone = drones[i];
+        const orbit = lyraDroneOrbitState[i];
+        if (!orbit) continue;
+        orbit.angle += orbit.speed * dt;
+        positionLyraDroneElement(drone, orbit, anchors, ts);
+    }
+
+    lyraDroneOrbitFrame = requestAnimationFrame(updateLyraDroneOrbitFrame);
+}
+
+function startLyraDroneOrbitLoop() {
+    if (lyraDroneOrbitFrame) return;
+    lyraDroneOrbitLastTs = 0;
+    lyraDroneOrbitFrame = requestAnimationFrame(updateLyraDroneOrbitFrame);
+}
+
+function renderLyraMiningDrones() {
+    const layer = document.getElementById('lyra-drone-layer');
+    const anchors = getLyraSceneAnchors();
+    if (!layer || !anchors) return;
+    const count = getLyraDroneCount();
+    layer.innerHTML = '';
+    ensureLyraDroneOrbitState(count);
+    if (count <= 0) {
+        stopLyraDroneOrbitLoop();
+        return;
+    }
+
+    for (let i = 0; i < count; i++) {
+        const drone = document.createElement('span');
+        drone.className = 'lyra-drone';
+        drone.dataset.droneIndex = String(i);
+
+        const shell = document.createElement('span');
+        shell.className = 'lyra-drone-shell';
+        drone.appendChild(shell);
+
+        const nose = document.createElement('span');
+        nose.className = 'lyra-drone-nose';
+        drone.appendChild(nose);
+
+        const armLeft = document.createElement('span');
+        armLeft.className = 'lyra-drone-arm left';
+        drone.appendChild(armLeft);
+
+        const armRight = document.createElement('span');
+        armRight.className = 'lyra-drone-arm right';
+        drone.appendChild(armRight);
+
+        const podLeft = document.createElement('span');
+        podLeft.className = 'lyra-drone-pod left';
+        drone.appendChild(podLeft);
+
+        const podRight = document.createElement('span');
+        podRight.className = 'lyra-drone-pod right';
+        drone.appendChild(podRight);
+
+        const finLeft = document.createElement('span');
+        finLeft.className = 'lyra-drone-fin left';
+        drone.appendChild(finLeft);
+
+        const finRight = document.createElement('span');
+        finRight.className = 'lyra-drone-fin right';
+        drone.appendChild(finRight);
+
+        const thrusterLeft = document.createElement('span');
+        thrusterLeft.className = 'lyra-drone-thruster left';
+        drone.appendChild(thrusterLeft);
+
+        const thrusterRight = document.createElement('span');
+        thrusterRight.className = 'lyra-drone-thruster right';
+        drone.appendChild(thrusterRight);
+
+        const core = document.createElement('span');
+        core.className = 'lyra-drone-core';
+        drone.appendChild(core);
+        layer.appendChild(drone);
+        positionLyraDroneElement(drone, lyraDroneOrbitState[i], anchors);
+    }
+    startLyraDroneOrbitLoop();
+}
+
+function getLyraAsteroidImpactPoint(sourceX, sourceY, anchors = null) {
+    const sceneAnchors = anchors || getLyraSceneAnchors();
+    if (!sceneAnchors || !Number.isFinite(sourceX) || !Number.isFinite(sourceY)) return null;
+    const dx = sceneAnchors.asteroidCenterX - sourceX;
+    const dy = sceneAnchors.asteroidCenterY - sourceY;
+    const fullLength = Math.hypot(dx, dy);
+    if (fullLength <= 0.001) return null;
+    const nx = dx / fullLength;
+    const ny = dy / fullLength;
+    return {
+        x: sceneAnchors.asteroidCenterX - (nx * sceneAnchors.asteroidRadius),
+        y: sceneAnchors.asteroidCenterY - (ny * sceneAnchors.asteroidRadius),
+        nx,
+        ny,
+        fullLength,
+    };
+}
+
+function emitLyraDroneVolley(options = {}) {
+    if (!isLyraGateOpen()) return;
+    const laserLayer = document.getElementById('lyra-laser-layer');
+    const scene = document.getElementById('lyra-scene');
+    const anchors = getLyraSceneAnchors();
+    const drones = [...document.querySelectorAll('#lyra-drone-layer .lyra-drone')];
+    if (!laserLayer || !scene || !anchors || drones.length === 0) return;
+    const sceneRect = scene.getBoundingClientRect();
+    const popupValues = Array.isArray(options.popupValues) ? options.popupValues : [];
+    const isCritical = !!options.isCritical;
+    const isOverloadActive = !!options.isOverloadActive;
+
+    for (const [index, drone] of drones.entries()) {
+        const core = drone.querySelector('.lyra-drone-core');
+        const sourceRect = (core || drone).getBoundingClientRect();
+        let x = (sourceRect.left - sceneRect.left) + (sourceRect.width * 0.5);
+        let y = (sourceRect.top - sceneRect.top) + (sourceRect.height * 0.5);
+        if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || y < 0 || x > sceneRect.width || y > sceneRect.height) {
+            x = Number(drone.dataset.orbitX);
+            y = Number(drone.dataset.orbitY);
+        }
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        const impactPoint = getLyraAsteroidImpactPoint(x, y, anchors);
+        if (!impactPoint) continue;
+        const length = impactPoint.fullLength - anchors.asteroidRadius;
+        if (length <= 4) continue;
+        const endX = impactPoint.x;
+        const endY = impactPoint.y;
+        const beamDx = endX - x;
+        const beamDy = endY - y;
+        const beamLength = Math.hypot(beamDx, beamDy);
+        const angle = Math.atan2(beamDy, beamDx) * 180 / Math.PI;
+        const beam = document.createElement('span');
+        beam.className = 'lyra-laser-burst drone-shot';
+        beam.style.left = `${x.toFixed(1)}px`;
+        beam.style.top = `${(y - 2.5).toFixed(1)}px`;
+        beam.style.width = `${beamLength.toFixed(1)}px`;
+        beam.style.rotate = `${angle.toFixed(2)}deg`;
+        laserLayer.appendChild(beam);
+        beam.addEventListener('animationend', () => beam.remove(), { once: true });
+
+        const impact = document.createElement('span');
+        impact.className = 'lyra-laser-impact drone-shot';
+        impact.style.left = `${endX.toFixed(1)}px`;
+        impact.style.top = `${endY.toFixed(1)}px`;
+        laserLayer.appendChild(impact);
+        impact.addEventListener('animationend', () => impact.remove(), { once: true });
+        flashLyraAsteroidHit();
+        setTimeout(() => emitLyraAsteroidChunks(1 + Math.floor(Math.random() * 2)), 42);
+        const popupValue = Number(popupValues[index]) || 0;
+        if (popupValue > 0) {
+            spawnLyraDamagePopup(popupValue, {
+                x: endX,
+                y: endY,
+                isCritical,
+                isOverloadActive,
+            });
+        }
+    }
+}
+
+function flashLyraAsteroidHit() {
+    const asteroid = document.getElementById('lyra-asteroid');
+    if (!asteroid) return;
+    asteroid.classList.remove('hit-flash');
+    void asteroid.offsetWidth;
+    asteroid.classList.add('hit-flash');
+    clearTimeout(asteroid._hitFlashTimer);
+    asteroid._hitFlashTimer = setTimeout(() => asteroid.classList.remove('hit-flash'), 120);
+}
+
+function triggerLyraCriticalShake() {
+    const scene = document.getElementById('lyra-scene');
+    if (!scene) return;
+    scene.classList.remove('crit-shake');
+    void scene.offsetWidth;
+    scene.classList.add('crit-shake');
+    clearTimeout(scene._critShakeTimer);
+    scene._critShakeTimer = setTimeout(() => scene.classList.remove('crit-shake'), 220);
+}
+
+function ensureLyraDamagePopupPool() {
+    if (lyraDamagePopupPool.length >= LYRA_DAMAGE_POPUP_POOL_SIZE) return;
+        lyraDamagePopupPool = Array.from({ length: LYRA_DAMAGE_POPUP_POOL_SIZE }, () => ({
+            active: false,
+            x: 0,
+            y: 0,
+            age: 0,
+            life: 0.9,
+            text: '',
+            color: '#7dd3fc',
+            isCritical: false,
+        }));
+}
+
+function resizeLyraPopupCanvas() {
+    const scene = document.getElementById('lyra-scene');
+    const canvas = document.getElementById('lyra-popup-canvas');
+    if (!scene || !canvas) return;
+    const rect = scene.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    canvas.style.width = `${Math.round(rect.width)}px`;
+    canvas.style.height = `${Math.round(rect.height)}px`;
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function stopLyraDamagePopupLoop() {
+    if (lyraDamagePopupFrame) cancelAnimationFrame(lyraDamagePopupFrame);
+    lyraDamagePopupFrame = 0;
+    lyraDamagePopupLastTs = 0;
+    const canvas = document.getElementById('lyra-popup-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const popup of lyraDamagePopupPool) popup.active = false;
+}
+
+function drawLyraDamagePopups(ts) {
+    const canvas = document.getElementById('lyra-popup-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    if (!canvas || !ctx) {
+        lyraDamagePopupFrame = 0;
+        return;
+    }
+    if (!lyraDamagePopupLastTs) lyraDamagePopupLastTs = ts;
+    const dt = Math.min(0.05, Math.max(0.001, (ts - lyraDamagePopupLastTs) / 1000));
+    lyraDamagePopupLastTs = ts;
+    const speedMultiplier = isLyraOverloadActive() ? 1.55 : 1;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let activeCount = 0;
+    for (const popup of lyraDamagePopupPool) {
+        if (!popup.active) continue;
+        popup.age += dt * speedMultiplier;
+        if (popup.age >= popup.life) {
+            popup.active = false;
+            continue;
+        }
+        activeCount++;
+        const progress = popup.age / popup.life;
+        const lift = (popup.isCritical ? 68 : 54) * progress * speedMultiplier;
+        const fade = 1 - progress;
+        const scale = popup.isCritical ? 1.34 + (0.14 * (1 - progress)) : 1 + (0.08 * (1 - progress));
+        ctx.save();
+        ctx.globalAlpha = fade;
+        ctx.translate(popup.x, popup.y - lift);
+        ctx.scale(scale, scale);
+        ctx.font = popup.isCritical ? '900 34px "Ubuntu Mono", monospace' : '900 22px "Ubuntu Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = popup.isCritical ? 6 : 4;
+        ctx.strokeStyle = 'rgba(8, 15, 40, 0.74)';
+        ctx.strokeText(popup.text, 0, 0);
+        ctx.fillStyle = popup.color;
+        ctx.shadowBlur = popup.isCritical ? 28 : 16;
+        ctx.shadowColor = popup.color;
+        ctx.fillText(popup.text, 0, 0);
+        ctx.restore();
+    }
+    if (activeCount > 0) {
+        lyraDamagePopupFrame = requestAnimationFrame(drawLyraDamagePopups);
+    } else {
+        lyraDamagePopupFrame = 0;
+    }
+}
+
+function spawnLyraDamagePopup(value, options = {}) {
+    const anchors = getLyraSceneAnchors();
+    if (!anchors) return;
+    ensureLyraDamagePopupPool();
+    resizeLyraPopupCanvas();
+    let popup = lyraDamagePopupPool.find((entry) => !entry.active);
+    if (!popup) popup = lyraDamagePopupPool.reduce((oldest, entry) => (entry.age > oldest.age ? entry : oldest), lyraDamagePopupPool[0]);
+    const isCritical = !!options.isCritical;
+    const overloadActive = !!options.isOverloadActive || isLyraOverloadActive();
+    const popupX = Number.isFinite(options.x) ? options.x : anchors.asteroidCenterX;
+    const popupY = Number.isFinite(options.y) ? options.y : anchors.asteroidCenterY;
+    popup.active = true;
+    popup.x = popupX;
+    popup.y = popupY;
+    popup.age = 0;
+    popup.life = overloadActive ? (isCritical ? 0.78 : 0.7) : (isCritical ? 1.04 : 0.92);
+    popup.text = formatMiningDamageText(value, isCritical);
+    popup.color = isCritical ? '#ff4d5a' : '#7dd3fc';
+    popup.isCritical = isCritical;
+    if (!lyraDamagePopupFrame) {
+        lyraDamagePopupLastTs = 0;
+        lyraDamagePopupFrame = requestAnimationFrame(drawLyraDamagePopups);
+    }
+}
+
+function getLyraUpgradeIconSvg(upgradeId) {
+    const icons = {
+        automated_drones: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5 18 10v4l-6 3.5L6 14v-4Z"></path><path d="M12 6.5V3.5"></path><path d="M6 10 3.5 8.5"></path><path d="M18 10l2.5-1.5"></path></svg>',
+        laser_drills: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2 6 13h4l-1 9 7-13h-4l2-7Z"></path></svg>',
+        buffer_optimizations: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"></path><path d="M5 12h10"></path><path d="M5 17h6"></path><path d="M18 15v4"></path><path d="M16 17h4"></path></svg>',
+        neural_focus: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 2v3"></path><path d="M12 19v3"></path><path d="M2 12h3"></path><path d="M19 12h3"></path></svg>',
+        overclocked_actuators: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v10"></path><path d="M7 12h10"></path><path d="m17 7 2 2"></path><path d="m5 15 2 2"></path><path d="m17 17 2-2"></path><path d="m5 9 2-2"></path></svg>',
+    };
+    return icons[upgradeId] || icons.buffer_optimizations;
+}
+
+function setLyraSidebarTab(tabId) {
+    lyraSidebarTab = ['systems', 'library', 'firmware', 'statistics'].includes(tabId) ? tabId : 'systems';
+    document.querySelectorAll('#lyra-upgrades-sidebar .lyra-sidebar-tab').forEach((button) => {
+        button.classList.toggle('active', button.dataset.lyraTab === lyraSidebarTab);
+    });
+    document.querySelectorAll('#lyra-upgrades-sidebar .lyra-sidebar-panel').forEach((panel) => {
+        const isActive = panel.id === `lyra-panel-${lyraSidebarTab}`;
+        panel.classList.toggle('active', isActive);
+        panel.style.opacity = isActive ? '1' : '0';
+        panel.style.visibility = isActive ? 'visible' : 'hidden';
+        panel.style.pointerEvents = isActive ? 'auto' : 'none';
+        panel.style.zIndex = isActive ? '2' : '1';
+    });
+}
+window.setLyraSidebarTab = setLyraSidebarTab;
+
+function setLyraSelectedUpgrade(upgradeId) {
+    lyraSelectedUpgradeId = upgradeId || lyraSelectedUpgradeId;
+    renderLyraMiningSidebar();
+}
+window.setLyraSelectedUpgrade = setLyraSelectedUpgrade;
+
+function triggerLyraPurchaseFeedback(buttonEl) {
+    if (!(buttonEl instanceof HTMLElement)) return;
+    const card = buttonEl.closest('.lyra-upgrade-card');
+    buttonEl.classList.remove('glitch-success');
+    if (card) card.classList.remove('purchase-flash');
+    void buttonEl.offsetWidth;
+    buttonEl.classList.add('glitch-success');
+    if (card) card.classList.add('purchase-flash');
+    setTimeout(() => {
+        buttonEl.classList.remove('glitch-success');
+        if (card) card.classList.remove('purchase-flash');
+    }, 420);
+}
+
+function startLyraOverloadHintLoop() {
+    return;
+}
+
+async function selectLyraStoryBook(bookId) {
+    const api = getMiningApi();
+    if (!api || !lyraMiningState || typeof api.setCurrentStoryBook !== 'function') return;
+    const book = typeof api.getStoryBookDefinition === 'function' ? api.getStoryBookDefinition(bookId) : null;
+    if (!book || book.locked) return;
+    try {
+        await loadLyraStoryBook(bookId, { force: true });
+        const selection = api.setCurrentStoryBook(lyraMiningState, bookId);
+        lyraMiningState = selection.state;
+        if (lyraStatsInterval) {
+            clearInterval(lyraStatsInterval);
+            lyraStatsInterval = null;
+        }
+        resetLyraGateState();
+        resetLyraSceneForNextAsteroid();
+        renderLyraWordStream();
+        renderLyraMiningHud();
+        renderLyraMiningSidebar();
+        updateLyraStats();
+        focusLyraInput();
+    } catch (error) {
+        console.error('selectLyraStoryBook failed', error);
+        showUiMessage('Unable to load that story book right now.', 'error', 2200, 'top-right');
+    }
+}
+window.selectLyraStoryBook = selectLyraStoryBook;
+
+function renderLyraLibraryPanel() {
+    const panel = document.getElementById('lyra-panel-library');
+    const api = getMiningApi();
+    if (!panel || !api || !lyraMiningState) return;
+    const books = getLyraStoryLibrary();
+    const activeBookId = getLyraCurrentStoryBookId();
+    panel.innerHTML = `
+        <div class="lyra-library-panel">
+            <div class="lyra-library-card">
+                <div class="lyra-library-head">
+                    <div class="lyra-library-title">Story Library</div>
+                    <div class="lyra-specialization-status">Story Mode</div>
+                </div>
+                <div class="lyra-library-copy">Mine through public domain books. Your place is saved after every completed word, so you resume exactly where you left off.</div>
+                <div class="lyra-library-books">
+                    ${books.map((book) => {
+        if (book.locked) {
+            return `
+                            <button type="button" class="lyra-library-book" disabled>
+                                <strong>New Books Coming Soon!</strong>
+                                <span>Locked</span>
+                                <small>Additional public-domain expeditions will unlock here.</small>
+                            </button>
+                        `;
+        }
+        const savedProgress = Math.max(0, Math.floor(Number(
+            lyraMiningState.storyProgressByBook && lyraMiningState.storyProgressByBook[book.id],
+        ) || 0));
+        return `
+                        <button type="button" class="lyra-library-book${activeBookId === book.id ? ' active' : ''}" onclick="selectLyraStoryBook('${book.id}')">
+                            <strong>${escapeHtml(book.name)}</strong>
+                            <span>${escapeHtml(book.author || 'Public Domain')}</span>
+                            <small>${savedProgress > 0 ? `Resume at word ${formatMiningNumber(savedProgress + 1)}` : 'Start from the beginning'}</small>
+                        </button>
+                    `;
+    }).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderLyraDroneSpecializationPanel() {
+    const panel = document.getElementById('lyra-panel-firmware');
+    const api = getMiningApi();
+    if (!panel || !api || !lyraMiningState) return;
+    const dronesLevel = Math.max(0, Number(lyraMiningState.upgrades && lyraMiningState.upgrades.automated_drones) || 0);
+    const unlocked = dronesLevel >= 10;
+    const currentSpec = lyraMiningState.droneSpecialization || '';
+    if (!unlocked) {
+        panel.innerHTML = `
+            <div class="lyra-specialization-card locked">
+                <div class="lyra-specialization-head">
+                    <div class="lyra-specialization-label">Drone Firmware</div>
+                    <div class="lyra-specialization-status">Locked</div>
+                </div>
+                <div class="lyra-specialization-desc">Reach Automated Limpet Drones level 10 to unlock Swarm, Precision, and Salvage firmware paths.</div>
+            </div>
+        `;
+        return;
+    }
+    panel.innerHTML = `
+        <div class="lyra-specialization-panel">
+        <div class="lyra-specialization-card">
+            <div class="lyra-specialization-head">
+                <div class="lyra-specialization-label">Drone Firmware</div>
+                <div class="lyra-specialization-status">${currentSpec ? 'Selected' : 'Choose Path'}</div>
+            </div>
+            <div class="lyra-specialization-desc">Firmware paths reshape passive mining behavior once the limpet network is mature enough.</div>
+            <div class="lyra-specialization-options">
+                ${api.DRONE_SPECIALIZATIONS.map((spec) => `
+                    <button
+                        type="button"
+                        class="lyra-specialization-option${currentSpec === spec.id ? ' active' : ''}"
+                        onclick="setLyraDroneSpecialization('${spec.id}')"
+                    >
+                        <strong>${escapeHtml(spec.name)}</strong>
+                        <span>${escapeHtml(spec.description)}</span>
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+        </div>
+    `;
+}
+
+function renderLyraStatisticsPanel() {
+    const panel = document.getElementById('lyra-panel-statistics');
+    const api = getMiningApi();
+    if (!panel || !api || !lyraMiningState) return;
+    const effectiveStats = getLyraEffectiveMiningStats();
+    const displayDps = getLyraDisplayedDps(effectiveStats);
+    const accuracy = Math.round(getLyraAccuracyRatio() * 100);
+    const overloadMeter = effectiveStats ? Math.round(effectiveStats.overloadMeter) : 0;
+    const overloadState = effectiveStats && effectiveStats.overloadActive ? 'Active' : overloadMeter >= 100 ? 'Primed' : 'Charging';
+    panel.innerHTML = `
+        <div class="lyra-statistics-panel">
+            <div class="lyra-stat-card">
+                <div class="lyra-stat-card-title">Mining Telemetry</div>
+                <div class="lyra-stat-grid">
+                    <div class="lyra-stat-chip"><span>DPS</span><strong>${formatMiningNumber(displayDps)}</strong></div>
+                    <div class="lyra-stat-chip"><span>Crit Chance</span><strong>${Math.round((lyraMiningState.critChance || 0) * 100)}%</strong></div>
+                    <div class="lyra-stat-chip"><span>Crit Damage</span><strong>${Number(lyraMiningState.critMultiplier || 0).toFixed(1)}x</strong></div>
+                    <div class="lyra-stat-chip"><span>Accuracy</span><strong>${accuracy}%</strong></div>
+                </div>
+            </div>
+            <div class="lyra-stat-card">
+                <div class="lyra-stat-card-title">Burst Status</div>
+                <div class="lyra-stat-grid">
+                    <div class="lyra-stat-chip"><span>Overload</span><strong>${overloadState}</strong></div>
+                    <div class="lyra-stat-chip"><span>Charge</span><strong>${overloadMeter}%</strong></div>
+                    <div class="lyra-stat-chip"><span>Streak</span><strong>${lyraGateState.comboStreak}</strong></div>
+                    <div class="lyra-stat-chip"><span>Lifetime Dmg</span><strong>${formatMiningNumber(lyraMiningState.totalDamageDealt || 0)}</strong></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderLyraMiningSidebar() {
+    const crystalsEl = document.getElementById('lyra-sidebar-crystals');
+    const layerEl = document.getElementById('lyra-sidebar-layer');
+    const dpsEl = document.getElementById('lyra-sidebar-dps');
+    const systemsPanel = document.getElementById('lyra-panel-systems');
+    if (!systemsPanel || !lyraMiningState) return;
+    const api = getMiningApi();
+    if (!api) return;
+    const wallet = Math.max(0, Math.floor(Number(lyraMiningState.totalAetherCrystals) || 0));
+    const effects = api.getUpgradeEffects(lyraMiningState.upgrades);
+    const effectiveStats = typeof api.getEffectiveMiningStats === 'function'
+        ? api.getEffectiveMiningStats(lyraMiningState, Date.now())
+        : null;
+    const displayDps = getLyraDisplayedDps(effectiveStats);
+    if (crystalsEl) crystalsEl.textContent = formatMiningNumber(wallet);
+    if (layerEl) layerEl.textContent = formatMiningNumber((Number(lyraMiningState.currentLayer) || 0) + 1);
+    if (dpsEl) dpsEl.textContent = formatMiningNumber(displayDps || effects.dps);
+    const visibleUpgrades = api.MINING_UPGRADES.filter((upgrade) => ['automation', 'active', 'bridge', 'critical'].includes(upgrade.category));
+    if (!visibleUpgrades.some((upgrade) => upgrade.id === lyraSelectedUpgradeId)) {
+        lyraSelectedUpgradeId = visibleUpgrades[0] ? visibleUpgrades[0].id : '';
+    }
+    const selectedUpgrade = visibleUpgrades.find((upgrade) => upgrade.id === lyraSelectedUpgradeId) || visibleUpgrades[0] || null;
+    const selectedLevel = selectedUpgrade ? Math.max(0, Number(lyraMiningState.upgrades && lyraMiningState.upgrades[selectedUpgrade.id]) || 0) : 0;
+    const selectedCost = selectedUpgrade ? api.getUpgradeCost(selectedUpgrade.id, selectedLevel) : 0;
+    const selectedAffordable = !!selectedUpgrade && wallet >= selectedCost && selectedLevel < selectedUpgrade.maxLevel;
+    const selectedEffect = selectedUpgrade ? (selectedUpgrade.effect(selectedLevel + 1) || {}) : {};
+    const selectedEffectText = !selectedUpgrade
+        ? ''
+        : selectedUpgrade.id === 'automated_drones'
+            ? `+${formatMiningNumber(selectedEffect.dps || 0)} DPS next level`
+            : selectedUpgrade.id === 'laser_drills'
+                ? `+${formatMiningNumber(selectedEffect.baseDamageBonus || 0)} active damage`
+                : selectedUpgrade.id === 'buffer_optimizations'
+                    ? `+${Math.round((selectedEffect.wpmMultiplierBonus || 0) * 100)}% WPM scaling`
+                    : selectedUpgrade.id === 'neural_focus'
+                        ? `+${Math.round((selectedEffect.critChanceBonus || 0) * 100)}% crit chance`
+                        : `+${Number(selectedEffect.critMultiplierBonus || 0).toFixed(1)}x crit damage`;
+    systemsPanel.innerHTML = `
+        <div class="lyra-systems-panel">
+        <div class="lyra-upgrade-list">
+        ${visibleUpgrades.map((upgrade) => {
+        const level = Math.max(0, Number(lyraMiningState.upgrades && lyraMiningState.upgrades[upgrade.id]) || 0);
+        const cost = api.getUpgradeCost(upgrade.id, level);
+        const affordable = wallet >= cost && level < upgrade.maxLevel;
+        return `
+            <button type="button" class="lyra-upgrade-card${affordable ? ' can-afford' : ''}${lyraSelectedUpgradeId === upgrade.id ? ' selected' : ''}" onclick="setLyraSelectedUpgrade('${upgrade.id}')">
+                <div class="lyra-upgrade-top">
+                    <div class="lyra-upgrade-title">
+                        <div class="lyra-upgrade-icon">${getLyraUpgradeIconSvg(upgrade.id)}</div>
+                        <div class="lyra-upgrade-name">${escapeHtml(upgrade.name)}</div>
+                    </div>
+                    <div class="lyra-upgrade-level">Lv ${level}/${upgrade.maxLevel}</div>
+                </div>
+            </button>
+        `;
+        }).join('')}
+        </div>
+        ${selectedUpgrade ? `
+            <div class="lyra-upgrade-detail">
+                <div class="lyra-upgrade-detail-head">
+                    <div class="lyra-upgrade-detail-title">
+                        <div class="lyra-upgrade-icon">${getLyraUpgradeIconSvg(selectedUpgrade.id)}</div>
+                        <span>${escapeHtml(selectedUpgrade.name)}</span>
+                    </div>
+                    <div class="lyra-upgrade-level">Lv ${selectedLevel}/${selectedUpgrade.maxLevel}</div>
+                </div>
+                <div class="lyra-upgrade-detail-copy">${escapeHtml(selectedUpgrade.description)}</div>
+                <div class="lyra-upgrade-detail-meta">
+                    <div class="lyra-upgrade-detail-chip">
+                        <span>Effect</span>
+                        <strong>${escapeHtml(selectedEffectText)}</strong>
+                    </div>
+                    <div class="lyra-upgrade-detail-chip">
+                        <span>Cost</span>
+                        <strong>${formatMiningNumber(selectedCost)}</strong>
+                    </div>
+                </div>
+                <button type="button" class="lyra-upgrade-buy${selectedAffordable ? ' can-afford' : ''}" onclick="purchaseLyraMiningUpgrade('${selectedUpgrade.id}', this)" ${selectedAffordable ? '' : 'disabled'}>
+                    ${selectedLevel >= selectedUpgrade.maxLevel ? 'Maxed' : 'Purchase'}
+                </button>
+            </div>
+        ` : ''}
+        </div>
+    `;
+    renderLyraLibraryPanel();
+    renderLyraDroneSpecializationPanel();
+    renderLyraStatisticsPanel();
+    setLyraSidebarTab(lyraSidebarTab);
+}
+
+function updateLyraOverloadVisualState(stats = null) {
+    const wrap = document.querySelector('#lyra-gate-modal .lyra-gate-wrap');
+    const scene = document.getElementById('lyra-scene');
+    const overloadWrap = document.getElementById('lyra-overload-wrap');
+    const statusEl = document.getElementById('lyra-overload-status');
+    const hintEl = document.getElementById('lyra-overload-hint');
+    const triggerEl = document.getElementById('lyra-overload-trigger');
+    const effectiveStats = stats || getLyraEffectiveMiningStats();
+    const meter = effectiveStats ? Math.max(0, Math.min(100, Number(effectiveStats.overloadMeter) || 0)) : 0;
+    const active = !!(effectiveStats && effectiveStats.overloadActive);
+    const ready = !active && meter >= 100;
+    const hintState = active ? 'active' : ready ? 'ready' : 'charging';
+    const api = getMiningApi();
+    const remainingMs = active ? Math.max(0, Number(effectiveStats.overloadEndsAt) - Date.now()) : 0;
+    const overloadDurationMs = Math.max(1, Number(api && api.OVERLOAD_DURATION_MS) || 10000);
+    const displayPercent = active
+        ? Math.max(0, Math.min(100, (remainingMs / overloadDurationMs) * 100))
+        : meter;
+    const activeSegments = Math.max(0, Math.min(10, Math.ceil(displayPercent / 10)));
+    document.querySelectorAll('#lyra-overload-battery .lyra-overload-segment').forEach((segment) => {
+        const segmentLevel = Number(segment.getAttribute('data-overload-segment')) || 0;
+        segment.classList.toggle('active', activeSegments >= segmentLevel);
+    });
+    if (statusEl) {
+        if (active) {
+            statusEl.textContent = `${(remainingMs / 1000).toFixed(1)}s`;
+        } else {
+            statusEl.textContent = `${Math.round(meter)}%`;
+        }
+    }
+    if (hintEl) {
+        hintEl.classList.toggle('lyra-overload-charging', hintState === 'charging');
+        hintEl.textContent = hintState === 'charging' ? 'Charging' : hintState === 'ready' ? 'Primed' : 'Active';
+    }
+    if (triggerEl) {
+        triggerEl.disabled = !ready;
+        triggerEl.classList.toggle('ready', ready);
+        triggerEl.textContent = active ? 'Engaged' : 'Activate';
+    }
+    if (wrap) wrap.classList.toggle('overload-active', active);
+    if (scene) scene.classList.toggle('overload-active', active);
+    if (overloadWrap) {
+        overloadWrap.dataset.overloadState = hintState;
+        overloadWrap.classList.toggle('ready', ready);
+        overloadWrap.classList.toggle('overload-active', active);
+    }
+    startLyraOverloadHintLoop();
+}
+
+function renderLyraMiningHud() {
+    const progressEl = document.getElementById('lyra-progress-text');
+    const hpEl = document.getElementById('lyra-scene-hp');
+    const dpsEl = document.getElementById('lyra-scene-dps');
+    const comboEl = document.getElementById('lyra-scene-combo');
+    if (!lyraMiningState) return;
+    const maxHp = Math.max(1, Number(lyraMiningState.asteroidMaxHP) || 1);
+    const hp = Math.max(0, Number(lyraMiningState.asteroidHP) || 0);
+    const comboText = `x${getLyraComboMultiplierDisplay()}`;
+    const effectiveStats = getLyraEffectiveMiningStats();
+    const displayDps = getLyraDisplayedDps(effectiveStats);
+    const progressText = `Layer ${formatMiningNumber((Number(lyraMiningState.currentLayer) || 0) + 1)} · HP ${formatMiningNumber(hp)} / ${formatMiningNumber(maxHp)} · Combo ${comboText}`;
+    if (progressEl) progressEl.textContent = progressText;
+    if (hpEl) hpEl.textContent = `${formatMiningNumber(hp)} / ${formatMiningNumber(maxHp)}`;
+    if (dpsEl) dpsEl.textContent = formatMiningNumber(displayDps);
+    if (comboEl) comboEl.textContent = comboText;
+    updateLyraAsteroidVisualState();
+    updateLyraOverloadVisualState(effectiveStats);
+    renderLyraMiningDrones();
+    renderLyraMiningSidebar();
+}
+
+function applyLyraMiningDamage(damageAmount, source = 'typing') {
+    const api = getMiningApi();
+    if (!api || !lyraMiningState) return null;
+    const prevCrystals = lyraMiningState.totalAetherCrystals;
+    const applied = api.applyDamageToState(lyraMiningState, damageAmount, { source });
+    lyraMiningState = applied.state;
+    recordLyraDamageBurst(damageAmount, source);
+    syncLyraWalletFromMiningState(prevCrystals);
+    renderLyraMiningHud();
+    if (applied.result && applied.result.shatteredLayers > 0) {
+        triggerLyraAsteroidCycle();
+    }
+    return applied;
+}
+
+function tickLyraMiningPassiveDamage() {
+    const api = getMiningApi();
+    if (!api || !lyraMiningState) return;
+    const prevCrystals = lyraMiningState.totalAetherCrystals;
+    const ticked = api.tickMiningState(lyraMiningState, Date.now());
+    lyraMiningState = ticked.state;
+    syncLyraWalletFromMiningState(prevCrystals);
+    renderLyraMiningHud();
+    if (Number(ticked.idleDamage) > 0.05) {
+        const droneEffects = typeof api.getDroneSpecializationEffects === 'function'
+            ? api.getDroneSpecializationEffects(lyraMiningState.droneSpecialization)
+            : null;
+        const volleyRepeats = Math.max(1, Math.round(Number(droneEffects && droneEffects.attackSpeedMultiplier) || 1));
+        const droneCount = Math.max(1, document.querySelectorAll('#lyra-drone-layer .lyra-drone').length);
+        const totalShots = droneCount * volleyRepeats;
+        const popupShares = Array.from({ length: totalShots }, (_, index) => {
+            const remaining = Math.max(0, Number(ticked.idleDamage) || 0)
+                - ((Number(ticked.idleDamage) || 0) / totalShots) * index;
+            if (index === totalShots - 1) return remaining;
+            return (Number(ticked.idleDamage) || 0) / totalShots;
+        });
+        for (let i = 0; i < volleyRepeats; i++) {
+            const start = i * droneCount;
+            const end = start + droneCount;
+            setTimeout(() => emitLyraDroneVolley({
+                popupValues: popupShares.slice(start, end),
+                isCritical: !!ticked.passiveCritApplied,
+                isOverloadActive: !!ticked.overloadActive,
+            }), i * 80);
+        }
+        if (ticked.passiveCritApplied) triggerLyraCriticalShake();
+    }
+    if (ticked.result && ticked.result.shatteredLayers > 0 && !lyraGateState.cycleBusy) {
+        triggerLyraAsteroidCycle();
+    }
+}
+
+function purchaseLyraMiningUpgrade(upgradeId, buttonEl = null) {
+    const api = getMiningApi();
+    if (!api) return;
+    syncLyraMiningStateWithWallet(lyraMiningState);
+    const purchased = api.purchaseMiningUpgrade(lyraMiningState, upgradeId);
+    lyraMiningState = purchased.state;
+    if (!purchased.ok) {
+        playSound(SFX.below50);
+        showUiMessage(purchased.error || 'Purchase failed.', 'error', 1600, 'top-left');
+        renderLyraMiningHud();
+        return;
+    }
+    setSkillPoints(Math.max(0, Math.floor(Number(lyraMiningState.totalAetherCrystals) || 0)));
+    updateSkillDisplay();
+    flushProgressSyncNow();
+    playSound(SFX.purchase1);
+    renderLyraMiningHud();
+    triggerLyraPurchaseFeedback(buttonEl);
+    showUiMessage(`${api.getUpgradeDefinition(upgradeId)?.name || 'Upgrade'} purchased.`, 'success', 1500, 'top-left');
+}
+window.purchaseLyraMiningUpgrade = purchaseLyraMiningUpgrade;
+
+function setLyraDroneSpecialization(specId) {
+    const api = getMiningApi();
+    if (!api || !lyraMiningState || typeof api.setDroneSpecialization !== 'function') return;
+    const result = api.setDroneSpecialization(lyraMiningState, specId);
+    lyraMiningState = result.state;
+    renderLyraMiningHud();
+    if (!result.ok) {
+        playSound(SFX.below50);
+        showUiMessage(result.error || 'Unable to apply firmware path.', 'error', 1800, 'top-left');
+        return;
+    }
+    playSound(SFX.purchase1);
+    showUiMessage(`${api.getDroneSpecializationDefinition(specId)?.name || 'Firmware'} online.`, 'success', 1600, 'top-left');
+}
+window.setLyraDroneSpecialization = setLyraDroneSpecialization;
+
+function triggerLyraOverload(source = 'key') {
+    const api = getMiningApi();
+    if (!api || !lyraMiningState || typeof api.activateOverload !== 'function') return false;
+    const result = api.activateOverload(lyraMiningState, Date.now());
+    lyraMiningState = result.state;
+    renderLyraMiningHud();
+    if (!result.ok) return false;
+    playSound(SFX.levelUp);
+    if (source !== 'tick') showUiMessage('Aether Overload engaged.', 'success', 1400, 'top-left');
+    return true;
+}
+window.triggerLyraOverload = triggerLyraOverload;
+
+async function setupLyraMiningMode() {
+    const api = getMiningApi();
+    if (!api) return;
+    syncLyraMiningStateWithWallet(api.loadMiningState());
+    await primeLyraCurrentStoryBook();
+    const prevCrystals = lyraMiningState.totalAetherCrystals;
+    const ticked = api.tickMiningState(lyraMiningState, Date.now());
+    lyraMiningState = ticked.state;
+    syncLyraWalletFromMiningState(prevCrystals);
+    resizeLyraPopupCanvas();
+    renderLyraMiningHud();
+    setLyraSidebarTab(lyraSidebarTab);
+}
+
+window.addEventListener('resize', () => {
+    if (!isLyraGateOpen()) return;
+    resizeLyraPopupCanvas();
+    updateLyraShipAim();
+});
+
 function renderLyraWordStream() {
     const stream = document.getElementById('lyra-quote-display');
-    const progressEl = document.getElementById('lyra-progress-text');
-    if (!stream || !progressEl) return;
-    ensureLyraWordsBuffer(160);
-    const start = Math.max(0, lyraGateState.wordIndex - 12);
-    const end = Math.min(lyraGateState.words.length, lyraGateState.wordIndex + 52);
-    const activeWord = lyraGateState.words[lyraGateState.wordIndex] || '';
-    const typedLen = lyraGateState.typed.length;
-    const chunks = [];
-    for (let i = start; i < end; i++) {
-        const word = lyraGateState.words[i] || '';
-        if (i < lyraGateState.wordIndex) {
-            const attempt = String(lyraGateState.attempts[i] || '');
-            let doneChars = '';
-            for (let c = 0; c < word.length; c++) {
-                const expected = word[c];
-                const typed = attempt[c];
-                const isCorrect = typed === expected;
-                const cls = isCorrect ? 'lyra-char good char-correct' : 'lyra-char bad char-incorrect';
-                doneChars += `<span class="${cls}">${escapeHtml(expected)}</span>`;
-            }
-            chunks.push(`<span class="lyra-word done">${doneChars}<span class="char-untyped lyra-char">&nbsp;</span></span>`);
-            continue;
+    if (!stream) return;
+    ensureLyraWordsBuffer(LYRA_VISIBLE_WORD_WINDOW);
+    if (lyraWordSlots.length !== LYRA_VISIBLE_WORD_WINDOW || stream.childElementCount === 0) {
+        lyraWordSlots = [];
+        lyraCharSpans = [];
+        stream.innerHTML = '';
+        for (let slotIndex = 0; slotIndex < LYRA_VISIBLE_WORD_WINDOW; slotIndex++) {
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'quote-word';
+            wordSpan.style.whiteSpace = 'nowrap';
+            const spaceSpan = document.createElement('span');
+            spaceSpan.textContent = '\u00A0';
+            const slot = {
+                wordEl: wordSpan,
+                spaceEl: spaceSpan,
+                charEls: [],
+            };
+            lyraWordSlots.push(slot);
+            stream.appendChild(wordSpan);
+            stream.appendChild(spaceSpan);
         }
-        if (i > lyraGateState.wordIndex) {
-            const upcomingChars = [...word].map((ch) => `<span class="lyra-char pending char-untyped">${escapeHtml(ch)}</span>`).join('');
-            chunks.push(`<span class="lyra-word">${upcomingChars}<span class="char-untyped lyra-char">&nbsp;</span></span>`);
-            continue;
-        }
-        let activeHtml = '';
-        for (let c = 0; c < word.length; c++) {
-            const expected = word[c];
-            const typed = lyraGateState.typed[c];
-            let cls = 'pending char-untyped';
-            if (typed != null && typed !== '') cls = typed === expected ? 'good char-correct' : 'bad char-incorrect';
-            if (c === typedLen) cls += ' cursor char-cursor';
-            activeHtml += `<span class="lyra-char ${cls}">${escapeHtml(expected)}</span>`;
-        }
-        const trailingCls = typedLen >= word.length ? 'char-untyped lyra-char cursor char-cursor' : 'char-untyped lyra-char';
-        chunks.push(`<span class="lyra-word active">${activeHtml}<span class="${trailingCls}">&nbsp;</span></span>`);
     }
-    stream.innerHTML = chunks.join('');
-    const asteroidsMined = getLyraAsteroidsMined();
-    const wordsInCurrent = lyraGateState.totalCompleted % LYRA_WORDS_PER_ASTEROID;
-    progressEl.textContent = `Asteroid ${Math.min(asteroidsMined + 1, LYRA_ASTEROIDS_TO_CLEAR)} / ${LYRA_ASTEROIDS_TO_CLEAR}  ·  ${wordsInCurrent} / ${LYRA_WORDS_PER_ASTEROID} words`;
+    lyraCharSpans = [];
+    const activeWord = String(lyraGateState.words[0] || '');
+    const typedChars = String(lyraGateState.typed || '');
+    for (let slotIndex = 0; slotIndex < lyraWordSlots.length; slotIndex++) {
+        const slot = lyraWordSlots[slotIndex];
+        const word = String(lyraGateState.words[slotIndex] || '');
+        slot.wordEl.dataset.lyraActiveWord = slotIndex === 0 && word ? '1' : '';
+        slot.wordEl.style.display = word ? 'inline-block' : 'none';
+        slot.spaceEl.style.display = word && slotIndex < lyraWordSlots.length - 1 ? 'inline' : 'none';
+        if (!word) continue;
+        if (slot.charEls.length < word.length) {
+            for (let i = slot.charEls.length; i < word.length; i++) {
+                const span = document.createElement('span');
+                slot.charEls.push(span);
+                slot.wordEl.appendChild(span);
+            }
+        }
+        for (let i = 0; i < slot.charEls.length; i++) {
+            const span = slot.charEls[i];
+            if (i >= word.length) {
+                span.style.display = 'none';
+                span.textContent = '';
+                span.className = '';
+                continue;
+            }
+            const ch = word[i];
+            span.style.display = 'inline';
+            span.textContent = ch;
+            if (slotIndex === 0) {
+                if (i < typedChars.length) {
+                    span.className = lyraCharsMatch(typedChars[i], ch) ? 'char-correct' : 'char-incorrect';
+                } else if (i === typedChars.length) {
+                    span.className = 'char-cursor';
+                } else {
+                    span.className = 'char-untyped';
+                }
+            } else {
+                span.className = 'char-untyped';
+            }
+            lyraCharSpans.push(span);
+        }
+    }
     updateLyraShipAim();
     updateLyraStats();
-    // Horizontal scroll: center the active word
-    const box = document.getElementById('lyra-quote-display');
-    const activeEl = stream.querySelector('.lyra-word.active');
-    if (box && activeEl) {
-        const left = activeEl.offsetLeft - (box.clientWidth * 0.35);
-        box.scrollLeft = Math.max(0, left);
+    renderLyraMiningHud();
+    renderLyraStoryMeta();
+    updateLyraStoryResetMenu();
+    if (stream) {
+        stream.scrollLeft = 0;
     }
 }
 
@@ -11666,70 +14500,30 @@ function updateLyraStats() {
     const timeEl = document.getElementById('lyra-time');
     if (!wpmEl || !accEl || !timeEl) return;
     const elapsed = lyraGateState.startTime ? (performance.now() - lyraGateState.startTime) / 1000 : 0;
-    const minutes = elapsed / 60;
-    // WPM: correct chars / 5 / minutes
-    const wpm = minutes > 0.05 ? Math.round((lyraGateState.correctChars / 5) / minutes) : 0;
-    const acc = lyraGateState.totalChars > 0 ? Math.round((lyraGateState.correctChars / lyraGateState.totalChars) * 100) : 100;
+    const wpm = getLyraCurrentWpm();
+    const acc = Math.round(getLyraAccuracyRatio() * 100);
     const mins = Math.floor(elapsed / 60);
     const secs = Math.floor(elapsed % 60);
     wpmEl.textContent = wpm;
     accEl.textContent = acc;
     timeEl.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+    if (isLyraGateOpen() && !lyraGateState.cycleBusy) tickLyraMiningPassiveDamage();
 }
 
-function getLyraAsteroidSVG(seed) {
-    const s = seed || 0;
-    // Seeded pseudo-random for consistent per-asteroid variation
-    let h = s;
-    function rand() { h = (h * 16807 + 11) % 2147483647; return (h & 0x7fffffff) / 2147483647; }
-    // Irregular rocky outline
-    const cx = 60, cy = 60, baseR = 44;
-    const points = 14;
-    const outline = [];
-    for (let i = 0; i < points; i++) {
-        const a = (i / points) * Math.PI * 2;
-        const r = baseR + (rand() - 0.5) * 18;
-        outline.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
-    }
-    const path = outline.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') + 'Z';
-    // Craters
-    const craters = [];
-    for (let i = 0; i < 5; i++) {
-        const a = rand() * Math.PI * 2;
-        const d = 8 + rand() * 24;
-        const cr = 4 + rand() * 8;
-        craters.push({ x: cx + Math.cos(a) * d, y: cy + Math.sin(a) * d, r: cr });
-    }
-    // Floating debris chunks
-    const debris = [];
-    for (let i = 0; i < 6; i++) {
-        const a = rand() * Math.PI * 2;
-        const d = 50 + rand() * 14;
-        const dr = 1.5 + rand() * 3;
-        debris.push({ x: cx + Math.cos(a) * d, y: cy + Math.sin(a) * d, r: dr, rot: rand() * 360 });
-    }
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-      <defs>
-        <radialGradient id="arock${s}" cx="38%" cy="32%" r="58%">
-          <stop offset="0%" stop-color="#e8d5a8"/>
-          <stop offset="22%" stop-color="#c9a96e"/>
-          <stop offset="50%" stop-color="#8b6914"/>
-          <stop offset="78%" stop-color="#4a3000"/>
-          <stop offset="100%" stop-color="#1a1000"/>
-        </radialGradient>
-        <radialGradient id="ahigh${s}" cx="30%" cy="25%" r="45%">
-          <stop offset="0%" stop-color="rgba(255,245,220,0.45)"/>
-          <stop offset="100%" stop-color="rgba(255,245,220,0)"/>
-        </radialGradient>
-        <filter id="arough${s}"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="4" seed="${s}"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter>
-      </defs>
-      <g filter="url(#arough${s})">
-        <path d="${path}" fill="url(#arock${s})" stroke="#3d2800" stroke-width="1.2"/>
-        <path d="${path}" fill="url(#ahigh${s})"/>
-        ${craters.map(c => `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${c.r.toFixed(1)}" fill="rgba(30,15,0,0.5)" stroke="rgba(80,50,10,0.4)" stroke-width="0.8"/><circle cx="${(c.x - c.r * 0.25).toFixed(1)}" cy="${(c.y - c.r * 0.25).toFixed(1)}" r="${(c.r * 0.5).toFixed(1)}" fill="rgba(60,30,0,0.35)"/>`).join('')}
-      </g>
-      ${debris.map(d => `<rect x="${(d.x - d.r).toFixed(1)}" y="${(d.y - d.r).toFixed(1)}" width="${(d.r * 2).toFixed(1)}" height="${(d.r * 1.6).toFixed(1)}" rx="1" fill="#7a5a28" opacity="0.7" transform="rotate(${d.rot.toFixed(0)} ${d.x.toFixed(1)} ${d.y.toFixed(1)})"/>`).join('')}
-    </svg>`;
+function renderLyraAsteroid(seed) {
+    const asteroid = document.getElementById('lyra-asteroid');
+    if (!asteroid) return;
+    const api = getMiningApi();
+    if (!api || typeof api.generateAsteroidArtSpec !== 'function' || typeof api.drawAsteroidToCanvas !== 'function') return;
+    const displaySize = getLyraAsteroidDisplaySize(lyraMiningState);
+    const renderSize = Math.max(40, Math.min(96, Math.round(displaySize * 0.5)));
+    const spec = api.generateAsteroidArtSpec((Number(seed) || 0) >>> 0, { size: renderSize });
+    asteroid.innerHTML = '';
+    asteroid.style.setProperty('--lyra-asteroid-base-rotation', `${spec.rotationDeg}deg`);
+    const canvas = document.createElement('canvas');
+    canvas.className = 'lyra-asteroid-canvas';
+    api.drawAsteroidToCanvas(canvas, spec);
+    asteroid.appendChild(canvas);
 }
 
 function initLyraStars() {
@@ -11818,14 +14612,10 @@ function emitLyraLaserBurst() {
     const laserLayer = document.getElementById('lyra-laser-layer');
     const anchors = getLyraSceneAnchors();
     if (!laserLayer || !anchors) return;
-    const dx = anchors.asteroidCenterX - anchors.shipMuzzleX;
-    const dy = anchors.asteroidCenterY - anchors.shipMuzzleY;
-    const dist = Math.hypot(dx, dy);
-    if (dist < 0.001) return;
-    const nx = dx / dist;
-    const ny = dy / dist;
-    const endX = anchors.asteroidCenterX - (nx * anchors.asteroidRadius);
-    const endY = anchors.asteroidCenterY - (ny * anchors.asteroidRadius);
+    const impactPoint = getLyraAsteroidImpactPoint(anchors.shipMuzzleX, anchors.shipMuzzleY, anchors);
+    if (!impactPoint) return;
+    const endX = impactPoint.x;
+    const endY = impactPoint.y;
     const beamDx = endX - anchors.shipMuzzleX;
     const beamDy = endY - anchors.shipMuzzleY;
     const length = Math.hypot(beamDx, beamDy);
@@ -11853,12 +14643,13 @@ function emitLyraLaserBurst() {
 
     updateLyraShipAim();
     setTimeout(() => emitLyraAsteroidChunks(1 + Math.floor(Math.random() * 2)), 42);
+    return { x: endX, y: endY };
 }
 
 function emitLyraWordCompletionShatter() {
     if (!isLyraGateOpen() || !miningVisualsEnabled) return;
     const stream = document.getElementById('lyra-quote-display');
-    const activeWord = stream ? stream.querySelector('.lyra-word.active') : null;
+    const activeWord = stream ? stream.querySelector('.quote-word[data-lyra-active-word="1"]') : null;
     if (!stream || !activeWord) return;
 
     const hostRect = stream.getBoundingClientRect();
@@ -11966,22 +14757,26 @@ function emitLyraExplosionAndCrystals() {
 function resetLyraSceneForNextAsteroid() {
     const asteroid = document.getElementById('lyra-asteroid');
     const ship = document.getElementById('lyra-ship');
+    const drones = document.getElementById('lyra-drone-layer');
     const lasers = document.getElementById('lyra-laser-layer');
     const chunks = document.getElementById('lyra-chunk-layer');
     const crystals = document.getElementById('lyra-crystal-layer');
     const explosion = document.getElementById('lyra-explosion-layer');
     if (asteroid) {
         asteroid.classList.remove('exploding');
-        lyraGateState.asteroidSeed = (lyraGateState.asteroidSeed + 1) % 1000000;
-        asteroid.style.transform = 'rotate(0deg)';
-        asteroid.innerHTML = getLyraAsteroidSVG(lyraGateState.asteroidSeed);
+        randomizeLyraAsteroidSeed();
+        renderLyraAsteroid(lyraGateState.asteroidSeed);
     }
     if (ship) ship.classList.remove('fly-away');
+    if (drones) drones.innerHTML = '';
+    stopLyraDroneOrbitLoop();
     if (lasers) lasers.innerHTML = '';
     if (chunks) chunks.innerHTML = '';
     if (crystals) crystals.innerHTML = '';
     if (explosion) explosion.innerHTML = '';
     updateLyraShipAim();
+    updateLyraAsteroidVisualState();
+    renderLyraMiningHud();
 }
 
 function triggerLyraAsteroidCycle() {
@@ -11995,14 +14790,6 @@ function triggerLyraAsteroidCycle() {
         if (ship) ship.classList.add('fly-away');
     }, 160);
     setTimeout(() => {
-        const asteroidsMined = getLyraAsteroidsMined();
-        if (asteroidsMined >= LYRA_ASTEROIDS_TO_CLEAR) {
-            lyraGateState.cycleBusy = false;
-            if (lyraStatsInterval) { clearInterval(lyraStatsInterval); lyraStatsInterval = null; }
-            markSectorCleared('lyra');
-            showLyraGateClearSplash();
-            return;
-        }
         lyraGateState.cycleBusy = false;
         resetLyraSceneForNextAsteroid();
         renderLyraWordStream();
@@ -12044,11 +14831,14 @@ function replayLyraGate() {
     const splash = document.querySelector('.lyra-clear-splash');
     if (splash) splash.remove();
     if (lyraStatsInterval) { clearInterval(lyraStatsInterval); lyraStatsInterval = null; }
+    stopLyraDamagePopupLoop();
     resetLyraGateState();
-    resetLyraSceneForNextAsteroid();
-    renderLyraWordStream();
-    updateLyraStats();
-    focusLyraInput();
+    setupLyraMiningMode().then(() => {
+        resetLyraSceneForNextAsteroid();
+        renderLyraWordStream();
+        updateLyraStats();
+        focusLyraInput();
+    });
 }
 
 function handleLyraGateKeydown(e) {
@@ -12057,36 +14847,30 @@ function handleLyraGateKeydown(e) {
         e.preventDefault();
         return true;
     }
-    // Tab = restart
     if (e.key === 'Tab') {
         playKeypressSound('Tab', e);
         e.preventDefault();
         e.stopPropagation();
+        if (triggerLyraOverload('tab')) return true;
         if (lyraStatsInterval) { clearInterval(lyraStatsInterval); lyraStatsInterval = null; }
+        stopLyraDamagePopupLoop();
         resetLyraGateState();
-        resetLyraSceneForNextAsteroid();
-        renderLyraWordStream();
-        updateLyraStats();
-        focusLyraInput();
+        setupLyraMiningMode().then(() => {
+            resetLyraSceneForNextAsteroid();
+            renderLyraWordStream();
+            updateLyraStats();
+            focusLyraInput();
+        });
         return true;
     }
-    const currentWord = lyraGateState.words[lyraGateState.wordIndex] || '';
+    const currentWord = lyraGateState.words[0] || '';
     if (e.key === 'Backspace') {
         playKeypressSound('Backspace', e);
         e.preventDefault();
         if (e.ctrlKey || e.metaKey) {
-            // Clear entire current word; if already empty, go back a word
-            if (lyraGateState.typed.length > 0) {
-                lyraGateState.typed = '';
-            } else if (lyraGateState.wordIndex > 0) {
-                lyraGateState.wordIndex -= 1;
-                lyraGateState.typed = '';
-            }
+            lyraGateState.typed = '';
         } else if (lyraGateState.typed.length > 0) {
             lyraGateState.typed = lyraGateState.typed.slice(0, -1);
-        } else if (lyraGateState.wordIndex > 0) {
-            lyraGateState.wordIndex -= 1;
-            lyraGateState.typed = lyraGateState.attempts[lyraGateState.wordIndex] || '';
         }
         renderLyraWordStream();
         return true;
@@ -12094,17 +14878,64 @@ function handleLyraGateKeydown(e) {
     if (e.key === ' ') {
         playKeypressSound(' ', e);
         e.preventDefault();
-        lyraGateState.attempts[lyraGateState.wordIndex] = lyraGateState.typed;
-        const isPerfectWord = lyraGateState.typed === currentWord;
+        if (!lyraGateState.typed.length && triggerLyraOverload('space')) return true;
+        const isPerfectWord = lyraWordsMatch(lyraGateState.typed, currentWord);
         if (isPerfectWord) {
             emitLyraWordCompletionShatter();
             if (miningLaserSoundEnabled) playSound(SFX.laser);
             lyraGateState.totalCompleted += 1;
-            if (lyraGateState.totalCompleted % LYRA_WORDS_PER_ASTEROID === 0) triggerLyraAsteroidCycle();
+            const api = getMiningApi();
+            if (api && lyraMiningState) {
+                if (typeof api.setCurrentStoryProgress === 'function') {
+                    const storyAdvance = api.setCurrentStoryProgress(
+                        lyraMiningState,
+                        Math.max(0, Number(lyraMiningState.currentStoryProgress) || 0) + 1,
+                    );
+                    lyraMiningState = storyAdvance.state;
+                }
+                const effects = api.getUpgradeEffects(lyraMiningState.upgrades);
+                const completionDamage = api.calculateDamage({
+                    charactersTyped: currentWord.length,
+                    wpm: getLyraCurrentWpm(),
+                    accuracy: getLyraAccuracyRatio(),
+                    sessionAccuracy: getLyraAccuracyRatio(),
+                    combo: lyraGateState.comboStreak,
+                    bufferBonus: effects.wpmMultiplierBonus,
+                    activeUpgradeBonus: effects.baseDamageBonus,
+                    critChance: lyraMiningState.critChance,
+                    critMultiplier: lyraMiningState.critMultiplier,
+                    isOverloadActive: typeof api.isOverloadActive === 'function' ? api.isOverloadActive(lyraMiningState, Date.now()) : false,
+                    rollForCrit: true,
+                });
+                const appliedCompletion = applyLyraMiningDamage(completionDamage.activeDamage, 'typing');
+                if (appliedCompletion && completionDamage.activeDamage > 0) {
+                    const completionAnchors = getLyraSceneAnchors();
+                    const completionImpact = completionAnchors
+                        ? getLyraAsteroidImpactPoint(completionAnchors.shipMuzzleX, completionAnchors.shipMuzzleY, completionAnchors)
+                        : null;
+                    spawnLyraDamagePopup(completionDamage.activeDamage, {
+                        x: completionImpact ? completionImpact.x : undefined,
+                        y: completionImpact ? completionImpact.y : undefined,
+                        isCritical: completionDamage.isCritical,
+                        isOverloadActive: completionDamage.isOverloadActive,
+                    });
+                    if (completionDamage.isCritical) triggerLyraCriticalShake();
+                }
+                if (typeof api.addOverloadCharge === 'function') {
+                    const charged = api.addOverloadCharge(lyraMiningState, api.OVERLOAD_CHARGE_PER_WORD || 2);
+                    lyraMiningState = charged.state;
+                    renderLyraMiningHud();
+                }
+            }
+            lyraGateState.storyBaseIndex += 1;
+            if (lyraGateState.words.length > 0) lyraGateState.words.shift();
+            ensureLyraWordsBuffer(LYRA_VISIBLE_WORD_WINDOW);
+            lyraGateState.typed = '';
+            renderLyraWordStream();
+            return true;
         }
-        lyraGateState.wordIndex += 1;
         lyraGateState.typed = '';
-        ensureLyraWordsBuffer(160);
+        showUiMessage('Complete the word to advance the story.', 'info', 1000, 'top-right');
         renderLyraWordStream();
         return true;
     }
@@ -12121,10 +14952,41 @@ function handleLyraGateKeydown(e) {
     const expected = currentWord[nextIndex] || '';
     lyraGateState.typed += e.key;
     lyraGateState.totalChars++;
-    if (expected && e.key.toLowerCase() === String(expected).toLowerCase()) {
+    if (expected && lyraCharsMatch(e.key, expected)) {
         lyraGateState.correctChars++;
-        emitLyraLaserBurst();
+        lyraGateState.comboStreak += 1;
+        lyraGateState.bestCombo = Math.max(lyraGateState.bestCombo, lyraGateState.comboStreak);
+        const laserImpact = emitLyraLaserBurst();
+        const api = getMiningApi();
+        if (api && lyraMiningState) {
+            const effects = api.getUpgradeEffects(lyraMiningState.upgrades);
+            const damageInfo = api.calculateDamage({
+                charactersTyped: 1,
+                wpm: getLyraCurrentWpm(),
+                accuracy: getLyraAccuracyRatio(),
+                sessionAccuracy: getLyraAccuracyRatio(),
+                combo: lyraGateState.comboStreak,
+                bufferBonus: effects.wpmMultiplierBonus,
+                activeUpgradeBonus: effects.baseDamageBonus,
+                critChance: lyraMiningState.critChance,
+                critMultiplier: lyraMiningState.critMultiplier,
+                isOverloadActive: typeof api.isOverloadActive === 'function' ? api.isOverloadActive(lyraMiningState, Date.now()) : false,
+                rollForCrit: false,
+            });
+            const applied = applyLyraMiningDamage(damageInfo.activeDamage, 'typing');
+            if (applied && damageInfo.activeDamage > 0) {
+                spawnLyraDamagePopup(damageInfo.activeDamage, {
+                    x: laserImpact ? laserImpact.x : undefined,
+                    y: laserImpact ? laserImpact.y : undefined,
+                    isCritical: damageInfo.isCritical,
+                    isOverloadActive: damageInfo.isOverloadActive,
+                });
+                flashLyraAsteroidHit();
+                if (damageInfo.isCritical) triggerLyraCriticalShake();
+            }
+        }
     } else {
+        lyraGateState.comboStreak = 0;
         updateLyraShipAim();
     }
     renderLyraWordStream();
@@ -12145,7 +15007,10 @@ function openLyraGate() {
         miningLaserOverlay.style.opacity = '0';
     }
     try {
+        stopLyraDamagePopupLoop();
+        stopLyraDroneOrbitLoop();
         resetLyraGateState();
+        const setupPromise = setupLyraMiningMode();
         if (ship) {
             ship.innerHTML = getCommunityShipSprite('player');
             const muzzle = document.createElement('span');
@@ -12155,12 +15020,15 @@ function openLyraGate() {
         }
         initLyraStars();
         bindLyraSceneParallax();
-        resetLyraSceneForNextAsteroid();
-        renderLyraWordStream();
-        setTimeout(() => {
-            updateLyraShipAim();
-            focusLyraInput();
-        }, 0);
+        setupPromise.then(() => {
+            resetLyraSceneForNextAsteroid();
+            renderLyraWordStream();
+            setTimeout(() => {
+                updateLyraShipAim();
+                resizeLyraPopupCanvas();
+                focusLyraInput();
+            }, 0);
+        });
     } catch (err) {
         console.error('openLyraGate failed', err);
         // Keep the modal open even if scene init has a transient issue.
@@ -12174,10 +15042,18 @@ function closeLyraGate() {
     if (!modal) return;
     closeModal(modal);
     lyraGateState.cycleBusy = false;
+    closeLyraStoryResetMenu();
+    if (lyraOverloadHintInterval) {
+        clearInterval(lyraOverloadHintInterval);
+        lyraOverloadHintInterval = null;
+    }
+    lyraOverloadHintFrame = 0;
     if (lyraStatsInterval) { clearInterval(lyraStatsInterval); lyraStatsInterval = null; }
     if (lyraQuoteDisplay) lyraQuoteDisplay.classList.remove('focused');
     const splash = document.querySelector('.lyra-clear-splash');
     if (splash) splash.remove();
+    stopLyraDamagePopupLoop();
+    stopLyraDroneOrbitLoop();
     // Reset the main mining laser overlay to its default state
     if (miningLaserOverlay) {
         miningLaserOverlay.classList.remove('show');
@@ -12192,7 +15068,16 @@ function closeLyraGate() {
     // Clear Lyra scene layers
     const laserLayer = document.getElementById('lyra-laser-layer');
     if (laserLayer) laserLayer.innerHTML = '';
+    const droneLayer = document.getElementById('lyra-drone-layer');
+    if (droneLayer) droneLayer.innerHTML = '';
 }
+
+document.addEventListener('click', (event) => {
+    const wrap = document.getElementById('lyra-story-reset');
+    if (!wrap || !lyraStoryResetMenuOpen) return;
+    if (wrap.contains(event.target)) return;
+    closeLyraStoryResetMenu();
+});
 
 function handleLyraGateBackdrop(event) {
     if (event && event.target === document.getElementById('lyra-gate-modal')) closeLyraGate();
@@ -14519,7 +17404,7 @@ function handleTypingKeydown(e) {
         isComplete = true;
         resultsPendingOpen = true;
         const _capturedElapsed = getElapsed();
-        setTimeout(() => showResults(_capturedElapsed), 400);
+        setTimeout(() => { if (resultsPendingOpen) showResults(_capturedElapsed); }, 400);
     }
 }
 
@@ -14905,10 +17790,15 @@ function handleMusicVolumeInput(event) {
 
 function updateMusicToggleUi() {
     const state = document.getElementById('music-state');
+    const btn = document.getElementById('music-toggle');
     if (!state) return;
     state.textContent = musicMuted ? '✗' : '✓';
     state.classList.toggle('on', !musicMuted);
     state.classList.toggle('off', musicMuted);
+    if (btn) {
+        btn.classList.toggle('active', !musicMuted);
+        btn.classList.toggle('inactive', musicMuted);
+    }
 }
 
 function updateMusicMenuUI() {
@@ -15090,11 +17980,16 @@ async function shareSite() {
 function setKeySoundToggleUI() {
     const label = document.getElementById('keysound-label');
     const state = document.getElementById('keysound-state');
+    const btn = document.getElementById('keysound-toggle');
     if (label) label.textContent = 'Key Sounds';
     if (!state) return;
     state.textContent = keySoundsEnabled ? '✓' : '✗';
     state.classList.toggle('on', keySoundsEnabled);
     state.classList.toggle('off', !keySoundsEnabled);
+    if (btn) {
+        btn.classList.toggle('active', keySoundsEnabled);
+        btn.classList.toggle('inactive', !keySoundsEnabled);
+    }
 }
 
 function updateKeySoundPackMenuUI() {
